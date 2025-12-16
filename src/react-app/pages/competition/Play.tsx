@@ -45,7 +45,7 @@ export default function CompetitionPage() {
     const [allCandles, setAllCandles] = useState<(CandlestickData & { volume?: number })[]>([]);
     const [currentPrice, setCurrentPrice] = useState<number>(0);
     const [replayIndex, setReplayIndex] = useState<number>(0);
-    const [currentCandle, setCurrentCandle] = useState<CandlestickData | null>(null);
+    const [_currentCandle, setCurrentCandle] = useState<CandlestickData | null>(null);
     const [futureCandles, setFutureCandles] = useState<CandlestickData[]>([]);
     const [isInFuture, setIsInFuture] = useState(false);
     const candleGeneratorRef = useRef<CandleGenerator | null>(null);
@@ -61,7 +61,7 @@ export default function CompetitionPage() {
 
     // Game State
     const [gameMode] = useState<GameMode>('speed');
-    const [timeLeft, setTimeLeft] = useState(300); // 5 minutes for speed mode
+    const [_timeRemaining, setTimeLeft] = useState(300); // 5 minutes for speed mode
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [isLiquidated, setIsLiquidated] = useState(false);
@@ -111,7 +111,7 @@ export default function CompetitionPage() {
     const [maxDrawdownLimit, setMaxDrawdownLimit] = useState<number>(5000); // Drawdown limit value (only used when enabled)
     const [isMaxDrawdownEnabled, setIsMaxDrawdownEnabled] = useState<boolean>(true); // Explicit flag to control liquidation check
     const [tradingFeePercent] = useState(0.06); // 0.06% per trade
-    
+
     // Market Events Hook
     const {
         activeEvent,
@@ -242,11 +242,11 @@ export default function CompetitionPage() {
         if (allCandles.length > 0 && allCandles.length >= replayIndex && !candleGeneratorRef.current) {
             const lastCandle = allCandles[replayIndex - 1];
             const historicalCandles = allCandles.slice(0, replayIndex);
-            
+
             const volatility = CandleGenerator.calculateVolatility(historicalCandles);
             const avgVolume = CandleGenerator.calculateAverageVolume(historicalCandles);
             const trend = CandleGenerator.detectTrend(historicalCandles);
-            
+
             candleGeneratorRef.current = new CandleGenerator({
                 startPrice: lastCandle.close,
                 volatility: Math.max(volatility, 0.01), // Minimum volatility
@@ -353,12 +353,12 @@ export default function CompetitionPage() {
         const interval = setInterval(() => {
             setReplayIndex((prev) => {
                 const nextIndex = prev + 1;
-                
+
                 // Check if we've reached the end of historical data
                 if (nextIndex >= allCandles.length) {
                     // Switch to future mode
                     setIsInFuture(true);
-                    
+
                     // Generate first future candle
                     if (candleGeneratorRef.current) {
                         const firstFutureCandle = candleGeneratorRef.current.generateCandle();
@@ -367,16 +367,16 @@ export default function CompetitionPage() {
                         setCurrentCandle(firstFutureCandle);
                         processCandle(firstFutureCandle);
                     }
-                    
+
                     return prev; // Don't increment replayIndex in future mode
                 }
-                
+
                 // Still in historical mode
                 const nextCandle = allCandles[nextIndex];
                 setCurrentPrice(nextCandle.close);
                 setCurrentCandle(nextCandle);
                 processCandle(nextCandle);
-                
+
                 return nextIndex;
             });
         }, playbackSpeed);
@@ -546,7 +546,7 @@ export default function CompetitionPage() {
             ...prev,
             totalBalance: settings.initialBalance,
         }));
-        
+
         if (settings.maxDrawdownPercent === null) {
             setIsMaxDrawdownEnabled(false);
             setMaxDrawdownLimit(0);
@@ -565,7 +565,7 @@ export default function CompetitionPage() {
 
     // Toggle Indicator
     const toggleIndicator = (id: string) => {
-        setIndicators(prev => prev.map(ind => 
+        setIndicators(prev => prev.map(ind =>
             ind.id === id ? { ...ind, enabled: !ind.enabled } : ind
         ));
     };
@@ -641,8 +641,8 @@ export default function CompetitionPage() {
                                         {isLiquidated ? '💀 LIQUIDATED!' : 'Game Over'}
                                     </h2>
                                     <p className="text-[#787B86]">
-                                        {isLiquidated 
-                                            ? `You hit the ${practiceSettings.maxDrawdownPercent}% max drawdown limit!` 
+                                        {isLiquidated
+                                            ? `You hit the ${practiceSettings.maxDrawdownPercent}% max drawdown limit!`
                                             : 'Time\'s up! Here\'s your final score:'}
                                     </p>
                                 </div>
@@ -718,11 +718,10 @@ export default function CompetitionPage() {
                                 <button
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
-                                    className={`px-4 py-2 text-[12px] font-medium transition-colors ${
-                                        activeTab === tab.key
-                                            ? 'text-[#2962FF] border-b-2 border-[#2962FF]'
-                                            : 'text-[#787B86] hover:text-[#D1D4DC]'
-                                    }`}
+                                    className={`px-4 py-2 text-[12px] font-medium transition-colors ${activeTab === tab.key
+                                        ? 'text-[#2962FF] border-b-2 border-[#2962FF]'
+                                        : 'text-[#787B86] hover:text-[#D1D4DC]'
+                                        }`}
                                 >
                                     {tab.label}
                                 </button>

@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import { createChart, ColorType, IChartApi, ISeriesApi, CandlestickData, CandlestickSeries, IPriceLine } from 'lightweight-charts';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -40,7 +41,7 @@ interface ChartPanelProps {
 export function ChartPanel({
     allCandles,
     replayIndex,
-    currentPrice,
+    currentPrice: _currentPrice,
     positions,
     activeEvent,
     onChartReady,

@@ -31,15 +31,19 @@ interface MarketEvent {
 interface FutureChartProps {
     historicalCandles: CandlestickData[];
     futureCandles: CandlestickData[];
+    currentPrice?: number;
     positions: Position[];
     activeEvent: MarketEvent | null;
+    activeIndicators?: string[];
 }
 
 export function FutureChart({
     historicalCandles,
     futureCandles,
+    currentPrice: _currentPrice,
     positions,
     activeEvent,
+    activeIndicators: _activeIndicators,
 }: FutureChartProps) {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
@@ -73,12 +77,12 @@ export function FutureChart({
                 fontSize: 12,
             },
             grid: {
-                vertLines: { 
+                vertLines: {
                     color: '#2A2E39',
                     style: 0,
                     visible: true,
                 },
-                horzLines: { 
+                horzLines: {
                     color: '#2A2E39',
                     style: 0,
                     visible: true,
@@ -146,7 +150,7 @@ export function FutureChart({
         if (allCandles.length > 0) {
             candlestickSeries.setData(allCandles);
             chart.timeScale().fitContent();
-            
+
             // Draw a vertical line to separate historical from future
             // Note: Vertical time lines are not directly supported by lightweight-charts
             // We'll use a visual indicator in the UI instead
@@ -181,7 +185,7 @@ export function FutureChart({
     // Update chart data when future candles change
     useEffect(() => {
         if (!seriesRef.current || !chartRef.current || !isReady) return;
-        
+
         if (allCandles.length > 0) {
             seriesRef.current.setData(allCandles);
         }
@@ -285,11 +289,11 @@ export function FutureChart({
             </AnimatePresence>
 
             {/* Chart Container */}
-            <div 
-                ref={chartContainerRef} 
+            <div
+                ref={chartContainerRef}
                 className="w-full h-full"
             />
-            
+
             {allCandles.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center text-[#787B86] z-10 pointer-events-none bg-[#131722]">
                     <div className="text-center">
