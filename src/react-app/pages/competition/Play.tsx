@@ -16,7 +16,7 @@ import { IndicatorsPanel, Indicator } from '@/react-app/components/competition/I
 import { PracticeSettings } from '@/react-app/hooks/useCompetitionGame';
 import { useMarketEvents } from '@/react-app/hooks/useMarketEvents';
 import { Position } from '@/react-app/hooks/useCompetitionTrading';
-import { CandleGenerator, createMarketEventImpact } from '@/react-app/utils/candleGenerator';
+import { CandleGenerator, createMarketEventImpact } from '../../utils/candleGenerator';
 import {
     Trophy,
     Skull,
