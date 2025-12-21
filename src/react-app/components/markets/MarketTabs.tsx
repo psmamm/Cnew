@@ -1,0 +1,57 @@
+import { Search, Bell } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export type MarketTab = 'overview' | 'trading-data' | 'ai-select' | 'token-unlock';
+
+interface MarketTabsProps {
+  activeTab: MarketTab;
+  onTabChange: (tab: MarketTab) => void;
+}
+
+export default function MarketTabs({ activeTab, onTabChange }: MarketTabsProps) {
+  const tabs: { id: MarketTab; label: string }[] = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'trading-data', label: 'Trading Data' },
+    { id: 'ai-select', label: 'AI Select' },
+    { id: 'token-unlock', label: 'Token Unlock' },
+  ];
+
+  return (
+    <div className="border-b border-white/10 pb-2">
+      <div className="flex items-center justify-between">
+        {/* Tabs */}
+        <div className="flex items-center space-x-8">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className="relative px-2 py-2 text-sm font-medium transition-colors"
+            >
+              <span className={activeTab === tab.id ? 'text-white' : 'text-[#7F8C8D] hover:text-[#AAB0C0]'}>
+                {tab.label}
+              </span>
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#6A3DF4]"
+                  initial={false}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Right Actions */}
+        <div className="flex items-center space-x-4">
+          <button className="p-2 text-[#7F8C8D] hover:text-white transition-colors">
+            <Search className="w-5 h-5" />
+          </button>
+          <button className="p-2 text-[#7F8C8D] hover:text-white transition-colors">
+            <Bell className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

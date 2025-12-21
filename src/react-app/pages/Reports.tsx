@@ -6,13 +6,40 @@ import { useDataExport } from '@/react-app/hooks/useDataExport';
 import { useTrades } from '@/react-app/hooks/useTrades';
 import { useMonteCarlo } from '@/react-app/hooks/useMonteCarlo';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLanguageCurrency } from '@/react-app/contexts/LanguageCurrencyContext';
 
 export default function ReportsPage() {
   const { monthlyData, strategyData, winLossData, periodStats, keyMetrics } = useReports();
   const { exportData } = useDataExport();
   const { trades } = useTrades(500);
   const monteCarlo = useMonteCarlo(trades);
+  const { currency, convertCurrency } = useLanguageCurrency();
+  const [conversionRate, setConversionRate] = useState<number>(1);
+  const currencyCode = currency.split('-')[0];
+
+  useEffect(() => {
+    const loadRate = async () => {
+      if (currencyCode === 'USD') {
+        setConversionRate(1);
+      } else {
+        const rate = await convertCurrency(1, 'USD');
+        setConversionRate(rate);
+      }
+    };
+    loadRate();
+  }, [currency, convertCurrency, currencyCode]);
+
+  const formatCurrency = (amount: number): string => {
+    const converted = amount * conversionRate;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(converted);
+  };
+
   const [mcParams, setMcParams] = useState({
     runs: 500,
     pathLength: 50,
@@ -39,7 +66,7 @@ export default function ReportsPage() {
         <div className="bg-[#1E2232] border border-white/10 rounded-lg p-3 shadow-lg">
           <p className="text-[#7F8C8D] text-sm mb-1">{label}</p>
           <p className="text-white font-semibold">
-            ${payload[0].value?.toFixed(2) || '0.00'}
+            {formatCurrency(payload[0].value || 0)}
           </p>
         </div>
       );
@@ -131,7 +158,7 @@ export default function ReportsPage() {
           <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
             <h3 className="text-[#7F8C8D] text-sm font-medium mb-2">Avg Trade</h3>
             <p className={`text-2xl font-bold ${keyMetrics.avgTrade >= 0 ? 'text-white' : 'text-[#E74C3C]'}`}>
-              ${keyMetrics.avgTrade}
+              {formatCurrency(keyMetrics.avgTrade)}
             </p>
             <div className="flex items-center space-x-1 mt-1">
               {keyMetrics.change.avgTrade >= 0 ? (
@@ -140,7 +167,7 @@ export default function ReportsPage() {
                 <TrendingDown className="w-3 h-3 text-[#E74C3C]" />
               )}
               <p className={`text-sm ${keyMetrics.change.avgTrade >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
-                {keyMetrics.change.avgTrade >= 0 ? '+' : ''}${keyMetrics.change.avgTrade.toFixed(2)} vs last month
+                {keyMetrics.change.avgTrade >= 0 ? '+' : ''}{formatCurrency(keyMetrics.change.avgTrade)} vs last month
               </p>
             </div>
           </div>
@@ -321,7 +348,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
                   <div className="text-[#7F8C8D] text-xs">Avg Ending Balance</div>
-                  <div className="text-white text-xl font-bold">${monteCarlo.monteResult.averageEndingBalance.toFixed(0)}</div>
+                  <div className="text-white text-xl font-bold">{formatCurrency(monteCarlo.monteResult.averageEndingBalance)}</div>
                 </div>
                 <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
                   <div className="text-[#7F8C8D] text-xs">Worst Drawdown</div>
@@ -371,16 +398,16 @@ export default function ReportsPage() {
               <div className="grid grid-cols-3 gap-3 pt-2">
                 <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
                   <div className="text-[#7F8C8D] text-xs">Adjusted P&L</div>
-                  <div className="text-white text-xl font-bold">${monteCarlo.whatIfResult.adjustedPnl.toFixed(0)}</div>
+                  <div className="text-white text-xl font-bold">{formatCurrency(monteCarlo.whatIfResult.adjustedPnl)}</div>
                 </div>
                 <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
                   <div className="text-[#7F8C8D] text-xs">Current P&L</div>
-                  <div className="text-white text-xl font-bold">${monteCarlo.whatIfResult.totalPnl.toFixed(0)}</div>
+                  <div className="text-white text-xl font-bold">{formatCurrency(monteCarlo.whatIfResult.totalPnl)}</div>
                 </div>
                 <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
                   <div className="text-[#7F8C8D] text-xs">Delta</div>
                   <div className={`text-xl font-bold ${monteCarlo.whatIfResult.delta >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
-                    {monteCarlo.whatIfResult.delta >= 0 ? '+' : ''}${monteCarlo.whatIfResult.delta.toFixed(0)}
+                    {monteCarlo.whatIfResult.delta >= 0 ? '+' : ''}{formatCurrency(monteCarlo.whatIfResult.delta)}
                   </div>
                 </div>
               </div>
@@ -420,7 +447,7 @@ export default function ReportsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#E74C3C] hidden md:table-cell">{row.avgLoss}</td>
                     <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${row.pnl > 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'
                       }`}>
-                      {row.pnl > 0 ? '+' : ''}${row.pnl.toFixed(0)}
+                      {row.pnl > 0 ? '+' : ''}{formatCurrency(row.pnl)}
                     </td>
                   </tr>
                 ))}

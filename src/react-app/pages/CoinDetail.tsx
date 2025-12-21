@@ -30,6 +30,23 @@ const CHART_INTERVALS = [
 export default function CoinDetailPage() {
   const { symbol } = useParams<{ symbol: string }>();
   const navigate = useNavigate();
+  const { currency, convertCurrency } = useLanguageCurrency();
+  const [conversionRate, setConversionRate] = useState<number>(1);
+  const currencyCode = currency.split('-')[0];
+  const currencySymbol = currency.split('-')[1] || currencyCode;
+
+  // Load conversion rate when currency changes
+  useEffect(() => {
+    const loadRate = async () => {
+      if (currencyCode === 'USD') {
+        setConversionRate(1);
+      } else {
+        const rate = await convertCurrency(1, 'USD');
+        setConversionRate(rate);
+      }
+    };
+    loadRate();
+  }, [currency, convertCurrency, currencyCode]);
 
   const {
     coinData,
@@ -91,11 +108,23 @@ export default function CoinDetailPage() {
     }
   }, [selectedInterval, symbol, loadKlines]);
 
-  // Format numbers
+  // Format numbers with currency conversion
   const formatPrice = (price: string): string => {
-    const num = parseFloat(price);
-    if (num >= 1) return `$${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    return `$${num.toFixed(6)}`;
+    const num = parseFloat(price) * conversionRate;
+    if (num >= 1) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currencyCode,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(num);
+    }
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 6,
+      maximumFractionDigits: 6,
+    }).format(num);
   };
 
   const formatPercent = (percent: number | string | undefined): string => {

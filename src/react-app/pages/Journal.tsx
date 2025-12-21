@@ -38,6 +38,7 @@ import { useStockSymbols } from "@/react-app/hooks/useStockSymbols";
 import { useUserEquity } from "@/react-app/hooks/useUserEquity";
 import { useLivePnL } from "@/react-app/hooks/useLivePnL";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguageCurrency } from "@/react-app/contexts/LanguageCurrencyContext";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { SymbolSearchDropdown, Modern3DDropdown, ModernInput, ModernDateInput } from "@/react-app/components/FormComponents";
 import { CalendarView } from "@/react-app/components/CalendarView";
@@ -108,6 +109,46 @@ type ChecklistItem = {
  * Displays and manages trading journal entries with advanced filtering and analytics
  */
 export default function JournalPage() {
+  const { currency, convertCurrency } = useLanguageCurrency();
+  const [conversionRate, setConversionRate] = useState<number>(1);
+  const currencyCode = currency.split('-')[0];
+  const currencySymbol = currency.split('-')[1] || currencyCode;
+
+  // Load conversion rate when currency changes
+  useEffect(() => {
+    const loadRate = async () => {
+      if (currencyCode === 'USD') {
+        setConversionRate(1);
+      } else {
+        const rate = await convertCurrency(1, 'USD');
+        setConversionRate(rate);
+      }
+    };
+    loadRate();
+  }, [currency, convertCurrency, currencyCode]);
+
+  // Format currency values
+  const formatCurrency = (amount: number): string => {
+    const converted = amount * conversionRate;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(converted);
+  };
+
+  const formatPrice = (price: number | string): string => {
+    const num = typeof price === 'string' ? parseFloat(price) : price;
+    const converted = num * conversionRate;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4,
+    }).format(converted);
+  };
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingTrade, setEditingTrade] = useState<any>(null);
@@ -864,7 +905,7 @@ export default function JournalPage() {
           <p className="text-[#BDC3C7] text-sm mb-1">{label}</p>
           <p className="text-white font-semibold">
             {typeof payload[0].value === 'number' && payload[0].value > 100
-              ? `$${payload[0].value.toFixed(2)}`
+              ? formatCurrency(payload[0].value)
               : payload[0].value}
           </p>
         </div>
@@ -1926,7 +1967,7 @@ export default function JournalPage() {
                           </div>
                           <div>
                             <span className="text-[#BDC3C7] text-xs">Entry Price</span>
-                            <p className="text-white font-medium">${trade.entry_price.toFixed(4)}</p>
+                            <p className="text-white font-medium">{formatPrice(trade.entry_price)}</p>
                           </div>
                         </div>
 
@@ -1963,7 +2004,7 @@ export default function JournalPage() {
                                   <div className="space-y-1">
                                     <p className={`text-xl font-bold ${livePnL.unrealizedPnL >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'
                                       }`}>
-                                      {livePnL.unrealizedPnL >= 0 ? '+' : ''}${livePnL.unrealizedPnL.toFixed(2)}
+                                      {livePnL.unrealizedPnL >= 0 ? '+' : ''}{formatCurrency(livePnL.unrealizedPnL)}
                                     </p>
                                     <p className={`text-sm ${livePnL.unrealizedPnLPercent >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'
                                       }`}>
@@ -1971,7 +2012,7 @@ export default function JournalPage() {
                                     </p>
                                     <div className="flex items-center justify-center space-x-2 text-xs text-[#BDC3C7]">
                                       <span>Current Price:</span>
-                                      <span className="text-white font-medium">${livePnL.currentPrice.toFixed(4)}</span>
+                                      <span className="text-white font-medium">{formatPrice(livePnL.currentPrice)}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -1987,7 +2028,7 @@ export default function JournalPage() {
                               <p className="text-[#BDC3C7] text-xs mb-1">Profit & Loss</p>
                               <p className={`text-2xl font-bold ${isProfitable ? 'text-[#2ECC71]' : 'text-[#E74C3C]'
                                 }`}>
-                                {isProfitable ? '+' : ''}${(trade.pnl || 0).toFixed(2)}
+                                {isProfitable ? '+' : ''}{formatCurrency(trade.pnl || 0)}
                               </p>
                             </div>
                           )}
@@ -2108,9 +2149,9 @@ export default function JournalPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-[#BDC3C7] font-medium">
                             {trade.quantity.toLocaleString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#BDC3C7] font-medium">${trade.entry_price.toFixed(4)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#BDC3C7] font-medium">{formatPrice(trade.entry_price)}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-[#BDC3C7] font-medium">
-                            {trade.exit_price ? `$${trade.exit_price.toFixed(4)}` : (
+                            {trade.exit_price ? formatPrice(trade.exit_price) : (
                               <div className="flex items-center space-x-1 text-yellow-400">
                                 <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
                                 <span className="text-xs font-medium">OPEN</span>

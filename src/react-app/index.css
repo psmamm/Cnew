@@ -35,8 +35,7 @@ body {
   width: 100%;
   background-color: #0D0F18;
   overflow: visible;
-  /* Stretch children to full width to avoid unintended side gutters */
-  align-items: stretch;
+  align-items: stretch; /* Set to stretch to avoid layout side gutters */
   /* Safe area for iPhone notch/Dynamic Island - only for top */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
@@ -135,4 +134,14 @@ button:active,
 a:active {
   opacity: 0.7;
   transition: opacity 0.1s;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
 }

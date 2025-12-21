@@ -21,9 +21,10 @@ import {
   ChevronUp,
   ChevronDown
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStrategies, useCreateStrategy, useUpdateStrategy, useStrategyPerformance } from "@/react-app/hooks/useStrategies";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguageCurrency } from "@/react-app/contexts/LanguageCurrencyContext";
 
 interface StrategyFormData {
   name: string;
@@ -48,6 +49,39 @@ const initialFormData: StrategyFormData = {
 };
 
 export default function StrategiesPage() {
+  const { currency, convertCurrency } = useLanguageCurrency();
+  const [conversionRate, setConversionRate] = useState<number>(1);
+  const currencyCode = currency.split('-')[0];
+
+  useEffect(() => {
+    const loadRate = async () => {
+      if (currencyCode === 'USD') {
+        setConversionRate(1);
+      } else {
+        const rate = await convertCurrency(1, 'USD');
+        setConversionRate(rate);
+      }
+    };
+    loadRate();
+  }, [currency, convertCurrency, currencyCode]);
+
+  const formatCurrency = (amount: number): string => {
+    const converted = amount * conversionRate;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(converted);
+  };
+
+  const formatPrice = (price: number | string): string => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    const converted = numPrice * conversionRate;
+    const currencySymbol = currency.split('-')[1] || currencyCode;
+    return `${currencySymbol}${converted.toFixed(4)}`;
+  };
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingStrategy, setEditingStrategy] = useState<any>(null);
@@ -483,7 +517,7 @@ export default function StrategiesPage() {
                   <div>
                     <span className="text-gray-400 text-xs">Total P&L</span>
                     <p className={`font-bold ${getPerformanceColor(strategy.total_pnl)}`}>
-                      ${strategy.total_pnl.toFixed(0)}
+                      {formatCurrency(strategy.total_pnl)}
                     </p>
                   </div>
                   <div>
@@ -1044,10 +1078,10 @@ export default function StrategiesPage() {
                                         {trade.direction.toUpperCase()}
                                       </span>
                                     </td>
-                                    <td className="px-4 py-3 text-gray-300">${trade.entry_price}</td>
-                                    <td className="px-4 py-3 text-gray-300">${trade.exit_price}</td>
+                                    <td className="px-4 py-3 text-gray-300">{formatPrice(trade.entry_price)}</td>
+                                    <td className="px-4 py-3 text-gray-300">{formatPrice(trade.exit_price)}</td>
                                     <td className={`px-4 py-3 font-medium ${getPerformanceColor(trade.pnl)}`}>
-                                      ${trade.pnl?.toFixed(2)}
+                                      {formatCurrency(trade.pnl || 0)}
                                     </td>
                                     <td className="px-4 py-3 text-gray-400 text-sm">
                                       {formatDate(trade.entry_date)}

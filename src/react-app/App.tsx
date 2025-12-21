@@ -1,6 +1,7 @@
 import { lazy, Suspense, ReactNode, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router";
 import { AuthProvider } from "./contexts/AuthContext";
+import { LanguageCurrencyProvider } from "./contexts/LanguageCurrencyContext";
 import LoadingSpinner from "@/react-app/components/LoadingSpinner";
 import ErrorBoundary from "@/react-app/components/ErrorBoundary";
 import ProtectedRoute from "@/react-app/components/ProtectedRoute";
@@ -101,11 +102,11 @@ const HomePage = lazy(() => import("@/react-app/pages/Home"));
 const DashboardPage = lazy(() => import("@/react-app/pages/Dashboard"));
 const JournalPage = lazy(() => import("@/react-app/pages/Journal"));
 const ReportsPage = lazy(() => import("@/react-app/pages/Reports"));
-const BigMoversPage = lazy(() => import("@/react-app/pages/BigMovers"));
-const OrderHeatmapPage = lazy(() => import("@/react-app/pages/OrderHeatmap"));
+// const BigMoversPage = lazy(() => import("@/react-app/pages/BigMovers")); // Temporarily disabled
+// const OrderHeatmapPage = lazy(() => import("@/react-app/pages/OrderHeatmap")); // Temporarily disabled
 const StrategiesPage = lazy(() => import("@/react-app/pages/Strategies"));
 const SettingsPage = lazy(() => import("@/react-app/pages/Settings"));
-const BitcoinHalvingPage = lazy(() => import("@/react-app/pages/BitcoinHalving"));
+// const BitcoinHalvingPage = lazy(() => import("@/react-app/pages/BitcoinHalving")); // Temporarily disabled
 const USDebtPage = lazy(() => import("@/react-app/pages/USDebt"));
 const StudyPage = lazy(() => import("@/react-app/pages/Study"));
 const AlphaHubPage = lazy(() => import("@/react-app/pages/AlphaHub"));
@@ -128,7 +129,8 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <Router>
+        <LanguageCurrencyProvider>
+          <Router>
           <Suspense fallback={<LoadingSpinner />}>
             <LayoutProbe>
               <Routes>
@@ -156,11 +158,12 @@ export default function App() {
                   </ProtectedRoute>
                 } />
 
-                <Route path="/big-movers" element={
+                {/* Temporarily disabled - Big Movers */}
+                {/* <Route path="/big-movers" element={
                   <ProtectedRoute>
                     <BigMoversPage />
                   </ProtectedRoute>
-                } />
+                } /> */}
                 <Route path="/markets" element={
                   <ProtectedRoute>
                     <MarketsPage />
@@ -171,22 +174,24 @@ export default function App() {
                     <CoinDetailPage />
                   </ProtectedRoute>
                 } />
-                <Route path="/order-heatmap" element={
+                {/* Temporarily disabled - Order Heatmap */}
+                {/* <Route path="/order-heatmap" element={
                   <ProtectedRoute>
                     <OrderHeatmapPage />
                   </ProtectedRoute>
-                } />
+                } /> */}
 
                 <Route path="/strategies" element={
                   <ProtectedRoute>
                     <StrategiesPage />
                   </ProtectedRoute>
                 } />
-                <Route path="/bitcoin-halving" element={
+                {/* Temporarily disabled - Bitcoin Halving */}
+                {/* <Route path="/bitcoin-halving" element={
                   <ProtectedRoute>
                     <BitcoinHalvingPage />
                   </ProtectedRoute>
-                } />
+                } /> */}
                 <Route path="/us-debt" element={
                   <ProtectedRoute>
                     <USDebtPage />
@@ -251,6 +256,7 @@ export default function App() {
             </LayoutProbe>
           </Suspense>
         </Router>
+        </LanguageCurrencyProvider>
       </AuthProvider>
     </ErrorBoundary>
   );

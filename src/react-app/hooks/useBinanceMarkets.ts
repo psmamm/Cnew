@@ -47,7 +47,11 @@ export interface EnhancedMarketData extends MarketTicker {
   priceChangePercent1h?: number;
   priceChangePercent7d?: number;
   sparklineData?: number[];
+  marketCap?: number;
   marketCapRank?: number;
+  category?: string[];
+  chain?: string;
+  isNew?: boolean;
   logo?: string;
 }
 
@@ -55,7 +59,7 @@ export interface MarketFilters {
   search: string;
   quoteAssets: string[];
   timeframe: '1h' | '24h' | '7d';
-  sortBy: 'symbol' | 'price' | 'change24h' | 'change1h' | 'change7d' | 'volume' | 'quoteVolume';
+  sortBy: 'symbol' | 'price' | 'change24h' | 'change1h' | 'change7d' | 'volume' | 'quoteVolume' | 'marketCap';
   sortOrder: 'asc' | 'desc';
   pageSize: 25 | 50 | 100;
 }
@@ -91,11 +95,12 @@ export function useBinanceMarkets() {
       
       const data = await response.json();
       
-      // Filter only TRADING status symbols - USDT pairs only
+      // Filter ALL TRADING status symbols - ALL Quote Assets (USDT, BTC, ETH, BNB, etc.)
       const tradingSymbols = data.symbols.filter((symbol: BinanceSymbol) => 
         symbol.status === 'TRADING' && 
         symbol.isSpotTradingAllowed &&
-        symbol.quoteAsset === 'USDT' && // Only USDT pairs
+        // ✅ ALL Quote Assets: USDT, BTC, ETH, BNB, USDC, TUSD, PAX, BUSD, etc.
+        // Optional: Exclude leveraged tokens
         !symbol.symbol.includes('UP') &&
         !symbol.symbol.includes('DOWN') &&
         !symbol.symbol.includes('BULL') &&
@@ -189,7 +194,7 @@ export function useBinanceMarkets() {
     
     // Increase batch size and symbols for better coverage
     const batchSize = 10;
-    const limitedSymbols = symbols.slice(0, 100); // Process top 100 symbols
+    const limitedSymbols = symbols.slice(0, 200); // Process top 200 symbols (increased for all quote assets)
     
     for (let i = 0; i < limitedSymbols.length; i += batchSize) {
       const batch = limitedSymbols.slice(i, i + batchSize);
@@ -507,52 +512,93 @@ export function useBinanceMarkets() {
       return true;
     });
     
-    // Sort
-    filtered.sort((a, b) => {
-      let aValue: number, bValue: number;
-      
-      switch (filters.sortBy) {
-        case 'symbol':
-          return filters.sortOrder === 'asc' 
-            ? a.symbol.localeCompare(b.symbol)
-            : b.symbol.localeCompare(a.symbol);
+    // Sort (marketCap sorting is handled in Markets.tsx after market cap data is added)
+    if (filters.sortBy !== 'marketCap') {
+      filtered.sort((a, b) => {
+        let aValue: number, bValue: number;
+        
+        switch (filters.sortBy) {
+          case 'symbol':
+            return filters.sortOrder === 'asc' 
+              ? a.symbol.localeCompare(b.symbol)
+              : b.symbol.localeCompare(a.symbol);
+              
+          case 'price':
+            aValue = parseFloat(a.lastPrice || '0');
+            bValue = parseFloat(b.lastPrice || '0');
+            break;
             
-        case 'price':
-          aValue = parseFloat(a.lastPrice || '0');
-          bValue = parseFloat(b.lastPrice || '0');
-          break;
-          
-        case 'change24h':
-          aValue = parseFloat(a.priceChangePercent || '0');
-          bValue = parseFloat(b.priceChangePercent || '0');
-          break;
-          
-        case 'change1h':
-          aValue = a.priceChangePercent1h || 0;
-          bValue = b.priceChangePercent1h || 0;
-          break;
-          
-        case 'change7d':
-          aValue = a.priceChangePercent7d || 0;
-          bValue = b.priceChangePercent7d || 0;
-          break;
-          
-        case 'volume':
-          aValue = parseFloat(a.volume || '0');
-          bValue = parseFloat(b.volume || '0');
-          break;
-          
-        case 'quoteVolume':
-        default:
-          aValue = parseFloat(a.quoteVolume || '0');
-          bValue = parseFloat(b.quoteVolume || '0');
-          break;
-      }
-      
-      return filters.sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
-    });
+          case 'change24h':
+            aValue = parseFloat(a.priceChangePercent || '0');
+            bValue = parseFloat(b.priceChangePercent || '0');
+            break;
+            
+          case 'change1h':
+            aValue = a.priceChangePercent1h || 0;
+            bValue = b.priceChangePercent1h || 0;
+            break;
+            
+          case 'change7d':
+            aValue = a.priceChangePercent7d || 0;
+            bValue = b.priceChangePercent7d || 0;
+            break;
+            
+          case 'volume':
+            aValue = parseFloat(a.volume || '0');
+            bValue = parseFloat(b.volume || '0');
+            break;
+            
+          case 'quoteVolume':
+          default:
+            aValue = parseFloat(a.quoteVolume || '0');
+            bValue = parseFloat(b.quoteVolume || '0');
+            break;
+        }
+        
+        return filters.sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+      });
+    }
     
     return filtered;
+  }, [enhancedData]);
+
+  // Get trending data (Hot, New, Top Gainer, Top Volume)
+  const getTrendingData = useCallback(() => {
+    const allData = Object.values(enhancedData);
+    
+    // Hot: Highest volume in last 24h
+    const hot = [...allData]
+      .sort((a, b) => parseFloat(b.quoteVolume || '0') - parseFloat(a.quoteVolume || '0'))
+      .slice(0, 3);
+
+    // Top Gainer: Highest 24h % change
+    const topGainer = [...allData]
+      .filter(item => parseFloat(item.priceChangePercent || '0') > 0)
+      .sort((a, b) => parseFloat(b.priceChangePercent || '0') - parseFloat(a.priceChangePercent || '0'))
+      .slice(0, 3);
+
+    // Top Volume: Highest 24h volume
+    const topVolume = [...allData]
+      .sort((a, b) => parseFloat(b.quoteVolume || '0') - parseFloat(a.quoteVolume || '0'))
+      .slice(0, 3);
+
+    // New: Based on volume spike or recent listings (simplified - using low volume as proxy for new)
+    const newCoins = [...allData]
+      .filter(item => {
+        const volume = parseFloat(item.quoteVolume || '0');
+        const priceChange = parseFloat(item.priceChangePercent || '0');
+        // New coins typically have lower volume but positive price change
+        return volume > 0 && volume < 1000000 && priceChange > 0;
+      })
+      .sort((a, b) => parseFloat(b.priceChangePercent || '0') - parseFloat(a.priceChangePercent || '0'))
+      .slice(0, 3);
+
+    return {
+      hot,
+      new: newCoins,
+      topGainer,
+      topVolume,
+    };
   }, [enhancedData]);
 
   return {
@@ -564,6 +610,7 @@ export function useBinanceMarkets() {
     wsConnected,
     getFilteredData,
     calculateMarketStats,
+    getTrendingData,
     fetchKlinesData,
     refetch: () => {
       setLoading(true);

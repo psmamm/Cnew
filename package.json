@@ -18,6 +18,7 @@
     "react-router": "^7.5.3",
     "react-router-dom": "^7.9.6",
     "recharts": "^3.1.2",
+    "tesseract.js": "^7.0.0",
     "zod": "^3.24.3"
   },
   "devDependencies": {

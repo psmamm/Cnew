@@ -172,9 +172,9 @@ export default function Home() {
         transition={{ duration: 0.8, ease: 'easeOut' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div className="flex justify-between items-center py-6 gap-4">
             <motion.div
-              className="flex items-center space-x-3"
+              className="flex items-center space-x-3 flex-shrink-0"
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
@@ -184,7 +184,7 @@ export default function Home() {
               <span className="text-2xl font-bold text-white">Tradecircle</span>
             </motion.div>
 
-            <nav className="hidden md:flex items-center space-x-8 flex-nowrap">
+            <nav className="hidden md:flex items-center gap-6 ml-auto">
               <a
                 href="#pricing"
                 className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
@@ -198,31 +198,19 @@ export default function Home() {
                 Features
               </a>
               {user ? (
-                <motion.button
+                <button
                   onClick={() => navigate('/dashboard')}
-                  className="bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] whitespace-nowrap"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
                 >
                   Dashboard
-                </motion.button>
+                </button>
               ) : (
-                <div className="flex items-center space-x-3 flex-nowrap">
-                  <motion.button
-                    onClick={() => navigate('/dashboard')}
-                    className="text-[#6A3DF4] hover:text-[#8A5CFF] font-medium transition-all duration-300 border border-[#6A3DF4]/30 hover:border-[#6A3DF4]/50 px-4 py-2 rounded-xl whitespace-nowrap"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Demo
-                  </motion.button>
-                  <button
-                    onClick={() => setShowLoginModal(true)}
-                    className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300"
-                  >
-                    Login
-                  </button>
-                </div>
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
+                >
+                  Login
+                </button>
               )}
             </nav>
 
@@ -274,26 +262,15 @@ export default function Home() {
                       Dashboard
                     </button>
                   ) : (
-                    <>
-                      <button
-                        onClick={() => {
-                          navigate('/dashboard');
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="w-full text-[#6A3DF4] font-medium border border-[#6A3DF4]/30 px-4 py-3 rounded-xl hover:bg-[#6A3DF4]/5 transition-all"
-                      >
-                        Demo
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowLoginModal(true);
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
-                      >
-                        Login
-                      </button>
-                    </>
+                    <button
+                      onClick={() => {
+                        setShowLoginModal(true);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
+                    >
+                      Login
+                    </button>
                   )}
                 </div>
               </div>

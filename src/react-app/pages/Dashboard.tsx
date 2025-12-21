@@ -22,13 +22,44 @@ import {
 } from "lucide-react";
 import { useTrades } from "@/react-app/hooks/useTrades";
 import { motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useLanguageCurrency } from "@/react-app/contexts/LanguageCurrencyContext";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const { trades, loading } = useTrades();
+  const { currency, convertCurrency } = useLanguageCurrency();
+  
+  // State for currency conversion rate
+  const [conversionRate, setConversionRate] = useState<number>(1);
+  const currencyCode = currency.split('-')[0];
+  const currencySymbol = currency.split('-')[1] || currencyCode;
+
+  // Load conversion rate when currency changes
+  useEffect(() => {
+    const loadRate = async () => {
+      if (currencyCode === 'USD') {
+        setConversionRate(1);
+      } else {
+        const rate = await convertCurrency(1, 'USD');
+        setConversionRate(rate);
+      }
+    };
+    loadRate();
+  }, [currency, convertCurrency, currencyCode]);
+
+  // Format currency values
+  const formatCurrency = (amount: number): string => {
+    const converted = amount * conversionRate;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(converted);
+  };
 
   // Calculate trading metrics
   const metrics = useMemo(() => {
@@ -211,7 +242,7 @@ export default function DashboardPage() {
                       {trade.is_closed && trade.pnl !== null ? (
                         <div className={`font-semibold ${(trade.pnl ?? 0) >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'
                           }`}>
-                          {(trade.pnl ?? 0) >= 0 ? '+' : ''}${(trade.pnl ?? 0).toFixed(2)}
+                          {(trade.pnl ?? 0) >= 0 ? '+' : ''}{formatCurrency(trade.pnl ?? 0)}
                         </div>
                       ) : (
                         <span className="text-[#6A3DF4] text-sm font-medium">Open</span>
@@ -289,7 +320,7 @@ export default function DashboardPage() {
           <motion.div variants={cardVariants}>
             <StatCard
               title="Total P&L"
-              value={loading ? "..." : `$${metrics.totalPnl.toFixed(2)}`}
+              value={loading ? "..." : formatCurrency(metrics.totalPnl)}
               change={loading ? "N/A" : `${metrics.totalPnlChange.toFixed(1)}%`}
               changeType={metrics.totalPnlChange >= 0 ? 'positive' : 'negative'}
               icon={DollarSign}
@@ -417,11 +448,11 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center p-3 bg-[#0D0F18]/30 rounded-xl group-hover:bg-[#2ECC71]/5 transition-colors">
                   <span className="text-[#7F8C8D] font-medium">Avg Win</span>
-                  <span className="text-[#2ECC71] font-semibold">${metrics.avgWin.toFixed(2)}</span>
+                  <span className="text-[#2ECC71] font-semibold">{formatCurrency(metrics.avgWin)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-[#0D0F18]/30 rounded-xl group-hover:bg-[#2ECC71]/5 transition-colors">
                   <span className="text-[#7F8C8D] font-medium">Avg Loss</span>
-                  <span className="text-[#E74C3C] font-semibold">${metrics.avgLoss.toFixed(2)}</span>
+                  <span className="text-[#E74C3C] font-semibold">{formatCurrency(metrics.avgLoss)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-[#0D0F18]/30 rounded-xl group-hover:bg-[#2ECC71]/5 transition-colors">
                   <span className="text-[#7F8C8D] font-medium">R:R Ratio</span>

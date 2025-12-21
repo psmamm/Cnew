@@ -1,16 +1,30 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useTrades } from '@/react-app/hooks/useTrades';
-import { useUserEquity } from '@/react-app/hooks/useUserEquity';
+import { useLanguageCurrency } from '@/react-app/contexts/LanguageCurrencyContext';
 
 export default function EquityChart() {
   const { trades } = useTrades();
-  const { equity } = useUserEquity();
+  const { currency, convertCurrency } = useLanguageCurrency();
+  const [conversionRate, setConversionRate] = useState<number>(1);
+  const currencyCode = currency.split('-')[0];
+
+  useEffect(() => {
+    const loadRate = async () => {
+      if (currencyCode === 'USD') {
+        setConversionRate(1);
+      } else {
+        const rate = await convertCurrency(1, 'USD');
+        setConversionRate(rate);
+      }
+    };
+    loadRate();
+  }, [currency, convertCurrency, currencyCode]);
   
   const chartData = useMemo(() => {
-    // Generate equity curve data based on trades and user starting capital
+    // Generate equity curve data - starts at 0 and accumulates from trades
     const data = [];
-    let runningPnl = equity.startingCapital; // Use actual starting capital
+    let runningPnl = 0; // Start at 0, not starting capital
     
     // Sort trades by date
     const sortedTrades = [...trades]
@@ -34,21 +48,31 @@ export default function EquityChart() {
     // Start from 30 days ago
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 29);
+    startDate.setHours(0, 0, 0, 0);
+    
+    // Filter trades to only include those in the last 30 days
+    const recentTrades = sortedTrades.filter(trade => {
+      const tradeDate = new Date(trade.exit_date || trade.entry_date);
+      return tradeDate >= startDate;
+    });
     
     let tradeIndex = 0;
     
+    // Generate data for each day in the last 30 days
     for (let i = 0; i < 30; i++) {
       const currentDate = new Date(startDate);
-      currentDate.setDate(currentDate.getDate() + i);
+      currentDate.setDate(startDate.getDate() + i);
       const dateStr = currentDate.toISOString().split('T')[0];
       
-      // Add any trades that happened on this day
-      while (tradeIndex < sortedTrades.length) {
-        const trade = sortedTrades[tradeIndex];
+      // Add any trades that happened on this day or before
+      while (tradeIndex < recentTrades.length) {
+        const trade = recentTrades[tradeIndex];
         const tradeDate = (trade.exit_date || trade.entry_date);
         
         if (tradeDate <= dateStr) {
-          runningPnl += trade.pnl || 0;
+          // Convert PnL to selected currency
+          const pnlInCurrency = (trade.pnl || 0) * conversionRate;
+          runningPnl += pnlInCurrency;
           tradeIndex++;
         } else {
           break;
@@ -62,7 +86,16 @@ export default function EquityChart() {
     }
     
     return data;
-  }, [trades, equity.startingCapital]);
+  }, [trades, conversionRate]);
+
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -70,7 +103,7 @@ export default function EquityChart() {
         <div className="bg-[#1E2232] border border-white/10 rounded-lg p-3 shadow-lg">
           <p className="text-[#7F8C8D] text-sm mb-1">{label}</p>
           <p className="text-white font-semibold">
-            ${payload[0].value.toFixed(2)}
+            {formatCurrency(payload[0].value)}
           </p>
         </div>
       );
@@ -93,7 +126,10 @@ export default function EquityChart() {
             stroke="#7F8C8D" 
             fontSize={12}
             tick={{ fill: '#7F8C8D' }}
-            tickFormatter={(value) => `$${value.toFixed(0)}`}
+            tickFormatter={(value) => {
+              const currencySymbol = currency.split('-')[1] || currencyCode;
+              return `${currencySymbol}${value.toFixed(0)}`;
+            }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Line 

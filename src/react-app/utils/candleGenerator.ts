@@ -4,7 +4,6 @@ interface CandleGeneratorOptions {
     startPrice: number;
     volatility: number;
     trend: 'bullish' | 'bearish' | 'neutral';
-    baseVolume: number;
 }
 
 interface MarketEventImpact {
@@ -18,7 +17,7 @@ export class CandleGenerator {
     private currentPrice: number;
     private volatility: number;
     private trend: 'bullish' | 'bearish' | 'neutral';
-    private baseVolume: number;
+
     private candleCount: number = 0;
     private marketEvent: MarketEventImpact | null = null;
 
@@ -26,7 +25,7 @@ export class CandleGenerator {
         this.currentPrice = options.startPrice;
         this.volatility = options.volatility;
         this.trend = options.trend;
-        this.baseVolume = options.baseVolume;
+
     }
 
     setMarketEvent(event: MarketEventImpact | null): void {
@@ -155,9 +154,14 @@ export function createMarketEventImpact(
         },
     };
 
-    return eventConfigs[eventType] || {
+    const config = eventConfigs[eventType] || {
         priceMultiplier: 1,
         volatilityMultiplier: 1,
         duration: 10000,
+    };
+
+    return {
+        ...config,
+        type: eventType,
     };
 }
