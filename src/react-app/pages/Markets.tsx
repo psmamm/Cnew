@@ -244,7 +244,7 @@ export default function MarketsPage() {
       }
     };
     loadRate();
-  }, [currency, convertCurrency, currencyCode]);
+  }, [currency, currencyCode]);
 
   // Format numbers with currency conversion (synchronous)
   const formatNumber = (num: number, compact = true): string => {

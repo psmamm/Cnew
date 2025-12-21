@@ -48,7 +48,7 @@ export default function DashboardPage() {
       }
     };
     loadRate();
-  }, [currency, convertCurrency, currencyCode]);
+  }, [currency, currencyCode]);
 
   // Format currency values
   const formatCurrency = (amount: number): string => {

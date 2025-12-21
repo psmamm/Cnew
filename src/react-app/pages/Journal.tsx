@@ -1975,7 +1975,7 @@ export default function JournalPage() {
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <span className="text-[#BDC3C7] text-xs">Exit Price</span>
-                              <p className="text-white font-medium">${trade.exit_price.toFixed(4)}</p>
+                              <p className="text-white font-medium">{formatPrice(trade.exit_price)}</p>
                             </div>
                             {returnPct && (
                               <div>

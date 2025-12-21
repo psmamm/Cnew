@@ -19,7 +19,7 @@ export default function EquityChart() {
       }
     };
     loadRate();
-  }, [currency, convertCurrency, currencyCode]);
+  }, [currency, currencyCode]);
   
   const chartData = useMemo(() => {
     // Generate equity curve data - starts at 0 and accumulates from trades

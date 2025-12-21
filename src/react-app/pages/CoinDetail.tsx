@@ -46,7 +46,7 @@ export default function CoinDetailPage() {
       }
     };
     loadRate();
-  }, [currency, convertCurrency, currencyCode]);
+  }, [currency, currencyCode]);
 
   const {
     coinData,

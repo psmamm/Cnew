@@ -63,7 +63,7 @@ export default function StrategiesPage() {
       }
     };
     loadRate();
-  }, [currency, convertCurrency, currencyCode]);
+  }, [currency, currencyCode]);
 
   const formatCurrency = (amount: number): string => {
     const converted = amount * conversionRate;

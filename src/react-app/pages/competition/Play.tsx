@@ -53,7 +53,7 @@ export default function CompetitionPage() {
             }
         };
         loadRate();
-    }, [currency, convertCurrency, currencyCode]);
+    }, [currency, currencyCode]);
 
     const formatCurrency = (amount: number): string => {
         const converted = amount * conversionRate;
