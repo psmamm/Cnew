@@ -71,7 +71,7 @@ export default function CompetitionPage() {
     const [allCandles, setAllCandles] = useState<(CandlestickData & { volume?: number })[]>([]);
     const [currentPrice, setCurrentPrice] = useState<number>(0);
     const [replayIndex, setReplayIndex] = useState<number>(0);
-    const [currentCandle, setCurrentCandle] = useState<CandlestickData | null>(null);
+    const [_currentCandle, setCurrentCandle] = useState<CandlestickData | null>(null);
     const [futureCandles, setFutureCandles] = useState<CandlestickData[]>([]);
     const [isInFuture, setIsInFuture] = useState(false);
     const candleGeneratorRef = useRef<CandleGenerator | null>(null);
@@ -87,7 +87,7 @@ export default function CompetitionPage() {
 
     // Game State
     const [gameMode] = useState<GameMode>('speed');
-    const [timeLeft, setTimeLeft] = useState(300); // 5 minutes for speed mode
+    const [_timeLeft, setTimeLeft] = useState(300); // 5 minutes for speed mode
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [isLiquidated, setIsLiquidated] = useState(false);
@@ -270,14 +270,13 @@ export default function CompetitionPage() {
             const historicalCandles = allCandles.slice(0, replayIndex);
             
             const volatility = CandleGenerator.calculateVolatility(historicalCandles);
-            const avgVolume = CandleGenerator.calculateAverageVolume(historicalCandles);
             const trend = CandleGenerator.detectTrend(historicalCandles);
             
             candleGeneratorRef.current = new CandleGenerator({
                 startPrice: lastCandle.close,
                 volatility: Math.max(volatility, 0.01), // Minimum volatility
                 trend: trend,
-                baseVolume: avgVolume,
+                // Removed baseVolume because it's not a valid property of CandleGeneratorOptions
             });
         }
     }, [allCandles, replayIndex]);

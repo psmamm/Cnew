@@ -112,7 +112,6 @@ export default function JournalPage() {
   const { currency, convertCurrency } = useLanguageCurrency();
   const [conversionRate, setConversionRate] = useState<number>(1);
   const currencyCode = currency.split('-')[0];
-  const currencySymbol = currency.split('-')[1] || currencyCode;
 
   // Load conversion rate when currency changes
   useEffect(() => {
