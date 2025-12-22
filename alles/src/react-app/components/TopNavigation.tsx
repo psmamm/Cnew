@@ -114,9 +114,9 @@ export default function TopNavigation() {
     { name: t('Dashboard'), path: '/dashboard', hasDropdown: false, key: 'Dashboard' },
     { name: t('Competition'), path: '/competition', hasDropdown: false, key: 'Competition' },
     { name: t('Journal'), path: '/journal', hasDropdown: false, key: 'Journal' },
-    { name: t('Markets'), path: '/markets', hasDropdown: false, key: 'Markets' },
     { name: t('Strategies'), path: '/strategies', hasDropdown: false, key: 'Strategies' },
     { name: t('Reports'), path: '/reports', hasDropdown: false, key: 'Reports' },
+    { name: t('Markets'), path: '/markets', hasDropdown: false, key: 'Markets' },
     { name: t('Study'), path: '/study', hasDropdown: false, key: 'Study' },
     { name: t('Alpha Hub'), path: '/alpha-hub', hasDropdown: false, key: 'Alpha Hub' },
   ];
