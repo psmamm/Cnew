@@ -1,5 +1,4 @@
 import DashboardLayout from "@/react-app/components/DashboardLayout";
-import DashboardHeader from "@/react-app/components/DashboardHeader";
 import StatCard from "@/react-app/components/StatCard";
 import RecentTrades from "@/react-app/components/RecentTrades";
 import QuickActions from "@/react-app/components/QuickActions";
@@ -151,10 +150,6 @@ export default function DashboardPage() {
     );
   }, [trades, searchQuery]);
 
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
-
   // Get time-based greeting and icon
   const getTimeBasedGreeting = () => {
     const hour = new Date().getHours();
@@ -196,8 +191,6 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Dashboard Header */}
-        <DashboardHeader onSearchChange={handleSearchChange} />
         {/* Search Results or Welcome Header */}
         {searchQuery ? (
           <motion.div

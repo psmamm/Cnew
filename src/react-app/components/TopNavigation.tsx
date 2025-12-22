@@ -9,7 +9,6 @@ import {
   X,
   User,
   Wallet,
-  MessageCircle,
   Bell,
   ArrowDown,
   BarChart3,
@@ -30,7 +29,7 @@ export default function TopNavigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
-  const { language, setLanguage, currency, setCurrency, t } = useLanguageCurrency();
+  const { language, setLanguage, t } = useLanguageCurrency();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>({});
   const [showNotifications, setShowNotifications] = useState(false);
@@ -39,7 +38,6 @@ export default function TopNavigation() {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [showLanguageCurrency, setShowLanguageCurrency] = useState(false);
   const [languageSearch, setLanguageSearch] = useState('');
-  const [currencySearch, setCurrencySearch] = useState('');
 
   const toggleDropdown = (name: string) => {
     setOpenDropdowns(prev => ({
@@ -102,120 +100,13 @@ export default function TopNavigation() {
     '中文',
   ];
 
-  const currencies = [
-    { code: 'USD', symbol: '$', name: 'USD-$' },
-    { code: 'AED', symbol: 'إ.د', name: 'AED-إ.د' },
-    { code: 'AFN', symbol: '؋', name: 'AFN-؋' },
-    { code: 'ALL', symbol: 'L', name: 'ALL-L' },
-    { code: 'AMD', symbol: '֏', name: 'AMD-֏' },
-    { code: 'ARS', symbol: 'ARS$', name: 'ARS-ARS$' },
-    { code: 'AUD', symbol: 'A$', name: 'AUD-A$' },
-    { code: 'AZN', symbol: '₼', name: 'AZN-₼' },
-    { code: 'BDT', symbol: '৳', name: 'BDT-৳' },
-    { code: 'BGN', symbol: 'лв', name: 'BGN-лв' },
-    { code: 'BHD', symbol: 'د.ب.', name: 'BHD-د.ب.' },
-    { code: 'BND', symbol: '$', name: 'BND-$' },
-    { code: 'BOB', symbol: '$b', name: 'BOB-$b' },
-    { code: 'BRL', symbol: 'R$', name: 'BRL-R$' },
-    { code: 'BWP', symbol: 'P', name: 'BWP-P' },
-    { code: 'BYN', symbol: 'Br', name: 'BYN-Br' },
-    { code: 'CAD', symbol: 'C$', name: 'CAD-C$' },
-    { code: 'CHF', symbol: 'CHF', name: 'CHF-CHF' },
-    { code: 'CLP', symbol: '$', name: 'CLP-$' },
-    { code: 'CNY', symbol: '¥', name: 'CNY-¥' },
-    { code: 'COP', symbol: '$', name: 'COP-$' },
-    { code: 'CRC', symbol: '₡', name: 'CRC-₡' },
-    { code: 'CZK', symbol: 'Kč', name: 'CZK-Kč' },
-    { code: 'DKK', symbol: 'kr', name: 'DKK-kr' },
-    { code: 'DOP', symbol: '$', name: 'DOP-$' },
-    { code: 'DZD', symbol: 'د.ج', name: 'DZD-د.ج' },
-    { code: 'EGP', symbol: '£', name: 'EGP-£' },
-    { code: 'EUR', symbol: '€', name: 'EUR-€' },
-    { code: 'GBP', symbol: '£', name: 'GBP-£' },
-    { code: 'GEL', symbol: '₾', name: 'GEL-₾' },
-    { code: 'GHS', symbol: '₵', name: 'GHS-₵' },
-    { code: 'HKD', symbol: 'HK$', name: 'HKD-HK$' },
-    { code: 'HRK', symbol: 'kn', name: 'HRK-kn' },
-    { code: 'HUF', symbol: 'Ft', name: 'HUF-Ft' },
-    { code: 'IDR', symbol: 'Rp', name: 'IDR-Rp' },
-    { code: 'ILS', symbol: '₪', name: 'ILS-₪' },
-    { code: 'INR', symbol: '₹', name: 'INR-₹' },
-    { code: 'IQD', symbol: 'ع.د', name: 'IQD-ع.د' },
-    { code: 'IRR', symbol: '﷼', name: 'IRR-﷼' },
-    { code: 'ISK', symbol: 'kr', name: 'ISK-kr' },
-    { code: 'JMD', symbol: '$', name: 'JMD-$' },
-    { code: 'JOD', symbol: 'د.ا', name: 'JOD-د.ا' },
-    { code: 'JPY', symbol: '¥', name: 'JPY-¥' },
-    { code: 'KES', symbol: 'Sh', name: 'KES-Sh' },
-    { code: 'KGS', symbol: 'с', name: 'KGS-с' },
-    { code: 'KHR', symbol: '៛', name: 'KHR-៛' },
-    { code: 'KRW', symbol: '₩', name: 'KRW-₩' },
-    { code: 'KWD', symbol: 'د.ك', name: 'KWD-د.ك' },
-    { code: 'KZT', symbol: '₸', name: 'KZT-₸' },
-    { code: 'LAK', symbol: '₭', name: 'LAK-₭' },
-    { code: 'LBP', symbol: 'ل.ل', name: 'LBP-ل.ل' },
-    { code: 'LKR', symbol: '₨', name: 'LKR-₨' },
-    { code: 'MAD', symbol: 'د.م.', name: 'MAD-د.م.' },
-    { code: 'MDL', symbol: 'L', name: 'MDL-L' },
-    { code: 'MGA', symbol: 'Ar', name: 'MGA-Ar' },
-    { code: 'MKD', symbol: 'ден', name: 'MKD-ден' },
-    { code: 'MMK', symbol: 'K', name: 'MMK-K' },
-    { code: 'MNT', symbol: '₮', name: 'MNT-₮' },
-    { code: 'MOP', symbol: 'MOP$', name: 'MOP-MOP$' },
-    { code: 'MUR', symbol: '₨', name: 'MUR-₨' },
-    { code: 'MXN', symbol: '$', name: 'MXN-$' },
-    { code: 'MYR', symbol: 'RM', name: 'MYR-RM' },
-    { code: 'MZN', symbol: 'MT', name: 'MZN-MT' },
-    { code: 'NGN', symbol: '₦', name: 'NGN-₦' },
-    { code: 'NOK', symbol: 'kr', name: 'NOK-kr' },
-    { code: 'NPR', symbol: '₨', name: 'NPR-₨' },
-    { code: 'NZD', symbol: 'NZ$', name: 'NZD-NZ$' },
-    { code: 'OMR', symbol: 'ر.ع.', name: 'OMR-ر.ع.' },
-    { code: 'PAB', symbol: 'B/.', name: 'PAB-B/.' },
-    { code: 'PEN', symbol: 'S/', name: 'PEN-S/' },
-    { code: 'PHP', symbol: '₱', name: 'PHP-₱' },
-    { code: 'PKR', symbol: '₨', name: 'PKR-₨' },
-    { code: 'PLN', symbol: 'zł', name: 'PLN-zł' },
-    { code: 'QAR', symbol: 'ر.ق', name: 'QAR-ر.ق' },
-    { code: 'RON', symbol: 'lei', name: 'RON-lei' },
-    { code: 'RSD', symbol: 'дин', name: 'RSD-дин' },
-    { code: 'RUB', symbol: '₽', name: 'RUB-₽' },
-    { code: 'RWF', symbol: 'Fr', name: 'RWF-Fr' },
-    { code: 'SAR', symbol: 'ر.س', name: 'SAR-ر.س' },
-    { code: 'SEK', symbol: 'kr', name: 'SEK-kr' },
-    { code: 'SGD', symbol: 'S$', name: 'SGD-S$' },
-    { code: 'THB', symbol: '฿', name: 'THB-฿' },
-    { code: 'TND', symbol: 'د.ت', name: 'TND-د.ت' },
-    { code: 'TRY', symbol: '₺', name: 'TRY-₺' },
-    { code: 'TWD', symbol: 'NT$', name: 'TWD-NT$' },
-    { code: 'TZS', symbol: 'Sh', name: 'TZS-Sh' },
-    { code: 'UAH', symbol: '₴', name: 'UAH-₴' },
-    { code: 'UGX', symbol: 'Sh', name: 'UGX-Sh' },
-    { code: 'UYU', symbol: '$U', name: 'UYU-$U' },
-    { code: 'UZS', symbol: 'so\'m', name: 'UZS-so\'m' },
-    { code: 'VND', symbol: '₫', name: 'VND-₫' },
-    { code: 'XAF', symbol: 'Fr', name: 'XAF-Fr' },
-    { code: 'XOF', symbol: 'Fr', name: 'XOF-Fr' },
-    { code: 'YER', symbol: '﷼', name: 'YER-﷼' },
-    { code: 'ZAR', symbol: 'R', name: 'ZAR-R' },
-    { code: 'ZMW', symbol: 'ZK', name: 'ZMW-ZK' },
-  ];
 
   const filteredLanguages = languages.filter(lang =>
     lang.toLowerCase().includes(languageSearch.toLowerCase())
   );
 
-  const filteredCurrencies = currencies.filter(currency =>
-    currency.name.toLowerCase().includes(currencySearch.toLowerCase()) ||
-    currency.code.toLowerCase().includes(currencySearch.toLowerCase())
-  );
-
   const handleLanguageSelect = (selectedLang: string) => {
     setLanguage(selectedLang);
-  };
-
-  const handleCurrencySelect = (selectedCurr: string) => {
-    setCurrency(selectedCurr);
   };
 
   // Navigation items - defined after hooks to ensure context is available
@@ -648,7 +539,7 @@ export default function TopNavigation() {
 
             {/* Utility Icons - White */}
             <div className="hidden md:flex items-center space-x-1 border-l border-white/10 pl-2 ml-1">
-              {/* Language & Currency Dropdown */}
+              {/* Language Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowLanguageCurrency(!showLanguageCurrency)}
@@ -657,7 +548,7 @@ export default function TopNavigation() {
                   <Globe className="w-5 h-5" />
                 </button>
 
-                {/* Language & Currency Dropdown */}
+                {/* Language Dropdown */}
                 <AnimatePresence>
                   {showLanguageCurrency && (
                     <motion.div
@@ -665,66 +556,37 @@ export default function TopNavigation() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-[600px] bg-[#1A1D23] border border-white/10 rounded-lg shadow-xl z-[100]"
+                      className="absolute right-0 mt-2 w-80 bg-[#1A1D23] border border-white/10 rounded-lg shadow-xl z-[100]"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="flex">
-                        {/* Language Panel */}
-                        <div className="flex-1 p-4 border-r border-white/10">
-                          <h3 className="text-white font-semibold text-sm mb-3">{t('Language')}</h3>
-                          <div className="mb-3">
-                            <input
-                              type="text"
-                              value={languageSearch}
-                              onChange={(e) => setLanguageSearch(e.target.value)}
-                              placeholder={t('Search')}
-                              className="w-full px-3 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-white text-sm placeholder-[#7F8C8D] focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
-                            />
-                          </div>
-                          <div className="max-h-80 overflow-y-auto">
-                            {filteredLanguages.map((lang) => (
-                              <button
-                                key={lang}
-                                onClick={() => handleLanguageSelect(lang)}
-                                className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
-                                  language === lang
-                                    ? 'text-[#6A3DF4] font-medium'
-                                    : 'text-white hover:bg-white/5'
-                                }`}
-                              >
-                                {lang}
-                              </button>
-                            ))}
-                          </div>
+                      <div className="p-4">
+                        <h3 className="text-white font-semibold text-sm mb-3">{t('Language')}</h3>
+                        <div className="mb-3">
+                          <input
+                            type="text"
+                            value={languageSearch}
+                            onChange={(e) => setLanguageSearch(e.target.value)}
+                            placeholder={t('Search')}
+                            className="w-full px-3 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-white text-sm placeholder-[#7F8C8D] focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
+                          />
                         </div>
-
-                        {/* Currency Panel */}
-                        <div className="flex-1 p-4">
-                          <h3 className="text-white font-semibold text-sm mb-3">{t('Currency')}</h3>
-                          <div className="mb-3">
-                            <input
-                              type="text"
-                              value={currencySearch}
-                              onChange={(e) => setCurrencySearch(e.target.value)}
-                              placeholder={t('Search')}
-                              className="w-full px-3 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-white text-sm placeholder-[#7F8C8D] focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
-                            />
-                          </div>
-                          <div className="max-h-80 overflow-y-auto">
-                            {filteredCurrencies.map((curr) => (
-                              <button
-                                key={curr.name}
-                                onClick={() => handleCurrencySelect(curr.name)}
-                                className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
-                                  currency === curr.name
-                                    ? 'text-[#6A3DF4] font-medium'
-                                    : 'text-white hover:bg-white/5'
-                                }`}
-                              >
-                                {curr.name}
-                              </button>
-                            ))}
-                          </div>
+                        <div className="max-h-80 overflow-y-auto">
+                          {filteredLanguages.map((lang) => (
+                            <button
+                              key={lang}
+                              onClick={() => {
+                                handleLanguageSelect(lang);
+                                setShowLanguageCurrency(false);
+                              }}
+                              className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+                                language === lang
+                                  ? 'text-[#6A3DF4] font-medium'
+                                  : 'text-white hover:bg-white/5'
+                              }`}
+                            >
+                              {lang}
+                            </button>
+                          ))}
                         </div>
                       </div>
                     </motion.div>

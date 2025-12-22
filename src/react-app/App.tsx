@@ -102,7 +102,6 @@ const HomePage = lazy(() => import("@/react-app/pages/Home"));
 const DashboardPage = lazy(() => import("@/react-app/pages/Dashboard"));
 const JournalPage = lazy(() => import("@/react-app/pages/Journal"));
 const ReportsPage = lazy(() => import("@/react-app/pages/Reports"));
-// const BigMoversPage = lazy(() => import("@/react-app/pages/BigMovers")); // Temporarily disabled
 // const OrderHeatmapPage = lazy(() => import("@/react-app/pages/OrderHeatmap")); // Temporarily disabled
 const StrategiesPage = lazy(() => import("@/react-app/pages/Strategies"));
 const SettingsPage = lazy(() => import("@/react-app/pages/Settings"));
@@ -158,12 +157,6 @@ export default function App() {
                   </ProtectedRoute>
                 } />
 
-                {/* Temporarily disabled - Big Movers */}
-                {/* <Route path="/big-movers" element={
-                  <ProtectedRoute>
-                    <BigMoversPage />
-                  </ProtectedRoute>
-                } /> */}
                 <Route path="/markets" element={
                   <ProtectedRoute>
                     <MarketsPage />

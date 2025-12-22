@@ -24,6 +24,7 @@ interface CategoryFiltersProps {
   activeSubFilter: SubFilterType;
   onCategoryChange: (category: CategoryType) => void;
   onSubFilterChange: (filter: SubFilterType) => void;
+  searchElement?: React.ReactNode;
 }
 
 const categories: { id: CategoryType; label: string; badge?: string }[] = [
@@ -58,6 +59,7 @@ export default function CategoryFilters({
   activeSubFilter,
   onCategoryChange,
   onSubFilterChange,
+  searchElement,
 }: CategoryFiltersProps) {
   return (
     <div className="space-y-3 mb-4">
@@ -93,6 +95,11 @@ export default function CategoryFilters({
       {/* Sub-Filter Chips - Direct on main background, no container */}
       <div className="overflow-x-auto scrollbar-hide">
         <div className="flex items-center space-x-2 pb-2 min-w-max">
+          {searchElement && (
+            <div className="flex-shrink-0">
+              {searchElement}
+            </div>
+          )}
           {subFilters.map((filter) => (
             <button
               key={filter.id}

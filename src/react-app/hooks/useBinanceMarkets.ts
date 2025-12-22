@@ -71,6 +71,27 @@ export interface MarketStats {
   topLoser: { symbol: string; change: number } | null;
 }
 
+// Get CoinGecko ID for a base asset
+function getCoinGeckoId(baseAsset: string): string {
+  const baseAssetLower = baseAsset.toLowerCase();
+  
+  // CoinGecko ID mapping
+  const coinGeckoMap: Record<string, string> = {
+    'BTC': 'bitcoin', 'ETH': 'ethereum', 'BNB': 'binancecoin', 'SOL': 'solana', 'XRP': 'ripple',
+    'DOGE': 'dogecoin', 'ADA': 'cardano', 'TRX': 'tron', 'AVAX': 'avalanche-2', 'TON': 'the-open-network',
+    'SHIB': 'shiba-inu', 'DOT': 'polkadot', 'BCH': 'bitcoin-cash', 'LINK': 'chainlink', 'NEAR': 'near',
+    'MATIC': 'matic-network', 'UNI': 'uniswap', 'LTC': 'litecoin', 'PEPE': 'pepe', 'ICP': 'internet-computer',
+    'ETC': 'ethereum-classic', 'APT': 'aptos', 'SUI': 'sui', 'CRO': 'crypto-com-chain', 'ATOM': 'cosmos',
+    'FIL': 'filecoin', 'OP': 'optimism', 'ARB': 'arbitrum', 'INJ': 'injective-protocol', 'STX': 'blockstack',
+    'IMX': 'immutable-x', 'TAO': 'bittensor', 'RENDER': 'render-token', 'LUNA': 'terra-luna',
+    'VTHO': 'vethor-token', 'ASR': 'as-roma-fan-token', 'BANK': 'bankless-dao', 'AT': 'artemis-token',
+    'ASTER': 'aster', 'VIRTUAL': 'virtual-protocol', 'USDT': 'tether', 'USDC': 'usd-coin', 'DAI': 'dai',
+    'TUSD': 'true-usd', 'BUSD': 'binance-usd', 'FDUSD': 'first-digital-usd', 'PAX': 'paxos-standard'
+  };
+  
+  return coinGeckoMap[baseAsset] || baseAssetLower;
+}
+
 export function useBinanceMarkets() {
   const [symbols, setSymbols] = useState<BinanceSymbol[]>([]);
   const [tickers, setTickers] = useState<Record<string, MarketTicker>>({});
@@ -252,7 +273,11 @@ export function useBinanceMarkets() {
       symbolsList.forEach(symbolInfo => {
         const ticker = tickerData[symbolInfo.symbol];
         if (ticker) {
-          const logoUrl = `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/32/color/${symbolInfo.baseAsset.toLowerCase()}.png`;
+          // Use GitHub CDN as primary (most reliable, direct image URLs)
+          // CoinGecko's /image endpoint returns JSON/redirects which causes issues
+          // The getLogoUrl function handles the fallback chain
+          const baseAssetLower = symbolInfo.baseAsset.toLowerCase();
+          const logoUrl = `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${baseAssetLower}.png`;
           
           enhanced[symbolInfo.symbol] = {
             ...ticker,
@@ -564,7 +589,8 @@ export function useBinanceMarkets() {
 
   // Get trending data (Hot, New, Top Gainer, Top Volume)
   const getTrendingData = useCallback(() => {
-    const allData = Object.values(enhancedData);
+    // Only USDT pairs
+    const allData = Object.values(enhancedData).filter(item => item.quoteAsset === 'USDT');
     
     // Hot: Highest volume in last 24h
     const hot = [...allData]

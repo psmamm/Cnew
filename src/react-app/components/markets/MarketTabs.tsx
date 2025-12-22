@@ -1,4 +1,3 @@
-import { Search, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export type MarketTab = 'overview' | 'trading-data' | 'ai-select' | 'token-unlock';
@@ -18,7 +17,7 @@ export default function MarketTabs({ activeTab, onTabChange }: MarketTabsProps) 
 
   return (
     <div className="border-b border-white/10 pb-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center">
         {/* Tabs */}
         <div className="flex items-center space-x-8">
           {tabs.map((tab) => (
@@ -40,16 +39,6 @@ export default function MarketTabs({ activeTab, onTabChange }: MarketTabsProps) 
               )}
             </button>
           ))}
-        </div>
-
-        {/* Right Actions */}
-        <div className="flex items-center space-x-4">
-          <button className="p-2 text-[#7F8C8D] hover:text-white transition-colors">
-            <Search className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-[#7F8C8D] hover:text-white transition-colors">
-            <Bell className="w-5 h-5" />
-          </button>
         </div>
       </div>
     </div>

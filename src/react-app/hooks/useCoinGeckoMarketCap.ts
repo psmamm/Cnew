@@ -85,7 +85,7 @@ export function useCoinGeckoMarketCap() {
   }, []);
 
   // Fetch market cap data from CoinGecko
-  const fetchMarketCapData = useCallback(async (symbols: string[]): Promise<Record<string, CoinGeckoMarketData>> => {
+  const fetchMarketCapData = useCallback(async (): Promise<Record<string, CoinGeckoMarketData>> => {
     // Check cache first
     if (cacheRef.current && Date.now() - cacheRef.current.timestamp < CACHE_DURATION) {
       return cacheRef.current.data;
@@ -95,7 +95,7 @@ export function useCoinGeckoMarketCap() {
       setLoading(true);
       setError(null);
 
-      // Fetch all market data (top 250 coins by market cap)
+      // Fetch all market data (top 250 coins by market cap - only for Binance coins)
       const response = await fetch(apiConfig.coingecko.endpoints.markets('usd', 250, 1));
       
       if (!response.ok) {
@@ -131,12 +131,21 @@ export function useCoinGeckoMarketCap() {
   // Get market cap for a specific symbol
   const getMarketCap = useCallback((baseAsset: string): CoinGeckoMarketData | null => {
     const symbol = baseAsset.toUpperCase();
-    return marketCapData[symbol] || null;
-  }, [marketCapData]);
+    // First try direct symbol match
+    if (marketCapData[symbol]) {
+      return marketCapData[symbol];
+    }
+    // Try CoinGecko ID match
+    const coinGeckoId = getCoinGeckoId(baseAsset);
+    if (coinGeckoId && marketCapData[coinGeckoId]) {
+      return marketCapData[coinGeckoId];
+    }
+    return null;
+  }, [marketCapData, getCoinGeckoId]);
 
   // Initialize: Fetch market cap data on mount
   useEffect(() => {
-    fetchMarketCapData([]);
+    fetchMarketCapData();
   }, [fetchMarketCapData]);
 
   return {
@@ -146,6 +155,6 @@ export function useCoinGeckoMarketCap() {
     getMarketCap,
     fetchMarketCapData,
     getCoinGeckoId,
-    refetch: () => fetchMarketCapData([]),
+    refetch: () => fetchMarketCapData(),
   };
 }

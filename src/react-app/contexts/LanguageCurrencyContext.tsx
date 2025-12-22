@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 // Language codes mapping
 const languageMap: Record<string, string> = {
@@ -170,29 +170,8 @@ export function LanguageCurrencyProvider({ children }: { children: ReactNode }) 
     }
     return 'USD-$';
   });
-  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
 
-  // Load exchange rates on mount
-  useEffect(() => {
-    const loadRates = async () => {
-      const baseCurrency = currency.split('-')[0];
-      const rates: Record<string, number> = {};
-      
-      // Fetch rates for common currencies
-      const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'KRW', 'AUD', 'CAD', 'CHF'];
-      for (const curr of currencies) {
-        if (curr !== baseCurrency) {
-          rates[curr] = await getExchangeRate(baseCurrency, curr);
-        } else {
-          rates[curr] = 1;
-        }
-      }
-      
-      setExchangeRates(rates);
-    };
-    
-    loadRates();
-  }, [currency]);
+  // Note: Exchange rates are calculated on-demand in getExchangeRate function
 
   const setLanguage = (lang: string) => {
     setLanguageState(lang);
@@ -239,7 +218,6 @@ export function LanguageCurrencyProvider({ children }: { children: ReactNode }) 
   const formatCurrency = async (amount: number, fromCurrency: string = 'USD'): Promise<string> => {
     const converted = await convertCurrency(amount, fromCurrency);
     const currencyCode = currency.split('-')[0];
-    const currencySymbol = currency.split('-')[1] || currencyCode;
     
     return new Intl.NumberFormat(languageMap[language] || 'en', {
       style: 'currency',

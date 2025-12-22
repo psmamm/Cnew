@@ -681,8 +681,8 @@ export const TradeImportWizard: React.FC<TradeImportWizardProps> = ({ onComplete
                                     </>
                                 ) : (
                                     <>
-                                        <BarChart2 className="w-6 h-6" />
-                                        Log Execution
+                                <BarChart2 className="w-6 h-6" />
+                                Log Execution
                                     </>
                                 )}
                             </motion.button>
