@@ -539,49 +539,49 @@ export function useBinanceMarkets() {
     
     // Sort (marketCap sorting is handled in Markets.tsx after market cap data is added)
     if (filters.sortBy !== 'marketCap') {
-      filtered.sort((a, b) => {
-        let aValue: number, bValue: number;
-        
-        switch (filters.sortBy) {
-          case 'symbol':
-            return filters.sortOrder === 'asc' 
-              ? a.symbol.localeCompare(b.symbol)
-              : b.symbol.localeCompare(a.symbol);
-              
-          case 'price':
-            aValue = parseFloat(a.lastPrice || '0');
-            bValue = parseFloat(b.lastPrice || '0');
-            break;
+    filtered.sort((a, b) => {
+      let aValue: number, bValue: number;
+      
+      switch (filters.sortBy) {
+        case 'symbol':
+          return filters.sortOrder === 'asc' 
+            ? a.symbol.localeCompare(b.symbol)
+            : b.symbol.localeCompare(a.symbol);
             
-          case 'change24h':
-            aValue = parseFloat(a.priceChangePercent || '0');
-            bValue = parseFloat(b.priceChangePercent || '0');
-            break;
-            
-          case 'change1h':
-            aValue = a.priceChangePercent1h || 0;
-            bValue = b.priceChangePercent1h || 0;
-            break;
-            
-          case 'change7d':
-            aValue = a.priceChangePercent7d || 0;
-            bValue = b.priceChangePercent7d || 0;
-            break;
-            
-          case 'volume':
-            aValue = parseFloat(a.volume || '0');
-            bValue = parseFloat(b.volume || '0');
-            break;
-            
-          case 'quoteVolume':
-          default:
-            aValue = parseFloat(a.quoteVolume || '0');
-            bValue = parseFloat(b.quoteVolume || '0');
-            break;
-        }
-        
-        return filters.sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
-      });
+        case 'price':
+          aValue = parseFloat(a.lastPrice || '0');
+          bValue = parseFloat(b.lastPrice || '0');
+          break;
+          
+        case 'change24h':
+          aValue = parseFloat(a.priceChangePercent || '0');
+          bValue = parseFloat(b.priceChangePercent || '0');
+          break;
+          
+        case 'change1h':
+          aValue = a.priceChangePercent1h || 0;
+          bValue = b.priceChangePercent1h || 0;
+          break;
+          
+        case 'change7d':
+          aValue = a.priceChangePercent7d || 0;
+          bValue = b.priceChangePercent7d || 0;
+          break;
+          
+        case 'volume':
+          aValue = parseFloat(a.volume || '0');
+          bValue = parseFloat(b.volume || '0');
+          break;
+          
+        case 'quoteVolume':
+        default:
+          aValue = parseFloat(a.quoteVolume || '0');
+          bValue = parseFloat(b.quoteVolume || '0');
+          break;
+      }
+      
+      return filters.sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+    });
     }
     
     return filtered;

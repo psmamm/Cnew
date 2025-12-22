@@ -129,7 +129,7 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <LanguageCurrencyProvider>
-          <Router>
+        <Router>
           <Suspense fallback={<LoadingSpinner />}>
             <LayoutProbe>
               <Routes>

@@ -75,7 +75,7 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
               type="email"
               autoComplete="email"
               required
-              className="w-full rounded-xl border border-white/10 bg-[#0D0F18]/50 px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#667eea]/50 focus:border-[#667eea]/50 transition-all"
+              className="w-full rounded-xl border border-white/10 bg-[#0D0F18]/50 px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -87,7 +87,7 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
               <label htmlFor="password" className="text-[#AAB0C0] font-medium">
                 Password
               </label>
-              <Link to="/forgot-password" className="text-[#667eea] hover:text-[#764ba2] transition-colors">
+              <Link to="/forgot-password" className="text-[#6A3DF4] hover:text-[#8A5CFF] transition-colors">
                 Forgot your password?
               </Link>
             </div>
@@ -97,7 +97,7 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
               type="password"
               autoComplete="current-password"
               required
-              className="w-full rounded-xl border border-white/10 bg-[#0D0F18]/50 px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#667eea]/50 focus:border-[#667eea]/50 transition-all"
+              className="w-full rounded-xl border border-white/10 bg-[#0D0F18]/50 px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -109,7 +109,7 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-gradient-to-r from-[#667eea] to-[#764ba2] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full rounded-xl bg-[#6A3DF4] hover:bg-[#8A5CFF] px-4 py-3 text-sm font-semibold text-white shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
@@ -137,7 +137,7 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
 
       <div className="text-center text-sm text-[#7F8C8D]">
         Don't have an account?{' '}
-        <Link to="/signup" className="text-[#667eea] hover:text-[#764ba2] transition-colors font-medium">
+        <Link to="/signup" className="text-[#6A3DF4] hover:text-[#8A5CFF] transition-colors font-medium">
           Sign up
         </Link>
       </div>

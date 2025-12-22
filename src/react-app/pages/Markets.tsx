@@ -36,7 +36,7 @@ export default function MarketsPage() {
     getTrendingData,
     refetch
   } = useBinanceMarkets();
-  
+
   const { getMarketCap } = useCoinGeckoMarketCap();
 
   // Tab state
@@ -424,7 +424,7 @@ export default function MarketsPage() {
               searchElement={
                 <div className="relative">
                   {!searchFocus ? (
-                    <button
+              <button
                       onClick={() => {
                         setSearchFocus(true);
                         setTimeout(() => searchInputRef.current?.focus(), 0);
@@ -432,16 +432,16 @@ export default function MarketsPage() {
                       className="flex items-center justify-center w-10 h-10 bg-[#0D0F18]/50 border border-white/10 hover:border-[#6A3DF4]/50 rounded-lg text-[#7F8C8D] hover:text-white transition-all"
                     >
                       <Search className="w-4 h-4" />
-                    </button>
+              </button>
                   ) : (
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#7F8C8D]" />
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        placeholder="Search by symbol or name..."
-                        value={filters.search}
-                        onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search by symbol or name..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                         onBlur={() => {
                           if (!filters.search) {
                             setSearchFocus(false);
@@ -449,74 +449,74 @@ export default function MarketsPage() {
                         }}
                         className="w-64 pl-10 pr-10 py-2 bg-[#0D0F18]/50 border border-[#6A3DF4]/50 rounded-lg text-white placeholder-[#7F8C8D] focus:outline-none transition-all text-sm"
                         autoFocus
-                      />
-                      {filters.search && (
-                        <button
+                />
+                {filters.search && (
+                  <button
                           onClick={() => {
                             setFilters(prev => ({ ...prev, search: '' }));
                             setSearchFocus(false);
                           }}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#7F8C8D] hover:text-white"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#7F8C8D] hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
                   )}
-                </div>
+            </div>
               }
             />
 
             {/* Markets Table - Direct on main background, no container */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
               <div className="overflow-x-auto">
-              {loading && Object.keys(enhancedData).length === 0 ? (
-                <div className="p-12 text-center">
-                  <div className="w-16 h-16 border-4 border-[#6A3DF4] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Loading Market Data</h3>
-                  <p className="text-[#7F8C8D]">Fetching real-time data from Binance...</p>
-                </div>
-              ) : error ? (
-                <div className="p-12 text-center">
-                  <div className="w-16 h-16 bg-[#E74C3C]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          {loading && Object.keys(enhancedData).length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 border-4 border-[#6A3DF4] border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+              <h3 className="text-xl font-semibold text-white mb-2">Loading Market Data</h3>
+              <p className="text-[#7F8C8D]">Fetching real-time data from Binance...</p>
+            </div>
+          ) : error ? (
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 bg-[#E74C3C]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-[#E74C3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" />
                     </svg>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Failed to Load Market Data</h3>
-                  <p className="text-[#7F8C8D] mb-6">{error}</p>
-                  <button
-                    onClick={refetch}
-                    className="px-6 py-3 bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white rounded-lg font-medium transition-colors"
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : paginatedData.length === 0 ? (
-                <div className="p-12 text-center">
-                  <div className="w-16 h-16 bg-[#6A3DF4]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Search className="w-8 h-8 text-[#6A3DF4]" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">No Markets Found</h3>
-                  <p className="text-[#7F8C8D] mb-6">Try adjusting your search or filters</p>
-                  <button
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Failed to Load Market Data</h3>
+              <p className="text-[#7F8C8D] mb-6">{error}</p>
+              <button
+                onClick={refetch}
+                className="px-6 py-3 bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white rounded-lg font-medium transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : paginatedData.length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 bg-[#6A3DF4]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-8 h-8 text-[#6A3DF4]" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">No Markets Found</h3>
+              <p className="text-[#7F8C8D] mb-6">Try adjusting your search or filters</p>
+              <button
                     onClick={() => {
                       setFilters(prev => ({ ...prev, search: '', quoteAssets: ['USDT'] }));
                     }}
-                    className="px-6 py-3 bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white rounded-lg font-medium transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              ) : (
+                className="px-6 py-3 bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white rounded-lg font-medium transition-colors"
+              >
+                Clear Filters
+              </button>
+            </div>
+          ) : (
                 <div>
-                  {/* Table */}
-                  <table className="w-full">
+              {/* Table */}
+                <table className="w-full">
                     <thead>
                       <tr className="text-sm font-medium text-[#7F8C8D] border-b border-white/10">
                         <th className="text-left py-3 px-4">
@@ -621,39 +621,39 @@ export default function MarketsPage() {
                         </th>
                         <th className="text-center py-3 px-4">
                           <span>Actions</span>
-                        </th>
-                      </tr>
-                    </thead>
+                      </th>
+                    </tr>
+                  </thead>
                     <tbody>
-                      {paginatedData.map((item, index) => (
-                        <motion.tr
-                          key={item.symbol}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.02 }}
-                          onClick={() => navigate(`/markets/${item.symbol}`)}
+                    {paginatedData.map((item, index) => (
+                      <motion.tr
+                        key={item.symbol}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.02 }}
+                        onClick={() => navigate(`/markets/${item.symbol}`)}
                           className="hover:bg-white/5 cursor-pointer transition-all group border-b border-white/5"
-                        >
+                      >
                           {/* Name */}
                           <td className="py-3 px-4">
                             <div className="flex items-center space-x-3">
-                              <button
-                                onClick={(e) => toggleWatchlist(item.symbol, e)}
+                          <button
+                            onClick={(e) => toggleWatchlist(item.symbol, e)}
                                 className={`flex-shrink-0 transition-all ${
                                   watchlist.has(item.symbol)
                                     ? 'text-[#F39C12] hover:text-[#E67E22]'
                                     : 'text-[#7F8C8D] hover:text-[#AAB0C0]'
-                                }`}
-                              >
-                                <Star className={`w-4 h-4 ${watchlist.has(item.symbol) ? 'fill-current' : ''}`} />
-                              </button>
+                              }`}
+                          >
+                            <Star className={`w-4 h-4 ${watchlist.has(item.symbol) ? 'fill-current' : ''}`} />
+                          </button>
                               <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#0D0F18]/50">
                                 <img
                                   src={item.logo || getLogoUrlForCoin(item.baseAsset)}
-                                  alt={item.baseAsset}
+                                alt={item.baseAsset}
                                   className="w-6 h-6 object-cover"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
                                     let attemptCount = parseInt(target.dataset.attemptCount || '0');
                                     
                                     // Track attempts to prevent infinite loops
@@ -667,47 +667,47 @@ export default function MarketsPage() {
                                       target.src = urls[attemptCount];
                                     } else {
                                       // Final fallback to text
-                                      target.style.display = 'none';
-                                      const parent = target.parentElement;
+                                  target.style.display = 'none';
+                                  const parent = target.parentElement;
                                       if (parent && !parent.querySelector('span')) {
                                         parent.innerHTML = `<span class="text-[#BDC3C7] font-bold text-xs">${item.baseAsset.slice(0, 2)}</span>`;
                                       }
-                                    }
-                                  }}
-                                />
-                              </div>
-                              <div>
+                                  }
+                                }}
+                              />
+                            </div>
+                            <div>
                                 <div className="font-semibold text-white text-sm">{item.baseAsset}</div>
                                 <div className="text-xs text-[#7F8C8D]">{item.baseAsset}/USDT</div>
                               </div>
-                            </div>
-                          </td>
+                          </div>
+                        </td>
 
-                          {/* Price */}
+                        {/* Price */}
                           <td className="py-3 px-4 text-right">
                             <div className="font-semibold text-white text-sm">{formatPrice(item.lastPrice, item.quoteAsset)}</div>
-                          </td>
+                        </td>
 
-                          {/* 24h % */}
+                        {/* 24h % */}
                           <td className="py-3 px-4 text-right">
                             <span className={`font-semibold text-sm ${getPercentColor(item.priceChangePercent)}`}>
-                              {formatPercent(item.priceChangePercent)}
-                            </span>
-                          </td>
+                            {formatPercent(item.priceChangePercent)}
+                          </span>
+                        </td>
 
                           {/* 7d Change */}
                           <td className="py-3 px-4 text-right">
                             <span className={`font-semibold text-sm ${getPercentColor(item.priceChangePercent7d || 0)}`}>
                               {formatPercent(item.priceChangePercent7d || 0)}
-                            </span>
-                          </td>
+                          </span>
+                        </td>
 
                           {/* 24h Volume */}
                           <td className="py-3 px-4 text-right hidden lg:table-cell">
                             <div className="text-[#AAB0C0] text-sm">
                               {formatNumber(convertVolumeToUSDT(item.quoteVolume || '0', item.quoteAsset))}
-                            </div>
-                          </td>
+                          </div>
+                        </td>
 
                           {/* Market Cap */}
                           <td className="py-3 px-4 text-right hidden xl:table-cell">
@@ -716,88 +716,88 @@ export default function MarketsPage() {
                                 ? formatNumber(item.marketCap) 
                                 : '—'}
                             </div>
-                          </td>
+                        </td>
 
                           {/* Actions */}
                           <td className="py-3 px-4 text-center">
                             <div className="flex items-center justify-center space-x-2">
-                              <button
+                          <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   navigate(`/markets/${item.symbol}`);
                                 }}
                                 className="p-1.5 text-[#7F8C8D] hover:text-white transition-colors"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                          </motion.tr>
-                        ))}
-                    </tbody>
-                  </table>
-
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="pt-4 mt-4 border-t border-white/10">
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="text-sm text-[#7F8C8D]">
-                          Showing {(currentPage - 1) * filters.pageSize + 1} to {Math.min(currentPage * filters.pageSize, filteredData.length)} of {filteredData.length} results
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                            disabled={currentPage === 1}
-                            className="px-4 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-[#AAB0C0] hover:bg-[#0D0F18]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                           >
-                            Previous
+                            <Eye className="w-4 h-4" />
                           </button>
+                            </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
 
-                          <div className="flex items-center space-x-1">
-                            {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                              let page;
-                              if (totalPages <= 7) {
-                                page = i + 1;
-                              } else if (currentPage <= 4) {
-                                page = i + 1;
-                              } else if (currentPage >= totalPages - 3) {
-                                page = totalPages - 6 + i;
-                              } else {
-                                page = currentPage - 3 + i;
-                              }
+              {/* Pagination */}
+              {totalPages > 1 && (
+                    <div className="pt-4 mt-4 border-t border-white/10">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-sm text-[#7F8C8D]">
+                      Showing {(currentPage - 1) * filters.pageSize + 1} to {Math.min(currentPage * filters.pageSize, filteredData.length)} of {filteredData.length} results
+                    </div>
 
-                              return (
-                                <button
-                                  key={page}
-                                  onClick={() => setCurrentPage(page)}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-[#AAB0C0] hover:bg-[#0D0F18]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      >
+                        Previous
+                      </button>
+
+                      <div className="flex items-center space-x-1">
+                        {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                          let page;
+                          if (totalPages <= 7) {
+                            page = i + 1;
+                          } else if (currentPage <= 4) {
+                            page = i + 1;
+                          } else if (currentPage >= totalPages - 3) {
+                            page = totalPages - 6 + i;
+                          } else {
+                            page = currentPage - 3 + i;
+                          }
+
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentPage(page)}
                                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                                     currentPage === page
-                                      ? 'bg-[#6A3DF4] text-white shadow-lg'
-                                      : 'text-[#AAB0C0] hover:bg-[#0D0F18]/50'
-                                  }`}
-                                >
-                                  {page}
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          <button
-                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                            disabled={currentPage === totalPages}
-                            className="px-4 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-[#AAB0C0] hover:bg-[#0D0F18]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                          >
-                            Next
-                          </button>
-                        </div>
+                                ? 'bg-[#6A3DF4] text-white shadow-lg'
+                                : 'text-[#AAB0C0] hover:bg-[#0D0F18]/50'
+                                }`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        })}
                       </div>
+
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-[#AAB0C0] hover:bg-[#0D0F18]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      >
+                        Next
+                      </button>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
+                </div>
+          )}
               </div>
-            </motion.div>
+        </motion.div>
           </div>
         )}
 

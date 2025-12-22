@@ -5,12 +5,18 @@ import { useNavigate } from 'react-router';
 import {
   TrendingUp,
   Check,
-  Sparkles,
   BarChart3,
   Target,
   Shield,
   X,
   Menu,
+  FileText,
+  Users,
+  Trophy,
+  Brain,
+  BookOpen,
+  Zap,
+  ChevronDown,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SignInForm from '../components/auth/SignInForm';
@@ -59,6 +65,7 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const pageRef = useRef<HTMLDivElement | null>(null);
   const heroRef = useRef<HTMLElement | null>(null);
   const { user } = useAuth();
@@ -184,7 +191,7 @@ export default function Home() {
               <span className="text-2xl font-bold text-white">Tradecircle</span>
             </motion.div>
 
-            <nav className="hidden md:flex items-center gap-6 ml-auto">
+            <nav className="hidden md:flex items-center gap-4 ml-auto">
               <a
                 href="#pricing"
                 className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
@@ -205,12 +212,20 @@ export default function Home() {
                   Dashboard
                 </button>
               ) : (
-                <button
-                  onClick={() => setShowLoginModal(true)}
-                  className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
-                >
-                  Login
-                </button>
+                <>
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="bg-[#1E2232] hover:bg-[#2A2F42] border border-white/10 hover:border-white/20 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-300 whitespace-nowrap"
+                  >
+                    Log In
+                  </button>
+                  <button
+                    onClick={() => navigate('/signup')}
+                    className="bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                  >
+                    Sign Up
+                  </button>
+                </>
               )}
             </nav>
 
@@ -250,7 +265,7 @@ export default function Home() {
                 >
                   Features
                 </a>
-                <div className="pt-4 border-t border-white/5 flex flex-col space-y-4">
+                <div className="pt-4 border-t border-white/5 flex flex-col space-y-3">
                   {user ? (
                     <button
                       onClick={() => {
@@ -262,15 +277,26 @@ export default function Home() {
                       Dashboard
                     </button>
                   ) : (
-                    <button
-                      onClick={() => {
-                        setShowLoginModal(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
-                    >
-                      Login
-                    </button>
+                    <>
+                      <button
+                        onClick={() => {
+                          setShowLoginModal(true);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full bg-[#1E2232] hover:bg-[#2A2F42] border border-white/10 hover:border-white/20 text-white px-6 py-3 rounded-xl font-medium transition-all"
+                      >
+                        Log In
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigate('/signup');
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                      >
+                        Sign Up
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -377,29 +403,18 @@ export default function Home() {
           </motion.p>
 
           <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            className="flex justify-center items-center"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             <motion.button
-              onClick={() => navigate('/dashboard')}
-              className="bg-[#1E2232] backdrop-blur-xl text-white hover:bg-[#2A2F42] border border-white/10 hover:border-white/20 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 shadow-lg"
+              onClick={() => navigate('/signup')}
+              className="bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-12 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div className="flex items-center space-x-2">
-                <Sparkles className="w-5 h-5 text-[#BDC3C7]" />
-                <span>Try Demo</span>
-              </div>
-            </motion.button>
-            <motion.button
-              onClick={handleGetStarted}
-              className="bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-10 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Start Free Trial
+              Start your Journey Now
             </motion.button>
           </motion.div>
         </motion.div>
@@ -500,7 +515,12 @@ export default function Home() {
                   'Unlimited trades',
                   'Advanced analytics & reports',
                   'Strategy backtesting',
-                  'Trade replay & analysis',
+                  'Trade journaling & analysis',
+                  'Competition mode & tournaments',
+                  'Alpha Hub access',
+                  'Study & educational content',
+                  'Trade against other traders',
+                  'Win prizes in tournaments',
                   'Custom alerts',
                   'Priority support',
                   'API access',
@@ -549,7 +569,7 @@ export default function Home() {
             <p className="text-2xl text-[#AAB0C0] font-light">Everything you need to succeed</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-8">
             {[
               {
                 icon: BarChart3,
@@ -558,13 +578,43 @@ export default function Home() {
               },
               {
                 icon: Target,
-                title: 'Strategy Testing',
+                title: 'Strategy Backtesting',
                 description: 'Backtest your strategies against historical data to validate your approach before risking real money.',
               },
               {
                 icon: Shield,
                 title: 'Risk Management',
                 description: 'Track your risk metrics and get alerts when you\'re approaching your limits.',
+              },
+              {
+                icon: FileText,
+                title: 'Trade Journaling',
+                description: 'Document every trade, analyze your decisions, and learn from your wins and losses with our comprehensive journal.',
+              },
+              {
+                icon: Users,
+                title: 'Competition Mode',
+                description: 'Trade against other traders in real-time competitions. Win bets and prove your trading skills against the best.',
+              },
+              {
+                icon: Trophy,
+                title: 'Tournaments & Prizes',
+                description: 'Join trading tournaments and compete for prizes. Climb the leaderboard and win rewards based on your performance.',
+              },
+              {
+                icon: Brain,
+                title: 'Alpha Hub',
+                description: 'Discover market insights, trading signals, and alpha-generating strategies from top traders and analysts.',
+              },
+              {
+                icon: BookOpen,
+                title: 'Study & Learn',
+                description: 'Access comprehensive trading courses, tutorials, and educational content to improve your trading skills.',
+              },
+              {
+                icon: Zap,
+                title: 'Live Trading',
+                description: 'Execute trades in real-time with advanced order types, leverage, and professional trading tools.',
               },
             ].map((feature, index) => (
               <motion.div
@@ -581,6 +631,107 @@ export default function Home() {
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
                 <p className="text-[#AAB0C0] leading-relaxed">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-32 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-5xl font-bold text-white mb-6">Frequently Asked Questions</h2>
+            <p className="text-2xl text-[#AAB0C0] font-light">Everything you need to know about Tradecircle</p>
+          </motion.div>
+
+          <div className="space-y-4">
+            {[
+              {
+                question: 'What is Tradecircle?',
+                answer: 'Tradecircle is a comprehensive trading analytics platform that helps traders become consistently profitable. We offer advanced analytics, strategy backtesting, trade journaling, competition mode, tournaments, and educational content all in one place.',
+              },
+              {
+                question: 'How does Competition Mode work?',
+                answer: 'In Competition Mode, you can trade against other traders in real-time. You can place bets on your trades and compete for prizes. Win matches to climb the leaderboard and earn rewards based on your trading performance.',
+              },
+              {
+                question: 'What are Tournaments?',
+                answer: 'Tournaments are structured trading competitions where you compete against other traders over a set period. Winners receive prizes based on their performance, including highest P&L, best win rate, and other metrics. Join tournaments to test your skills and win rewards.',
+              },
+              {
+                question: 'How does Strategy Backtesting work?',
+                answer: 'Our Strategy Backtesting feature allows you to test your trading strategies against historical market data. You can validate your approach, optimize parameters, and see how your strategy would have performed in the past before risking real money.',
+              },
+              {
+                question: 'What is Trade Journaling?',
+                answer: 'Trade Journaling helps you document every trade, analyze your decisions, and learn from your wins and losses. Track your emotions, market conditions, entry/exit reasons, and review your performance to continuously improve your trading skills.',
+              },
+              {
+                question: 'What is Alpha Hub?',
+                answer: 'Alpha Hub is your source for market insights, trading signals, and alpha-generating strategies. Discover valuable information from top traders and analysts to help you make better trading decisions and find profitable opportunities.',
+              },
+              {
+                question: 'What educational content is available?',
+                answer: 'Our Study section offers comprehensive trading courses, tutorials, quizzes, and educational content covering everything from basics to advanced trading strategies. Learn at your own pace and improve your trading knowledge.',
+              },
+              {
+                question: 'Is there a free plan?',
+                answer: 'Yes! We offer a free plan that includes up to 50 trades per month, basic analytics dashboard, trade journaling, access to Study materials, and community support. Perfect for getting started with trading analytics.',
+              },
+              {
+                question: 'What does the Pro plan include?',
+                answer: 'The Pro plan includes unlimited trades, advanced analytics & reports, strategy backtesting, trade journaling & analysis, competition mode & tournaments, Alpha Hub access, Study & educational content, ability to trade against other traders, win prizes in tournaments, custom alerts, priority support, API access, and export capabilities.',
+              },
+              {
+                question: 'Can I cancel my subscription anytime?',
+                answer: 'Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period, and you won\'t be charged for the next period.',
+              },
+            ].map((faq, index) => (
+              <motion.div
+                key={index}
+                className="bg-[#1E2232] rounded-xl border border-white/5 overflow-hidden hover:border-white/10 transition-all duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
+                  className="w-full px-8 py-6 flex items-center justify-between text-left group"
+                >
+                  <h3 className="text-xl font-semibold text-white group-hover:text-[#6A3DF4] transition-colors pr-8">
+                    {faq.question}
+                  </h3>
+                  <motion.div
+                    animate={{ rotate: openFAQ === index ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex-shrink-0"
+                  >
+                    <ChevronDown className="w-6 h-6 text-[#AAB0C0] group-hover:text-[#6A3DF4] transition-colors" />
+                  </motion.div>
+                </button>
+                <AnimatePresence>
+                  {openFAQ === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-8 pb-6">
+                        <p className="text-[#AAB0C0] leading-relaxed">{faq.answer}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             ))}
           </div>
