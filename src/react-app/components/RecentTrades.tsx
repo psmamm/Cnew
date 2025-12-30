@@ -4,9 +4,12 @@ import { useTrades } from '@/react-app/hooks/useTrades';
 import { useLivePnL } from '@/react-app/hooks/useLivePnL';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
+import { getCardBg, getCardBorder, getTextColor, getHoverBg } from '../utils/themeUtils';
 
 export default function RecentTrades() {
   const { trades, loading } = useTrades(10); // Get last 10 trades
+  const { theme } = useTheme();
   
   // Get open positions for live P&L
   const openPositions = useMemo(() => {
@@ -54,18 +57,18 @@ export default function RecentTrades() {
 
   if (loading) {
     return (
-      <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
-        <h2 className="text-xl font-semibold text-white mb-6">Recent Trades</h2>
+      <div className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)}`}>
+        <h2 className={`text-xl font-semibold ${getTextColor(theme, 'primary')} mb-6`}>Recent Trades</h2>
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-[#2A2F42] rounded-lg" />
+                <div className={`w-10 h-10 ${theme === 'dark' ? 'bg-[#2A2F42]' : 'bg-gray-200'} rounded-lg`} />
                 <div className="flex-1">
-                  <div className="h-4 bg-[#2A2F42] rounded w-1/3 mb-2" />
-                  <div className="h-3 bg-[#2A2F42] rounded w-1/2" />
+                  <div className={`h-4 ${theme === 'dark' ? 'bg-[#2A2F42]' : 'bg-gray-200'} rounded w-1/3 mb-2`} />
+                  <div className={`h-3 ${theme === 'dark' ? 'bg-[#2A2F42]' : 'bg-gray-200'} rounded w-1/2`} />
                 </div>
-                <div className="h-4 bg-[#2A2F42] rounded w-16" />
+                <div className={`h-4 ${theme === 'dark' ? 'bg-[#2A2F42]' : 'bg-gray-200'} rounded w-16`} />
               </div>
             </div>
           ))}
@@ -75,15 +78,15 @@ export default function RecentTrades() {
   }
 
   return (
-    <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
+    <div className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)}`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
             <Clock className="w-5 h-5 text-[#6A3DF4]" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-white">Recent Trades</h2>
-            <p className="text-[#7F8C8D] text-sm">Latest trading activity</p>
+            <h2 className={`text-xl font-semibold ${getTextColor(theme, 'primary')}`}>Recent Trades</h2>
+            <p className={`${getTextColor(theme, 'muted')} text-sm`}>Latest trading activity</p>
           </div>
         </div>
         <Link 
@@ -97,8 +100,8 @@ export default function RecentTrades() {
       
       {trades.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-[#7F8C8D] mb-2">No trades yet</div>
-          <p className="text-[#7F8C8D] text-sm">
+          <div className={getTextColor(theme, 'muted') + ' mb-2'}>No trades yet</div>
+          <p className={`${getTextColor(theme, 'muted')} text-sm`}>
             Start by <Link to="/journal" className="text-[#6A3DF4] hover:text-[#8A5CFF] transition-colors">adding your first trade</Link>
           </p>
         </div>
@@ -110,11 +113,11 @@ export default function RecentTrades() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="flex items-center space-x-4 p-4 bg-[#0D0F18] hover:bg-white/5 border border-white/10 rounded-xl transition-all duration-200 group"
+              className={`flex items-center space-x-4 p-4 ${getCardBg(theme)} ${getHoverBg(theme)} border ${getCardBorder(theme)} rounded-xl transition-all duration-200 group`}
             >
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-lg flex items-center justify-center">
-                  <span className="text-[#BDC3C7] font-medium">
+                  <span className={`${getTextColor(theme, 'secondary')} font-medium`}>
                     {getAssetIcon(trade.asset_type || 'stocks')}
                   </span>
                 </div>
@@ -122,7 +125,7 @@ export default function RecentTrades() {
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-2">
-                  <h3 className="text-white font-medium">{trade.symbol}</h3>
+                  <h3 className={`${getTextColor(theme, 'primary')} font-medium`}>{trade.symbol}</h3>
                   <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${
                     trade.direction === 'long' 
                       ? 'bg-[#2ECC71]/20 text-[#2ECC71]' 
@@ -137,11 +140,11 @@ export default function RecentTrades() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 mt-1">
-                  <p className="text-[#7F8C8D] text-sm">
+                  <p className={`${getTextColor(theme, 'muted')} text-sm`}>
                     {trade.quantity.toLocaleString()} @ ${trade.entry_price.toFixed(4)}
                   </p>
-                  <span className="text-[#7F8C8D]">•</span>
-                  <p className="text-[#7F8C8D] text-sm">{formatDate(trade.entry_date)}</p>
+                  <span className={getTextColor(theme, 'muted')}>•</span>
+                  <p className={`${getTextColor(theme, 'muted')} text-sm`}>{formatDate(trade.entry_date)}</p>
                 </div>
               </div>
               
@@ -158,7 +161,7 @@ export default function RecentTrades() {
                     <span className="text-[#6A3DF4] text-sm font-medium">Open</span>
                   </div>
                 )}
-                <div className="text-[#7F8C8D] text-xs mt-1">
+                <div className={`${getTextColor(theme, 'muted')} text-xs mt-1`}>
                   {trade.strategy_name || 'No Strategy'}
                 </div>
               </div>

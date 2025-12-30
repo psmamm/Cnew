@@ -23,6 +23,8 @@ import { useTrades } from "@/react-app/hooks/useTrades";
 import { motion } from "framer-motion";
 import { useMemo, useState, useEffect } from "react";
 import { useLanguageCurrency } from "@/react-app/contexts/LanguageCurrencyContext";
+import { useTheme } from "@/react-app/contexts/ThemeContext";
+import { getCardBg, getCardBorder, getTextColor, getHoverBg } from "@/react-app/utils/themeUtils";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -30,6 +32,7 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const { trades, loading } = useTrades();
   const { currency, convertCurrency } = useLanguageCurrency();
+  const { theme } = useTheme();
   
   // State for currency conversion rate
   const [conversionRate, setConversionRate] = useState<number>(1);
@@ -196,14 +199,14 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
+            className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)}`}
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-bold text-white">
+                <h2 className={`text-xl font-bold ${getTextColor(theme, 'primary')}`}>
                   Search results for "{searchQuery}"
                 </h2>
-                <p className="text-[#7F8C8D]">
+                <p className={getTextColor(theme, 'muted')}>
                   {filteredTrades.length} {filteredTrades.length === 1 ? 'trade' : 'trades'} found
                 </p>
               </div>
@@ -218,14 +221,14 @@ export default function DashboardPage() {
             {filteredTrades.length > 0 ? (
               <div className="space-y-3">
                 {filteredTrades.slice(0, 5).map((trade) => (
-                  <div key={trade.id} className="flex items-center justify-between p-4 bg-[#0D0F18] rounded-xl border border-white/10 hover:bg-white/5 transition-colors">
+                  <div key={trade.id} className={`flex items-center justify-between p-4 ${getCardBg(theme)} rounded-xl border ${getCardBorder(theme)} ${getHoverBg(theme)} transition-colors`}>
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
-                        <span className="text-[#BDC3C7] font-semibold">{trade.symbol}</span>
+                        <span className={`${getTextColor(theme, 'secondary')} font-semibold`}>{trade.symbol}</span>
                       </div>
                       <div>
-                        <h3 className="text-white font-medium">{trade.symbol}</h3>
-                        <p className="text-[#7F8C8D] text-sm">
+                        <h3 className={`${getTextColor(theme, 'primary')} font-medium`}>{trade.symbol}</h3>
+                        <p className={`${getTextColor(theme, 'muted')} text-sm`}>
                           {trade.direction.toUpperCase()} • {trade.entry_date}
                         </p>
                       </div>
@@ -243,14 +246,14 @@ export default function DashboardPage() {
                   </div>
                 ))}
                 {filteredTrades.length > 5 && (
-                  <p className="text-[#7F8C8D] text-center pt-4">
+                  <p className={`${getTextColor(theme, 'muted')} text-center pt-4`}>
                     And {filteredTrades.length - 5} more trades...
                   </p>
                 )}
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-[#7F8C8D]">No trades found</p>
+                <p className={getTextColor(theme, 'muted')}>No trades found</p>
               </div>
             )}
           </motion.div>
@@ -258,7 +261,7 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
+            className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)}`}
           >
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="mb-6 lg:mb-0">
@@ -266,28 +269,28 @@ export default function DashboardPage() {
                   <div className={`w-12 h-12 ${timeGreeting.iconBg} rounded-xl flex items-center justify-center`}>
                     <timeGreeting.icon className={`w-6 h-6 ${timeGreeting.iconColor}`} />
                   </div>
-                  <h1 className="text-4xl font-bold text-white">
+                  <h1 className={`text-4xl font-bold ${getTextColor(theme, 'primary')}`}>
                     {timeGreeting.greeting}, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'Trader'}!
                   </h1>
                 </div>
-                <p className="text-[#AAB0C0] text-lg">
+                <p className={`${getTextColor(theme, 'secondary')} text-lg`}>
                   Here's your trading performance overview
                 </p>
               </div>
               <div className="flex items-center space-x-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{metrics.totalTrades}</div>
-                  <div className="text-[#7F8C8D] text-sm font-medium">Total Trades</div>
+                  <div className={`text-3xl font-bold ${getTextColor(theme, 'primary')}`}>{metrics.totalTrades}</div>
+                  <div className={`${getTextColor(theme, 'muted')} text-sm font-medium`}>Total Trades</div>
                 </div>
-                <div className="w-px h-16 bg-white/10" />
+                <div className={`w-px h-16 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`} />
                 <div className="text-center">
                   <div className="text-3xl font-bold text-[#6A3DF4]">{metrics.openTrades}</div>
-                  <div className="text-[#7F8C8D] text-sm font-medium">Open Positions</div>
+                  <div className={`${getTextColor(theme, 'muted')} text-sm font-medium`}>Open Positions</div>
                 </div>
-                <div className="w-px h-16 bg-white/10" />
+                <div className={`w-px h-16 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`} />
                 <div className="text-center">
                   <div className="text-3xl font-bold text-[#2ECC71]">{metrics.todaysTrades}</div>
-                  <div className="text-[#7F8C8D] text-sm font-medium">Today's Trades</div>
+                  <div className={`${getTextColor(theme, 'muted')} text-sm font-medium`}>Today's Trades</div>
                 </div>
               </div>
             </div>
@@ -372,21 +375,21 @@ export default function DashboardPage() {
             transition={{ delay: 0.2 }}
             className="xl:col-span-8"
           >
-            <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full">
+            <div className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)} h-full`}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
                     <BarChart3 className="w-5 h-5 text-[#6A3DF4]" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-white">Portfolio Performance</h2>
-                    <p className="text-[#7F8C8D] text-sm">30-day equity curve</p>
+                    <h2 className={`text-xl font-semibold ${getTextColor(theme, 'primary')}`}>Portfolio Performance</h2>
+                    <p className={`${getTextColor(theme, 'muted')} text-sm`}>30-day equity curve</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 bg-[#6A3DF4] rounded-full" />
-                    <span className="text-[#7F8C8D] text-sm">Portfolio Value</span>
+                    <span className={`${getTextColor(theme, 'muted')} text-sm`}>Portfolio Value</span>
                   </div>
                   <div className="px-3 py-1 bg-[#2ECC71]/10 text-[#2ECC71] text-xs rounded-full">
                     Live
@@ -419,7 +422,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/reports')}
-            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 group relative overflow-hidden"
+            className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)} h-full cursor-pointer ${getHoverBg(theme)} transition-all duration-300 group relative overflow-hidden`}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#2ECC71]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative z-10">
@@ -429,8 +432,8 @@ export default function DashboardPage() {
                     <Trophy className="w-5 h-5 text-[#2ECC71]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Performance Metrics</h3>
-                    <p className="text-[#7F8C8D] text-sm">Click for detailed analysis</p>
+                    <h3 className={`text-lg font-semibold ${getTextColor(theme, 'primary')}`}>Performance Metrics</h3>
+                    <p className={`${getTextColor(theme, 'muted')} text-sm`}>Click for detailed analysis</p>
                   </div>
                 </div>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">
@@ -438,17 +441,17 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-[#0D0F18] rounded-xl border border-white/10 group-hover:bg-white/5 transition-colors">
-                  <span className="text-[#7F8C8D] font-medium">Avg Win</span>
+                <div className={`flex justify-between items-center p-3 ${getCardBg(theme)} rounded-xl border ${getCardBorder(theme)} ${getHoverBg(theme)} transition-colors`}>
+                  <span className={`${getTextColor(theme, 'muted')} font-medium`}>Avg Win</span>
                   <span className="text-[#2ECC71] font-semibold">{formatCurrency(metrics.avgWin)}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-[#0D0F18] rounded-xl border border-white/10 group-hover:bg-white/5 transition-colors">
-                  <span className="text-[#7F8C8D] font-medium">Avg Loss</span>
+                <div className={`flex justify-between items-center p-3 ${getCardBg(theme)} rounded-xl border ${getCardBorder(theme)} ${getHoverBg(theme)} transition-colors`}>
+                  <span className={`${getTextColor(theme, 'muted')} font-medium`}>Avg Loss</span>
                   <span className="text-[#E74C3C] font-semibold">{formatCurrency(metrics.avgLoss)}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-[#0D0F18] rounded-xl border border-white/10 group-hover:bg-white/5 transition-colors">
-                  <span className="text-[#7F8C8D] font-medium">R:R Ratio</span>
-                  <span className="text-white font-semibold">
+                <div className={`flex justify-between items-center p-3 ${getCardBg(theme)} rounded-xl border ${getCardBorder(theme)} ${getHoverBg(theme)} transition-colors`}>
+                  <span className={`${getTextColor(theme, 'muted')} font-medium`}>R:R Ratio</span>
+                  <span className={`${getTextColor(theme, 'primary')} font-semibold`}>
                     {metrics.avgLoss > 0 ? (metrics.avgWin / metrics.avgLoss).toFixed(2) : '∞'}:1
                   </span>
                 </div>
@@ -460,7 +463,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/journal')}
-            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 group relative overflow-hidden"
+            className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)} h-full cursor-pointer ${getHoverBg(theme)} transition-all duration-300 group relative overflow-hidden`}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#6A3DF4]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative z-10">
@@ -470,8 +473,8 @@ export default function DashboardPage() {
                     <PieChart className="w-5 h-5 text-[#6A3DF4]" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Trade Distribution</h3>
-                    <p className="text-[#7F8C8D] text-sm">View your trade journal</p>
+                    <h3 className={`text-lg font-semibold ${getTextColor(theme, 'primary')}`}>Trade Distribution</h3>
+                    <p className={`${getTextColor(theme, 'muted')} text-sm`}>View your trade journal</p>
                   </div>
                 </div>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity">

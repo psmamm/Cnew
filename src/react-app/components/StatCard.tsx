@@ -1,5 +1,7 @@
 import { LucideIcon, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTheme } from "../contexts/ThemeContext";
+import { getCardBg, getCardBorder, getTextColor, getHoverBg } from "../utils/themeUtils";
 
 interface StatCardProps {
   title: string;
@@ -24,8 +26,10 @@ export default function StatCard({
   subtitle,
   trend 
 }: StatCardProps) {
+  const { theme } = useTheme();
+  
   const getChangeColor = () => {
-    if (change === "N/A") return "text-[#AAB0C0]";
+    if (change === "N/A") return theme === 'dark' ? "text-[#AAB0C0]" : "text-gray-500";
     return changeType === 'positive' ? 'text-[#2ECC71]' : 'text-[#E74C3C]';
   };
 
@@ -50,10 +54,10 @@ export default function StatCard({
 
   return (
     <motion.div 
-      className={`bg-[#0D0F18] rounded-xl p-4 border border-white/10 transition-all duration-200 group h-full relative overflow-hidden ${
+      className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)} transition-all duration-200 group h-full relative overflow-hidden ${
         isClickable 
-          ? 'hover:bg-white/5 cursor-pointer' 
-          : 'hover:bg-white/5'
+          ? `${getHoverBg(theme)} cursor-pointer` 
+          : getHoverBg(theme)
       }`}
       onClick={onClick}
       whileHover={isClickable ? { y: -2 } : {}}
@@ -85,20 +89,20 @@ export default function StatCard({
         </div>
         
         <div className="flex-1">
-          <h3 className="text-[#7F8C8D] text-sm font-semibold mb-2 uppercase tracking-wide">{title}</h3>
+          <h3 className={`${getTextColor(theme, 'muted')} text-sm font-semibold mb-2 uppercase tracking-wide`}>{title}</h3>
           
           {loading ? (
             <div className="space-y-2">
-              <div className="h-8 bg-white/10 rounded animate-pulse" />
-              {subtitle && <div className="h-4 bg-white/5 rounded animate-pulse w-2/3" />}
+              <div className={`h-8 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'} rounded animate-pulse`} />
+              {subtitle && <div className={`h-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'} rounded animate-pulse w-2/3`} />}
             </div>
           ) : (
             <>
               <div className="flex items-baseline space-x-2 mb-2">
-                <p className="text-3xl font-bold text-white">{value}</p>
+                <p className={`text-3xl font-bold ${getTextColor(theme, 'primary')}`}>{value}</p>
               </div>
               {subtitle && (
-                <p className="text-[#AAB0C0] text-sm">{subtitle}</p>
+                <p className={`${getTextColor(theme, 'secondary')} text-sm`}>{subtitle}</p>
               )}
             </>
           )}
@@ -107,7 +111,7 @@ export default function StatCard({
         {/* Progress bar for Win Rate */}
         {title === "Win Rate" && value !== "..." && !loading && (
           <div className="mt-4">
-            <div className="w-full bg-[#0D0F18]/50 rounded-full h-2">
+            <div className={`w-full ${theme === 'dark' ? 'bg-[#0D0F18]/50' : 'bg-gray-200'} rounded-full h-2`}>
               <motion.div 
                 className={`bg-gradient-to-r ${getProgressColor()} h-2 rounded-full`}
                 initial={{ width: 0 }}
@@ -116,8 +120,8 @@ export default function StatCard({
               />
             </div>
             <div className="flex justify-between mt-1">
-              <span className="text-xs text-[#7F8C8D]">0%</span>
-              <span className="text-xs text-[#7F8C8D]">100%</span>
+              <span className={`text-xs ${getTextColor(theme, 'muted')}`}>0%</span>
+              <span className={`text-xs ${getTextColor(theme, 'muted')}`}>100%</span>
             </div>
           </div>
         )}
@@ -147,7 +151,7 @@ export default function StatCard({
                 />
               ))}
             </div>
-            <p className="text-xs text-[#7F8C8D] mt-1">Last 7 days</p>
+            <p className={`text-xs ${getTextColor(theme, 'muted')} mt-1`}>Last 7 days</p>
           </div>
         )}
 

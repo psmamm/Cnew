@@ -5,12 +5,15 @@ import { useDataExport } from '@/react-app/hooks/useDataExport';
 import { useTrades } from '@/react-app/hooks/useTrades';
 import { useState } from 'react';
 import { TradeImportWizard } from '@/react-app/components/wizards/TradeImportWizard';
+import { useTheme } from '../contexts/ThemeContext';
+import { getCardBg, getCardBorder, getTextColor, getHoverBg } from '../utils/themeUtils';
 
 export default function QuickActions() {
   const navigate = useNavigate();
   const { exportData, exporting } = useDataExport();
   const { trades } = useTrades(10);
   const [showWizard, setShowWizard] = useState(false);
+  const { theme } = useTheme();
 
   const handleExport = async () => {
     try {
@@ -66,14 +69,14 @@ export default function QuickActions() {
 
   return (
     <>
-      <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full">
+      <div className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)} h-full`}>
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
             <Plus className="w-5 h-5 text-[#6A3DF4]" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-white">Quick Actions</h2>
-            <p className="text-[#7F8C8D] text-sm">Common tasks</p>
+            <h2 className={`text-xl font-semibold ${getTextColor(theme, 'primary')}`}>Quick Actions</h2>
+            <p className={`${getTextColor(theme, 'muted')} text-sm`}>Common tasks</p>
           </div>
         </div>
         <div className="space-y-3">
@@ -87,7 +90,7 @@ export default function QuickActions() {
               whileTap={{ scale: action.disabled ? 1 : 0.98 }}
               onClick={action.disabled ? undefined : action.onClick}
               disabled={action.disabled}
-              className={`w-full flex items-center space-x-4 p-4 bg-[#0D0F18] hover:bg-white/5 border border-white/10 rounded-xl transition-all duration-200 group relative ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              className={`w-full flex items-center space-x-4 p-4 ${getCardBg(theme)} ${getHoverBg(theme)} border ${getCardBorder(theme)} rounded-xl transition-all duration-200 group relative ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                 }`}
             >
               <div className={`${action.color} p-3 rounded-xl transition-all shadow-md group-hover:shadow-lg group-hover:shadow-[#6A3DF4]/20 relative`}>
@@ -95,7 +98,7 @@ export default function QuickActions() {
               </div>
               <div className="flex-1 text-left">
                 <div className="flex items-center space-x-2">
-                  <h3 className="text-white font-semibold group-hover:text-white">{action.title}</h3>
+                  <h3 className={`${getTextColor(theme, 'primary')} font-semibold`}>{action.title}</h3>
                   {action.badge && (
                     <span className={`px-2 py-1 text-xs font-bold rounded-full ${action.badge === 'NEW'
                         ? 'bg-[#E74C3C] text-white animate-pulse'
@@ -105,7 +108,7 @@ export default function QuickActions() {
                     </span>
                   )}
                 </div>
-                <p className="text-[#7F8C8D] text-sm group-hover:text-[#AAB0C0]">{action.description}</p>
+                <p className={`${getTextColor(theme, 'muted')} text-sm`}>{action.description}</p>
               </div>
 
               {/* Loading indicator for export */}
