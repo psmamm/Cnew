@@ -196,7 +196,7 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
           >
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
             {filteredTrades.length > 0 ? (
               <div className="space-y-3">
                 {filteredTrades.slice(0, 5).map((trade) => (
-                  <div key={trade.id} className="flex items-center justify-between p-4 bg-[#0D0F18]/50 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                  <div key={trade.id} className="flex items-center justify-between p-4 bg-[#0D0F18] rounded-xl border border-white/10 hover:bg-white/5 transition-colors">
                     <div className="flex items-center space-x-3">
                       <div className="w-12 h-12 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
                         <span className="text-[#BDC3C7] font-semibold">{trade.symbol}</span>
@@ -258,7 +258,7 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#1E2232] rounded-2xl p-8 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
           >
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="mb-6 lg:mb-0">
@@ -372,7 +372,7 @@ export default function DashboardPage() {
             transition={{ delay: 0.2 }}
             className="xl:col-span-8"
           >
-            <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)] h-full">
+            <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
@@ -419,7 +419,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/reports')}
-            className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)] h-full cursor-pointer hover:border-[#2ECC71]/50 hover:shadow-[0_8px_30px_rgba(46,204,113,0.2)] transition-all duration-300 group relative overflow-hidden"
+            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 group relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#2ECC71]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative z-10">
@@ -438,15 +438,15 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-[#0D0F18]/30 rounded-xl group-hover:bg-[#2ECC71]/5 transition-colors">
+                <div className="flex justify-between items-center p-3 bg-[#0D0F18] rounded-xl border border-white/10 group-hover:bg-white/5 transition-colors">
                   <span className="text-[#7F8C8D] font-medium">Avg Win</span>
                   <span className="text-[#2ECC71] font-semibold">{formatCurrency(metrics.avgWin)}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-[#0D0F18]/30 rounded-xl group-hover:bg-[#2ECC71]/5 transition-colors">
+                <div className="flex justify-between items-center p-3 bg-[#0D0F18] rounded-xl border border-white/10 group-hover:bg-white/5 transition-colors">
                   <span className="text-[#7F8C8D] font-medium">Avg Loss</span>
                   <span className="text-[#E74C3C] font-semibold">{formatCurrency(metrics.avgLoss)}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-[#0D0F18]/30 rounded-xl group-hover:bg-[#2ECC71]/5 transition-colors">
+                <div className="flex justify-between items-center p-3 bg-[#0D0F18] rounded-xl border border-white/10 group-hover:bg-white/5 transition-colors">
                   <span className="text-[#7F8C8D] font-medium">R:R Ratio</span>
                   <span className="text-white font-semibold">
                     {metrics.avgLoss > 0 ? (metrics.avgWin / metrics.avgLoss).toFixed(2) : '∞'}:1
@@ -460,7 +460,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/journal')}
-            className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)] h-full cursor-pointer hover:border-[#6A3DF4]/50 hover:shadow-[0_8px_30px_rgba(106,61,244,0.2)] transition-all duration-300 group relative overflow-hidden"
+            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 group relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#6A3DF4]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative z-10">
@@ -502,7 +502,7 @@ export default function DashboardPage() {
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/journal')}
-            className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)] h-full cursor-pointer hover:border-[#F39C12]/50 hover:shadow-[0_8px_30px_rgba(243,156,18,0.2)] transition-all duration-300 group relative overflow-hidden"
+            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full cursor-pointer hover:bg-white/5 transition-all duration-300 group relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#F39C12]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="relative z-10">

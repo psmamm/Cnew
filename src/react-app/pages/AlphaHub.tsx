@@ -334,7 +334,7 @@ export default function AlphaHubPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1E2232] rounded-2xl p-8 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="mb-2 lg:mb-0">
@@ -415,7 +415,7 @@ export default function AlphaHubPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+              <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
@@ -471,7 +471,7 @@ export default function AlphaHubPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#1E2232] rounded-xl border border-white/10 hover:border-[#6A3DF4]/50 transition-all group cursor-pointer gap-4 ${transaction.usdValue >= 1000000 ? 'shadow-[0_0_20px_rgba(106,61,244,0.3)] border-[#6A3DF4]/30' : ''
+                        className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#0D0F18] rounded-xl border border-white/10 hover:bg-white/5 transition-all group cursor-pointer gap-4 ${transaction.usdValue >= 1000000 ? 'border-[#6A3DF4]/30' : ''
                           }`}
                         onClick={() => window.open(transaction.blockchainExplorerUrl, '_blank')}
                       >
@@ -558,7 +558,7 @@ export default function AlphaHubPage() {
             className="xl:col-span-4 space-y-6"
           >
             {/* Smart Money Alerts */}
-            <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+            <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 bg-[#6A3DF4]/10 rounded-lg flex items-center justify-center">
                   <Zap className="w-4 h-4 text-[#6A3DF4]" />
@@ -577,7 +577,7 @@ export default function AlphaHubPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
                     onClick={() => window.open(alert.explorerLink, '_blank')}
-                    className="p-3 bg-[#0D0F18]/50 rounded-lg border border-white/10 hover:border-[#6A3DF4]/50 cursor-pointer transition-all group"
+                    className="p-3 bg-[#0D0F18] rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer transition-all group"
                   >
                     <div className="flex items-start space-x-3">
                       <img
@@ -613,7 +613,7 @@ export default function AlphaHubPage() {
             </div>
 
             {/* Market Overview */}
-            <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+            <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-8 h-8 bg-[#6A3DF4]/10 rounded-lg flex items-center justify-center">
                   <BarChart3 className="w-4 h-4 text-[#6A3DF4]" />
@@ -627,7 +627,7 @@ export default function AlphaHubPage() {
               {/* Key Coins */}
               <div className="grid grid-cols-2 gap-3 mb-4">
                 {keyCoins.slice(0, 6).map((coin) => (
-                  <div key={coin.symbol} className="p-3 bg-[#0D0F18]/50 rounded-lg border border-white/5 hover:border-[#6A3DF4]/30 transition-colors">
+                  <div key={coin.symbol} className="p-3 bg-[#0D0F18] rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
                     <div className="flex items-center space-x-2">
                       <img
                         src={coin.logo}
@@ -680,7 +680,7 @@ export default function AlphaHubPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
@@ -706,9 +706,9 @@ export default function AlphaHubPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 hover:scale-[1.02] ${item.isBreaking
-                  ? 'bg-[#6A3DF4]/5 border-[#6A3DF4]/30 hover:border-[#6A3DF4]/50 shadow-[0_0_20px_rgba(106,61,244,0.2)]'
-                  : 'bg-[#0D0F18]/50 border-white/10 hover:border-white/20'
+                className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 hover:bg-white/5 ${item.isBreaking
+                  ? 'bg-[#6A3DF4]/5 border-[#6A3DF4]/30'
+                  : 'bg-[#0D0F18] border-white/10'
                   }`}
               >
                 <div className="space-y-3">

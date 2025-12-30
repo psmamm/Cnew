@@ -100,7 +100,7 @@ export default function EquityChart() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#1E2232] border border-white/10 rounded-lg p-3 shadow-lg">
+        <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
           <p className="text-[#7F8C8D] text-sm mb-1">{label}</p>
           <p className="text-white font-semibold">
             {formatCurrency(payload[0].value)}

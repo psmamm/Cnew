@@ -268,7 +268,7 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
                         })}
 
                         {/* Weekly Total */}
-                        <div className="p-2 min-h-[75px] bg-[#1E2232] border-l border-white/10">
+                        <div className="p-2 min-h-[75px] bg-[#0D0F18] border-l border-white/10">
                             <div className="text-[10px] text-[#7F8C8D] font-medium uppercase tracking-wider">Week {weekIdx + 1}</div>
                             <div className={`text-base font-bold mt-1 ${weeklyStats[weekIdx].pnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
                                 {weeklyStats[weekIdx].pnl >= 0 ? '+' : ''}${weeklyStats[weekIdx].pnl.toFixed(0)}
@@ -291,17 +291,17 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={closePopup}
-                            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
-                        />
-
+                            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        >
                         {/* Popup */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md"
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative z-50 w-full max-w-sm"
                         >
-                            <div className="bg-[#1E2232] rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+                            <div className="bg-[#0D0F18] rounded-xl border border-white/10 overflow-hidden">
                                 {/* Popup Header */}
                                 <div className="bg-gradient-to-r from-[#667eea] to-[#764ba2] p-4">
                                     <div className="flex items-center justify-between">
@@ -396,6 +396,7 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
                                     </div>
                                 </div>
                             </div>
+                        </motion.div>
                         </motion.div>
                     </>
                 )}

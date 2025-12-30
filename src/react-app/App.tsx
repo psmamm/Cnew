@@ -2,6 +2,8 @@ import { lazy, Suspense, ReactNode, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageCurrencyProvider } from "./contexts/LanguageCurrencyContext";
+import { WalletProvider } from "./contexts/WalletContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import LoadingSpinner from "@/react-app/components/LoadingSpinner";
 import ErrorBoundary from "@/react-app/components/ErrorBoundary";
 import ProtectedRoute from "@/react-app/components/ProtectedRoute";
@@ -129,10 +131,12 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <LanguageCurrencyProvider>
-        <Router>
-          <Suspense fallback={<LoadingSpinner />}>
-            <LayoutProbe>
-              <Routes>
+          <WalletProvider>
+            <ThemeProvider>
+              <Router>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <LayoutProbe>
+                    <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -245,10 +249,12 @@ export default function App() {
                     <SettingsPage />
                   </ProtectedRoute>
                 } />
-              </Routes>
-            </LayoutProbe>
-          </Suspense>
-        </Router>
+                    </Routes>
+                  </LayoutProbe>
+                </Suspense>
+              </Router>
+            </ThemeProvider>
+          </WalletProvider>
         </LanguageCurrencyProvider>
       </AuthProvider>
     </ErrorBoundary>

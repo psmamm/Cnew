@@ -16,6 +16,9 @@ interface Tournament {
     ended_at: string | null;
     created_at: string;
     participantCount?: number;
+    entry_fee?: number;
+    prize_pool?: number;
+    tournament_tier?: string;
 }
 
 interface TournamentParticipant {
@@ -196,6 +199,9 @@ export function useTournament(tournamentId: number | null) {
         timeLimit: number;
         maxDrawdown?: number;
         maxParticipants?: number;
+        entryFee?: number;
+        prizePool?: number;
+        tournamentTier?: string;
     }) => {
         if (!user) {
             throw new Error('User not authenticated');

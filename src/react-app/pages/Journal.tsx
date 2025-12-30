@@ -27,10 +27,13 @@ import {
   Coins,
   CreditCard,
   CheckCircle2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Wallet
 } from "lucide-react";
 import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useTrades, useCreateTrade, useUpdateTrade, useDailyStats, type Trade as TradeEntity } from "@/react-app/hooks/useTrades";
+import { useWalletTransactions } from "@/react-app/hooks/useWalletTransactions";
+import { useWallet } from "@/react-app/contexts/WalletContext";
 import { useStrategies } from "@/react-app/hooks/useStrategies";
 import { useBinanceCoins } from "@/react-app/hooks/useBinanceCoins";
 import { useForexPairs } from "@/react-app/hooks/useForexPairs";
@@ -288,13 +291,16 @@ export default function JournalPage() {
 
   const { trades: rawTrades, loading, refetch } = useTrades(500, 0, searchTerm, symbolFilter, directionFilter, assetTypeFilter);
   const { dailyStats } = useDailyStats();
+  const { wallet } = useWallet();
+  const { trades: walletTrades, loading: walletTradesLoading } = useWalletTransactions();
 
   const allTrades: ExtendedTrade[] = useMemo(() => {
     return [
       ...rawTrades.map(t => ({ ...t, source: 'api' as const })),
-      ...importedTrades
+      ...importedTrades,
+      ...(wallet.isConnected ? walletTrades.map(t => ({ ...t, source: 'wallet' as const })) : [])
     ];
-  }, [rawTrades, importedTrades]);
+  }, [rawTrades, importedTrades, walletTrades, wallet.isConnected]);
 
   // Get open positions for live P&L calculation
   const openPositions = useMemo(() => {
@@ -900,7 +906,7 @@ export default function JournalPage() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#1E2232] border border-white/10 rounded-lg p-3 shadow-lg">
+        <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
           <p className="text-[#BDC3C7] text-sm mb-1">{label}</p>
           <p className="text-white font-semibold">
             {typeof payload[0].value === 'number' && payload[0].value > 100
@@ -917,7 +923,7 @@ export default function JournalPage() {
     <DashboardLayout>
       <div className="space-y-6 pb-24 pt-2 w-full max-w-7xl mx-auto overflow-x-hidden px-4 sm:px-6 lg:px-8">
         {/* Clean Header */}
-        <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
@@ -962,7 +968,7 @@ export default function JournalPage() {
             { label: 'Loss Streak', value: `${riskMetrics.worstStreak} losses`, sub: 'In a row', icon: TrendingDown, color: 'text-[#E74C3C]' },
             { label: 'Avg R Multiple', value: riskMetrics.avgRR > 10 ? '∞' : riskMetrics.avgRR.toFixed(2), sub: 'estimated', icon: TrendingUpIcon, color: 'text-white' },
           ].map((card) => (
-            <div key={card.label} className="bg-[#1E2232] rounded-xl p-4 border border-white/5 hover:border-[#6A3DF4]/30 transition-all shadow-sm">
+            <div key={card.label} className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 hover:bg-white/5 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <div className="p-2 bg-[#6A3DF4]/10 rounded-lg">
                   <card.icon className="w-4 h-4 text-[#6A3DF4]" />
@@ -976,7 +982,7 @@ export default function JournalPage() {
         </div>
 
         {/* Calendar - Full Width */}
-        <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5">
+        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
           <CalendarView
             dailyStats={dailyStats || []}
             selectedDate={selectedDateFilter}
@@ -987,7 +993,7 @@ export default function JournalPage() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Equity Curve - Left */}
-          <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
             <div className="flex items-center space-x-3 mb-4">
               <div className="p-2 bg-[#667eea]/10 rounded-lg">
                 <TrendingUp className="w-4 h-4 text-[#667eea]" />
@@ -1008,7 +1014,7 @@ export default function JournalPage() {
           </div>
 
           {/* Top Symbols - Right */}
-          <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
             <div className="flex items-center space-x-3 mb-4">
               <div className="p-2 bg-[#667eea]/10 rounded-lg">
                 <BarChart3 className="w-4 h-4 text-[#667eea]" />
@@ -1030,7 +1036,7 @@ export default function JournalPage() {
         </div>
 
         {/* Checklist - Full */}
-        <div className="bg-[#1E2232] rounded-xl p-5 border border-white/5">
+        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-3">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-[#2ECC71]/10 rounded-lg">
@@ -1123,7 +1129,7 @@ export default function JournalPage() {
         </div>
 
         {/* Search & Controls */}
-        <div className="bg-[#1E2232] rounded-2xl p-4 border border-white/5">
+        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
@@ -1219,7 +1225,7 @@ export default function JournalPage() {
         {/* Basic Filters Panel (simplified) */}
         <AnimatePresence>
           {showFilters && (
-            <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 space-y-5">
+            <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-[#BDC3C7] text-sm font-medium mb-2">Symbol</label>
@@ -1332,7 +1338,7 @@ export default function JournalPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-[#0D0F18] w-full max-w-3xl rounded-2xl border border-white/10 p-6"
+                className="bg-[#0D0F18] w-full max-w-3xl rounded-xl border border-white/10 p-4"
                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -1358,7 +1364,7 @@ export default function JournalPage() {
                     value={importText}
                     onChange={(e) => setImportText(e.target.value)}
                     rows={10}
-                    className="w-full bg-[#1E2232] border border-white/10 rounded-xl p-4 text-white placeholder-[#7F8C8D] focus:outline-none focus:border-[#6A3DF4] focus:ring-2 focus:ring-[#6A3DF4]/30"
+                    className="w-full bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-white placeholder-[#7F8C8D] focus:outline-none focus:border-[#6A3DF4] focus:ring-2 focus:ring-[#6A3DF4]/30"
                     placeholder="symbol,direction,quantity,entry_price,exit_price,entry_date,exit_date,pnl,tags,notes&#10;BTCUSDT,long,1,50000,52000,2024-06-20,2024-06-21,2000,breakout;news,Fed day breakout"
                   />
                   {importError && <div className="text-[#E74C3C] text-sm">{importError}</div>}
@@ -1370,7 +1376,7 @@ export default function JournalPage() {
                       Abbrechen
                     </button>
                     <div className="flex items-center space-x-3">
-                      <label className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/40 text-white cursor-pointer transition-colors">
+                      <label className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-[#0D0F18] border border-white/10 hover:bg-white/5 text-white cursor-pointer transition-colors">
                         <Upload className="w-4 h-4" />
                         <span>CSV wählen</span>
                         <input
@@ -1402,7 +1408,7 @@ export default function JournalPage() {
               onClick={resetForm}
             >
               <div
-                className="bg-[#0D0F18] rounded-2xl p-8 border border-white/10 shadow-2xl 
+                className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 
                            w-full max-w-4xl max-h-[90vh] overflow-y-auto backdrop-blur-xl"
                 onClick={(e) => e.stopPropagation()}
                 style={{ zIndex: 60 }}
@@ -1432,7 +1438,7 @@ export default function JournalPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-10">
                   {/* Section 1: Trade Setup */}
-                  <div className="bg-[#1E2232] rounded-xl p-8 border border-white/10">
+                  <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
                     <div className="flex items-center space-x-3 mb-8">
                       <div className="p-2 bg-[#6A3DF4]/20 rounded-xl">
                         <Coins className="w-5 h-5 text-[#6A3DF4]" />
@@ -1530,7 +1536,7 @@ export default function JournalPage() {
                             onClick={() => setFormData({ ...formData, direction: 'long' })}
                             className={`flex-1 h-14 flex items-center justify-center space-x-3 rounded-xl font-semibold transition-all duration-200 ${formData.direction === 'long'
                               ? 'bg-[#2ECC71] text-white shadow-lg'
-                              : 'bg-[#1E2232] border border-white/20 text-[#BDC3C7] hover:border-[#2ECC71]/50'
+                              : 'bg-[#0D0F18] border border-white/10 text-[#BDC3C7] hover:bg-white/5'
                               }`}
                           >
                             <TrendingUp className="w-5 h-5" />
@@ -1541,7 +1547,7 @@ export default function JournalPage() {
                             onClick={() => setFormData({ ...formData, direction: 'short' })}
                             className={`flex-1 h-14 flex items-center justify-center space-x-3 rounded-xl font-semibold transition-all duration-200 ${formData.direction === 'short'
                               ? 'bg-[#E74C3C] text-white shadow-lg'
-                              : 'bg-[#1E2232] border border-white/20 text-[#BDC3C7] hover:border-[#E74C3C]/50'
+                              : 'bg-[#0D0F18] border border-white/10 text-[#BDC3C7] hover:bg-white/5'
                               }`}
                           >
                             <TrendingDown className="w-5 h-5" />
@@ -1553,7 +1559,7 @@ export default function JournalPage() {
                   </div>
 
                   {/* Section 2: Price Details */}
-                  <div className="bg-[#1E2232] rounded-xl p-8 border border-white/10">
+                  <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
                     <div className="flex items-center space-x-3 mb-8">
                       <div className="p-2 bg-[#6A3DF4]/20 rounded-xl">
                         <DollarSign className="w-5 h-5 text-[#6A3DF4]" />
@@ -1658,7 +1664,7 @@ export default function JournalPage() {
                   </div>
 
                   {/* Section 3: Additional Details */}
-                  <div className="bg-[#1E2232] rounded-xl p-8 border border-white/10">
+                  <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
                     <div className="flex items-center space-x-3 mb-8">
                       <div className="p-2 bg-[#6A3DF4]/20 rounded-xl">
                         <Settings className="w-5 h-5 text-[#6A3DF4]" />
@@ -1795,7 +1801,7 @@ export default function JournalPage() {
                           rows={5}
                           value={formData.notes}
                           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                          className="w-full p-5 bg-[#1E2232] 
+                          className="w-full p-5 bg-[#0D0F18] 
                                      border border-white/20 hover:border-[#6A3DF4]/50 rounded-xl text-white font-medium 
                                      placeholder-[#BDC3C7] focus:outline-none focus:border-[#6A3DF4] 
                                      focus:ring-2 focus:ring-[#6A3DF4]/20 transition-colors duration-200 resize-none
@@ -1854,7 +1860,7 @@ export default function JournalPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {loading ? (
                 Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-[#1E2232] rounded-xl p-6 border border-white/5">
+                  <div key={i} className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
                     <div className="animate-pulse">
                       <div className="flex items-center space-x-4 mb-6">
                         <div className="w-12 h-12 bg-white/10 rounded-xl" />
@@ -1873,7 +1879,7 @@ export default function JournalPage() {
                 ))
               ) : trades.length === 0 ? (
                 <div className="col-span-full text-center py-20">
-                  <div className="bg-[#1E2232] rounded-xl p-12 border border-white/5">
+                  <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
                     <div className="w-20 h-20 bg-gradient-to-r from-[#6A3DF4] to-[#8A5CFF] rounded-full flex items-center justify-center mx-auto mb-6">
                       <BarChart3 className="w-10 h-10 text-white" />
                     </div>
@@ -1902,29 +1908,31 @@ export default function JournalPage() {
                   return (
                     <div
                       key={trade.id}
-                      className="group relative bg-[#1E2232] rounded-xl p-6 border border-white/5 hover:border-[#6A3DF4]/30 transition-all cursor-pointer overflow-hidden"
+                      className="group relative bg-[#0D0F18] rounded-xl p-4 border border-white/10 hover:bg-white/5 transition-all cursor-pointer overflow-hidden"
                     >
-                      {/* Edit/Delete Icons */}
-                      <div className="absolute top-4 right-4 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(trade);
-                          }}
-                          className="w-8 h-8 flex items-center justify-center text-[#6A3DF4] hover:text-[#8A5CFF] rounded-lg hover:bg-[#6A3DF4]/10 transition-all"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(trade.id);
-                          }}
-                          className="w-8 h-8 flex items-center justify-center text-[#E74C3C] hover:text-red-300 rounded-lg hover:bg-[#E74C3C]/10 transition-all"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
+                      {/* Edit/Delete Icons - Only show for non-wallet trades */}
+                      {trade.source !== 'wallet' && (
+                        <div className="absolute top-4 right-4 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(trade);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center text-[#6A3DF4] hover:text-[#8A5CFF] rounded-lg hover:bg-[#6A3DF4]/10 transition-all"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(trade.id);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center text-[#E74C3C] hover:text-red-300 rounded-lg hover:bg-[#E74C3C]/10 transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
 
                       {/* Trade Header */}
                       <div className="flex items-center space-x-4 mb-6">
@@ -1933,8 +1941,16 @@ export default function JournalPage() {
                             {getAssetIcon(trade.asset_type || 'stocks')}
                           </span>
                         </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-white">{trade.symbol}</h3>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="text-xl font-bold text-white">{trade.symbol}</h3>
+                            {trade.source === 'wallet' && (
+                              <span className="px-2 py-0.5 bg-[#6A3DF4]/20 text-[#6A3DF4] border border-[#6A3DF4]/30 rounded text-xs font-medium flex items-center space-x-1">
+                                <Wallet className="w-3 h-3" />
+                                <span>Wallet</span>
+                              </span>
+                            )}
+                          </div>
                           <div className="flex items-center space-x-2 mt-1">
                             <p className="text-[#BDC3C7] text-sm">{formatDate(trade.entry_date)}</p>
                             {trade.strategy_name && (
@@ -2089,7 +2105,7 @@ export default function JournalPage() {
             </div>
           ) : (
             /* Clean Table View */
-            <div className="bg-[#1E2232] rounded-xl border border-white/5 overflow-hidden shadow-xl">
+            <div className="bg-[#0D0F18] rounded-xl border border-white/10 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-[#0D0F18]/50">

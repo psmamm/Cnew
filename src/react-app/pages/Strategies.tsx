@@ -285,7 +285,7 @@ export default function StrategiesPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden bg-gradient-to-br from-gray-800/40 via-gray-900/60 to-black/40 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/30"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 via-blue-600/5 to-emerald-600/5" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-full blur-3xl" />
@@ -320,7 +320,7 @@ export default function StrategiesPage() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10"
+                  className="text-center p-4 bg-[#0D0F18] rounded-xl border border-white/10"
                 >
                   <stat.icon className="w-5 h-5 text-purple-400 mx-auto mb-2" />
                   <div className="text-xl font-bold text-white">{stat.value}</div>
@@ -395,7 +395,7 @@ export default function StrategiesPage() {
             ))
           ) : filteredStrategies.length === 0 ? (
             <div className="col-span-full text-center py-20">
-              <div className="bg-gray-800/50 backdrop-blur-xl rounded-3xl p-12 border border-gray-700/50">
+              <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
                 <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Target className="w-10 h-10 text-white" />
                 </div>
@@ -424,7 +424,7 @@ export default function StrategiesPage() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -5, scale: 1.02 }}
-                className="group relative bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/50 hover:border-purple-500/50 transition-all overflow-hidden"
+                className="group relative bg-[#0D0F18] rounded-xl p-4 border border-white/10 hover:bg-white/5 transition-all overflow-hidden"
               >
                 {/* Background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryColor(strategy.category || null)} opacity-5 group-hover:opacity-10 transition-opacity`} />
@@ -583,7 +583,7 @@ export default function StrategiesPage() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-gray-800/95 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-8">
@@ -989,7 +989,7 @@ export default function StrategiesPage() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-gray-800/95 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-8">
@@ -1042,7 +1042,7 @@ export default function StrategiesPage() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="bg-gray-700/30 rounded-xl p-4 border border-gray-600/30"
+                          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
                         >
                           <metric.icon className="w-5 h-5 text-blue-400 mb-2" />
                           <div className="text-white font-bold text-lg">{metric.value}</div>
@@ -1055,7 +1055,7 @@ export default function StrategiesPage() {
                     {performance.trades.length > 0 && (
                       <div>
                         <h4 className="text-xl font-semibold text-white mb-4">Recent Trades</h4>
-                        <div className="bg-gray-700/30 rounded-xl border border-gray-600/30 overflow-hidden">
+                        <div className="bg-[#0D0F18] rounded-xl border border-white/10 overflow-hidden">
                           <div className="overflow-x-auto">
                             <table className="w-full">
                               <thead className="bg-gray-600/50">

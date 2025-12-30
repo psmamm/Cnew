@@ -593,12 +593,15 @@ competitionRouter.post('/tournaments', combinedAuthMiddleware, async (c) => {
     }
 
     const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
-    const { name, symbol, description, timeLimit, maxDrawdown, maxParticipants } = await c.req.json();
+    const { name, symbol, description, timeLimit, maxDrawdown, maxParticipants, entryFee, prizePool, tournamentTier } = await c.req.json();
+
+    // Calculate prize pool if not provided: entry_fee * max_participants
+    const calculatedPrizePool = prizePool !== undefined ? prizePool : (entryFee || 0) * (maxParticipants || 8);
 
     try {
         const result = await c.env.DB.prepare(`
-            INSERT INTO tournaments (creator_id, name, symbol, description, time_limit, max_drawdown, max_participants)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO tournaments (creator_id, name, symbol, description, time_limit, max_drawdown, max_participants, entry_fee, prize_pool, tournament_tier)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
             userId,
             name,
@@ -606,7 +609,10 @@ competitionRouter.post('/tournaments', combinedAuthMiddleware, async (c) => {
             description || '',
             timeLimit || 60,
             maxDrawdown || null,
-            maxParticipants || 1000
+            maxParticipants || 8,
+            entryFee || 0,
+            calculatedPrizePool,
+            tournamentTier || 'SUPER 8'
         ).run();
 
         return c.json({ success: true, tournamentId: result.meta.last_row_id });
@@ -693,6 +699,232 @@ competitionRouter.post('/tournaments/:id/join', combinedAuthMiddleware, async (c
     } catch (error) {
         console.error('Error joining tournament:', error);
         return c.json({ error: 'Failed to join tournament' }, 500);
+    }
+});
+
+// Seed example tournaments (admin/dev endpoint)
+competitionRouter.post('/tournaments/seed', async (c) => {
+    try {
+        const tournaments = [
+            // SUPER 8 Tournaments
+            {
+                creator_id: 'system',
+                name: 'BTC Quick Challenge',
+                symbol: 'BTCUSDT',
+                description: 'Fast-paced Bitcoin trading tournament. Show your skills!',
+                time_limit: 15,
+                max_participants: 8,
+                entry_fee: 25.00,
+                prize_pool: 200.00,
+                tournament_tier: 'SUPER 8',
+                status: 'ready'
+            },
+            {
+                creator_id: 'system',
+                name: 'ETH Speed Run',
+                symbol: 'ETHUSDT',
+                description: 'Ethereum trading speed challenge. 15 minutes to prove yourself!',
+                time_limit: 15,
+                max_participants: 8,
+                entry_fee: 30.00,
+                prize_pool: 240.00,
+                tournament_tier: 'SUPER 8',
+                status: 'ready'
+            },
+            {
+                creator_id: 'system',
+                name: 'BNB Beginner Battle',
+                symbol: 'BNBUSDT',
+                description: 'Perfect for beginners. Low entry, high learning!',
+                time_limit: 15,
+                max_participants: 8,
+                entry_fee: 20.00,
+                prize_pool: 160.00,
+                tournament_tier: 'SUPER 8',
+                status: 'ready'
+            },
+            // SWEET 16 Tournaments
+            {
+                creator_id: 'system',
+                name: 'BTC Championship',
+                symbol: 'BTCUSDT',
+                description: 'Competitive Bitcoin tournament. 16 traders, one winner!',
+                time_limit: 20,
+                max_participants: 16,
+                entry_fee: 100.00,
+                prize_pool: 1600.00,
+                tournament_tier: 'SWEET 16',
+                status: 'ready'
+            },
+            {
+                creator_id: 'system',
+                name: 'ETH Elite Challenge',
+                symbol: 'ETHUSDT',
+                description: 'Elite Ethereum trading competition. Are you ready?',
+                time_limit: 20,
+                max_participants: 16,
+                entry_fee: 75.00,
+                prize_pool: 1200.00,
+                tournament_tier: 'SWEET 16',
+                status: 'ready'
+            },
+            {
+                creator_id: 'system',
+                name: 'Multi-Coin Showdown',
+                symbol: 'BTCUSDT',
+                description: 'Trade multiple coins in this exciting tournament!',
+                time_limit: 25,
+                max_participants: 16,
+                entry_fee: 50.00,
+                prize_pool: 800.00,
+                tournament_tier: 'SWEET 16',
+                status: 'ready'
+            },
+            // ROYAL 8 Tournaments
+            {
+                creator_id: 'system',
+                name: 'BTC Royal Tournament',
+                symbol: 'BTCUSDT',
+                description: 'Premium Bitcoin tournament. High stakes, high rewards!',
+                time_limit: 15,
+                max_participants: 8,
+                entry_fee: 250.00,
+                prize_pool: 2000.00,
+                tournament_tier: 'ROYAL 8',
+                status: 'ready'
+            },
+            {
+                creator_id: 'system',
+                name: 'ETH Crown Challenge',
+                symbol: 'ETHUSDT',
+                description: 'The ultimate Ethereum trading challenge. Only for the best!',
+                time_limit: 15,
+                max_participants: 8,
+                entry_fee: 200.00,
+                prize_pool: 1600.00,
+                tournament_tier: 'ROYAL 8',
+                status: 'ready'
+            },
+            // Active Tournaments
+            {
+                creator_id: 'system',
+                name: 'BTC Live Battle',
+                symbol: 'BTCUSDT',
+                description: 'Live Bitcoin trading battle. Join now!',
+                time_limit: 30,
+                max_participants: 8,
+                entry_fee: 40.00,
+                prize_pool: 320.00,
+                tournament_tier: 'SUPER 8',
+                status: 'active'
+            },
+            {
+                creator_id: 'system',
+                name: 'ETH Active Challenge',
+                symbol: 'ETHUSDT',
+                description: 'Active Ethereum tournament. Still accepting participants!',
+                time_limit: 25,
+                max_participants: 16,
+                entry_fee: 60.00,
+                prize_pool: 960.00,
+                tournament_tier: 'SWEET 16',
+                status: 'active'
+            }
+        ];
+
+        const createdTournaments = [];
+        const errors = [];
+        
+        for (const tournament of tournaments) {
+            try {
+                // Check if tournament already exists (by name)
+                const existing = await c.env.DB.prepare(`
+                    SELECT id FROM tournaments WHERE name = ? AND creator_id = 'system'
+                `).bind(tournament.name).first();
+
+                if (!existing) {
+                    // Try to insert with new columns first
+                    try {
+                        const result = await c.env.DB.prepare(`
+                            INSERT INTO tournaments (creator_id, name, symbol, description, time_limit, max_participants, entry_fee, prize_pool, tournament_tier, status, started_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `).bind(
+                            tournament.creator_id,
+                            tournament.name,
+                            tournament.symbol,
+                            tournament.description,
+                            tournament.time_limit,
+                            tournament.max_participants,
+                            tournament.entry_fee,
+                            tournament.prize_pool,
+                            tournament.tournament_tier,
+                            tournament.status,
+                            tournament.status === 'active' ? new Date().toISOString() : null
+                        ).run();
+
+                        createdTournaments.push({
+                            id: result.meta.last_row_id,
+                            ...tournament
+                        });
+                    } catch (insertError: any) {
+                        // If new columns don't exist, try without them
+                        if (insertError.message?.includes('no such column: entry_fee') || 
+                            insertError.message?.includes('no such column: prize_pool') ||
+                            insertError.message?.includes('no such column: tournament_tier')) {
+                            console.log('New columns not found, trying without them...');
+                            const result = await c.env.DB.prepare(`
+                                INSERT INTO tournaments (creator_id, name, symbol, description, time_limit, max_participants, status, started_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            `).bind(
+                                tournament.creator_id,
+                                tournament.name,
+                                tournament.symbol,
+                                tournament.description,
+                                tournament.time_limit,
+                                tournament.max_participants,
+                                tournament.status,
+                                tournament.status === 'active' ? new Date().toISOString() : null
+                            ).run();
+
+                            createdTournaments.push({
+                                id: result.meta.last_row_id,
+                                ...tournament
+                            });
+                        } else {
+                            throw insertError;
+                        }
+                    }
+                }
+            } catch (error: any) {
+                console.error(`Error creating tournament ${tournament.name}:`, error);
+                errors.push({
+                    tournament: tournament.name,
+                    error: error.message || 'Unknown error'
+                });
+            }
+        }
+
+        if (errors.length > 0) {
+            console.error('Some tournaments failed to create:', errors);
+        }
+
+        return c.json({
+            success: true,
+            created: createdTournaments.length,
+            errors: errors.length,
+            tournaments: createdTournaments,
+            errorDetails: errors.length > 0 ? errors : undefined,
+            message: errors.length > 0 
+                ? `Created ${createdTournaments.length} tournaments, ${errors.length} failed. Please run migration 9.sql first.`
+                : `Successfully created ${createdTournaments.length} tournaments`
+        });
+    } catch (error: any) {
+        console.error('Error seeding tournaments:', error);
+        return c.json({ 
+            error: 'Failed to seed tournaments',
+            details: error.message || 'Unknown error',
+            hint: 'Make sure migration 9.sql has been executed to add entry_fee, prize_pool, and tournament_tier columns'
+        }, 500);
     }
 });
 

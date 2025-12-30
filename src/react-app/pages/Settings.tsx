@@ -432,7 +432,7 @@ export default function SettingsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1E2232] rounded-xl p-8 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex items-center space-x-4">
             <div className="bg-[#6A3DF4]/10 p-3 rounded-xl">
@@ -450,7 +450,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex items-center space-x-3 mb-6">
             <div className="bg-[#6A3DF4]/10 p-2 rounded-xl">
@@ -477,7 +477,7 @@ export default function SettingsPage() {
                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                        className="absolute top-24 left-0 z-50 bg-[#1E2232] border border-white/5 rounded-xl p-4 shadow-2xl w-64"
+                        className="absolute top-24 left-0 z-50 bg-[#0D0F18] border border-white/10 rounded-xl p-4 w-64"
                       >
                         <div className="flex items-center justify-between mb-3">
                           <h4 className="text-white font-semibold text-sm">Choose Icon</h4>
@@ -576,7 +576,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex items-center space-x-3 mb-6">
             <div className="bg-[#6A3DF4]/10 p-2 rounded-xl">
@@ -641,7 +641,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center space-x-3">
@@ -995,7 +995,7 @@ export default function SettingsPage() {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-[#1E2232] rounded-xl p-6 border border-white/10 shadow-2xl max-w-md w-full"
+                  className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 max-w-md w-full"
                 >
                   <div className="flex items-center space-x-3 mb-4">
                     <div className="w-12 h-12 bg-[#E74C3C]/10 rounded-full flex items-center justify-center">
@@ -1098,7 +1098,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex items-center space-x-3 mb-6">
             <div className="bg-[#6A3DF4]/10 p-2 rounded-xl">
@@ -1151,7 +1151,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex items-center space-x-3 mb-6">
             <div className="bg-[#6A3DF4]/10 p-2 rounded-xl">
@@ -1234,7 +1234,7 @@ export default function SettingsPage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-[#1E2232] rounded-xl max-w-md w-full p-6 border border-white/5 shadow-[0_8px_40px_rgba(0,0,0,0.3)]"
+              className="bg-[#0D0F18] rounded-xl max-w-md w-full p-4 border border-white/10"
             >
               <h3 className="text-xl font-semibold text-white mb-4">Export Data</h3>
               <p className="text-[#AAB0C0] text-sm mb-6">

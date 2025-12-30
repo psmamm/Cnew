@@ -77,7 +77,7 @@ export default function TokenUnlockTab() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5">
+      <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-12 h-12 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
             <Calendar className="w-6 h-6 text-[#6A3DF4]" />
@@ -146,7 +146,7 @@ export default function TokenUnlockTab() {
           </table>
         </div>
 
-        <div className="mt-6 p-4 bg-[#0D0F18]/30 rounded-xl border border-white/10">
+        <div className="mt-6 p-4 bg-[#0D0F18] rounded-xl border border-white/10">
           <p className="text-sm text-[#7F8C8D]">
             Token unlock schedules can significantly impact token prices. High-impact unlocks may cause increased
             selling pressure. Monitor these events closely.

@@ -66,7 +66,7 @@ export default function QuickActions() {
 
   return (
     <>
-      <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)] h-full">
+      <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full">
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
             <Plus className="w-5 h-5 text-[#6A3DF4]" />
@@ -87,7 +87,7 @@ export default function QuickActions() {
               whileTap={{ scale: action.disabled ? 1 : 0.98 }}
               onClick={action.disabled ? undefined : action.onClick}
               disabled={action.disabled}
-              className={`w-full flex items-center space-x-4 p-4 bg-[#0D0F18]/30 hover:bg-[#2A2F42]/50 border border-white/5 hover:border-[#6A3DF4]/30 rounded-xl transition-all duration-200 group relative ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              className={`w-full flex items-center space-x-4 p-4 bg-[#0D0F18] hover:bg-white/5 border border-white/10 rounded-xl transition-all duration-200 group relative ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                 }`}
             >
               <div className={`${action.color} p-3 rounded-xl transition-all shadow-md group-hover:shadow-lg group-hover:shadow-[#6A3DF4]/20 relative`}>

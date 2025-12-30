@@ -50,10 +50,10 @@ export default function StatCard({
 
   return (
     <motion.div 
-      className={`bg-[#1E2232] rounded-2xl p-6 border border-white/5 transition-all duration-200 group shadow-[0_4px_20px_rgba(0,0,0,0.2)] h-full relative overflow-hidden ${
+      className={`bg-[#0D0F18] rounded-xl p-4 border border-white/10 transition-all duration-200 group h-full relative overflow-hidden ${
         isClickable 
-          ? 'hover:border-[#6A3DF4]/50 cursor-pointer hover:shadow-[0_8px_30px_rgba(106,61,244,0.3)] hover:transform hover:scale-[1.02]' 
-          : 'hover:border-white/10'
+          ? 'hover:bg-white/5 cursor-pointer' 
+          : 'hover:bg-white/5'
       }`}
       onClick={onClick}
       whileHover={isClickable ? { y: -2 } : {}}

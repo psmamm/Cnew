@@ -27,8 +27,8 @@ export default function PricingCard({
   buttonVariant = 'secondary'
 }: PricingCardProps) {
   return (
-    <div className={`relative bg-[#1E2232] rounded-xl border-2 p-8 shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] ${
-      popular ? 'border-[#6A3DF4]/50 scale-105' : 'border-white/5 hover:border-white/10'
+    <div className={`relative bg-[#0D0F18] rounded-xl border-2 p-4 transition-all duration-200 hover:bg-white/5 ${
+      popular ? 'border-[#6A3DF4]/50 scale-105' : 'border-white/10'
     }`}>
       {popular && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -71,7 +71,7 @@ export default function PricingCard({
       <button className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
         buttonVariant === 'primary'
           ? 'bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]'
-          : 'bg-[#1E2232] hover:bg-[#2A2F42] text-white border border-white/20 hover:border-white/30'
+          : 'bg-[#0D0F18] hover:bg-white/5 text-white border border-white/10'
       }`}>
         {buttonText}
       </button>

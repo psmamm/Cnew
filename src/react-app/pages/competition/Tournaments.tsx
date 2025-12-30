@@ -2,20 +2,68 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import DashboardLayout from '@/react-app/components/DashboardLayout';
 import { useTournaments, useTournament } from '@/react-app/hooks/useTournaments';
+import { buildApiUrl } from '@/react-app/hooks/useApi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Plus, Play, Clock, CheckCircle, Users, Calendar, ArrowRight, X } from 'lucide-react';
+import { Trophy, Plus, Play, Clock, CheckCircle, Users, Calendar, ArrowRight, X, Crown, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/react-app/contexts/AuthContext';
 
 export default function TournamentsPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'active' | 'ready' | 'completed'>('active');
+    const [activeTab, setActiveTab] = useState<'active' | 'ready' | 'completed'>('ready'); // Default to 'ready' tournaments
+    const [seeding, setSeeding] = useState(false);
+    const [seedMessage, setSeedMessage] = useState<string | null>(null);
     
     const { tournaments: activeTournaments, loading: activeLoading, refetch: refetchActive } = useTournaments('active');
     const { tournaments: readyTournaments, loading: readyLoading, refetch: refetchReady } = useTournaments('ready');
     const { tournaments: completedTournaments, loading: completedLoading, refetch: refetchCompleted } = useTournaments('completed');
     const { createTournament } = useTournament(null);
+
+    const handleSeedTournaments = async () => {
+        if (!confirm('This will create example tournaments. Continue?')) {
+            return;
+        }
+
+        try {
+            setSeeding(true);
+            setSeedMessage(null);
+            
+            const response = await fetch(buildApiUrl('/api/competition/tournaments/seed'), {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to seed tournaments');
+            }
+
+            const data = await response.json();
+            
+            if (data.error) {
+                setSeedMessage(`Error: ${data.error}${data.hint ? ` - ${data.hint}` : ''}`);
+            } else if (data.errors > 0) {
+                setSeedMessage(`${data.message} Check console for details.`);
+                console.error('Tournament seeding errors:', data.errorDetails);
+            } else {
+                setSeedMessage(data.message || `Successfully created ${data.created} tournaments!`);
+            }
+            
+            // Refresh all tournament lists
+            refetchActive();
+            refetchReady();
+            refetchCompleted();
+
+            // Clear message after 8 seconds (longer for error messages)
+            setTimeout(() => setSeedMessage(null), 8000);
+        } catch (error: any) {
+            const errorMessage = error.message || 'Failed to seed tournaments';
+            setSeedMessage(`Error: ${errorMessage}. Make sure migration 9.sql has been executed.`);
+            setTimeout(() => setSeedMessage(null), 8000);
+        } finally {
+            setSeeding(false);
+        }
+    };
 
     const [createForm, setCreateForm] = useState({
         name: '',
@@ -23,7 +71,10 @@ export default function TournamentsPage() {
         description: '',
         timeLimit: 60,
         maxDrawdown: '',
-        maxParticipants: 1000
+        maxParticipants: 8,
+        entryFee: '',
+        prizePool: '',
+        tournamentTier: 'SUPER 8'
     });
 
     const handleCreateTournament = async () => {
@@ -44,47 +95,165 @@ export default function TournamentsPage() {
         return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
     };
 
-    const TournamentCard = ({ tournament }: { tournament: any }) => (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.02 }}
-            onClick={() => navigate(`/competition/tournaments/${tournament.id}`)}
-            className="bg-[#1E2232] border border-white/10 rounded-xl p-6 cursor-pointer hover:border-[#6A3DF4]/50 transition-all"
-        >
-            <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-2xl font-bold text-[#6A3DF4]">{tournament.symbol}</h3>
-                        {tournament.status === 'completed' && (
-                            <span className="px-2 py-1 bg-gray-700/50 text-gray-400 text-xs rounded-lg">Completed</span>
-                        )}
+    // Determine tournament tier badge
+    const getTournamentTier = (tournament: any) => {
+        if (tournament.tournament_tier) {
+            return tournament.tournament_tier;
+        }
+        // Fallback based on max_participants
+        if (tournament.max_participants === 8) return 'SUPER 8';
+        if (tournament.max_participants === 16) return 'SWEET 16';
+        return 'ROYAL 8';
+    };
+
+    const getTierBadgeStyle = (tier: string) => {
+        switch (tier) {
+            case 'SUPER 8':
+                return {
+                    bg: 'bg-green-500/20',
+                    border: 'border-green-500/50',
+                    text: 'text-green-400',
+                    icon: Trophy
+                };
+            case 'SWEET 16':
+                return {
+                    bg: 'bg-purple-500/20',
+                    border: 'border-purple-500/50',
+                    text: 'text-purple-400',
+                    icon: Crown
+                };
+            case 'ROYAL 8':
+                return {
+                    bg: 'bg-orange-500/20',
+                    border: 'border-orange-500/50',
+                    text: 'text-orange-400',
+                    icon: Crown
+                };
+            default:
+                return {
+                    bg: 'bg-[#6A3DF4]/20',
+                    border: 'border-[#6A3DF4]/50',
+                    text: 'text-[#6A3DF4]',
+                    icon: Trophy
+                };
+        }
+    };
+
+    const TournamentCard = ({ tournament }: { tournament: any }) => {
+        const tier = getTournamentTier(tournament);
+        const badgeStyle = getTierBadgeStyle(tier);
+        const BadgeIcon = badgeStyle.icon;
+        const entryFee = tournament.entry_fee || 0;
+        const prizePool = tournament.prize_pool || 0;
+        const participantCount = tournament.participantCount || 0;
+        const [joining, setJoining] = useState(false);
+
+        const handleEnterTournament = async (e: React.MouseEvent) => {
+            e.stopPropagation();
+            if (!user) {
+                alert('Please log in to join tournaments');
+                return;
+            }
+
+            try {
+                setJoining(true);
+                const response = await fetch(buildApiUrl(`/api/competition/tournaments/${tournament.id}/join`), {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to join tournament');
+                }
+
+                // After joining, navigate to tournament details
+                navigate(`/competition/tournaments/${tournament.id}`);
+            } catch (error: any) {
+                alert(error.message || 'Failed to join tournament');
+            } finally {
+                setJoining(false);
+            }
+        };
+
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.03, y: -5 }}
+                className="bg-[#0D0F18] border border-white/10 rounded-xl overflow-hidden hover:bg-white/5 transition-all flex flex-col h-full"
+            >
+                {/* Badge Header */}
+                <div className={`${badgeStyle.bg} ${badgeStyle.border} border-b px-4 py-3 flex items-center justify-center gap-2`}>
+                    <BadgeIcon className={`w-5 h-5 ${badgeStyle.text}`} />
+                    <span className={`${badgeStyle.text} font-bold text-sm uppercase tracking-wider`}>{tier}</span>
+                </div>
+
+                {/* Visual Element / Icon */}
+                <div className="flex items-center justify-center py-8 px-4">
+                    <div className="bg-[#0D0F18] rounded-xl p-6 border border-white/5">
+                        <TrendingUp className="w-12 h-12 text-[#6A3DF4]" />
                     </div>
-                    <p className="text-gray-400 text-sm mb-4">{tournament.description || tournament.name}</p>
                 </div>
-            </div>
 
-            <div className="space-y-2 text-sm text-gray-400">
-                <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span>{tournament.participantCount || 0} participants</span>
+                {/* Title */}
+                <div className="px-6 pb-4">
+                    <h3 className="text-2xl font-bold text-white text-center mb-2">
+                        {tournament.name || tournament.symbol}
+                    </h3>
+                    {tournament.status === 'completed' && (
+                        <div className="text-center mb-2">
+                            <span className="px-3 py-1 bg-gray-700/50 text-gray-400 text-xs rounded-lg">Completed</span>
+                        </div>
+                    )}
                 </div>
-                <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>Time Limit: {tournament.time_limit}m</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>created {formatTimeAgo(tournament.created_at)}</span>
-                </div>
-            </div>
 
-            <button className="mt-4 w-full bg-[#0D0F18] hover:bg-[#0D0F18]/80 border border-white/10 text-white py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-2">
-                View Results
-                <ArrowRight className="w-4 h-4" />
-            </button>
-        </motion.div>
-    );
+                {/* Details Section */}
+                <div className="px-6 pb-6 space-y-3 flex-1">
+                    <div className="text-sm text-gray-400 space-y-2">
+                        <div className="flex items-center justify-between">
+                            <span className="text-green-400">Leverage</span>
+                            <span className="text-white font-medium">10x</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span>Number of Players</span>
+                            <span className="text-white font-medium">{tournament.max_participants || 8}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span>Time to Complete</span>
+                            <span className="text-white font-medium">{tournament.time_limit}m</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span>Winner Takes</span>
+                            <span className="text-[#6A3DF4] font-bold">
+                                ${prizePool > 0 ? prizePool.toFixed(2) : '0.00'} USDT
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Entry Button */}
+                <div className="px-6 pb-4">
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleEnterTournament}
+                        disabled={joining || tournament.status === 'completed'}
+                        className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold text-sm transition-all shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                    >
+                        {joining ? 'Joining...' : tournament.status === 'completed' ? 'Completed' : `Enter for $${entryFee > 0 ? entryFee.toFixed(2) : '0.00'} USDT`}
+                    </motion.button>
+                </div>
+
+                {/* Players Online */}
+                <div className="px-6 pb-4 text-center">
+                    <span className="text-xs text-gray-500">
+                        {participantCount} player{participantCount !== 1 ? 's' : ''} online
+                    </span>
+                </div>
+            </motion.div>
+        );
+    };
 
     return (
         <DashboardLayout>
@@ -99,20 +268,49 @@ export default function TournamentsPage() {
                             <div>
                                 <h1 className="text-4xl font-bold mb-2">Tournaments</h1>
                                 <p className="text-gray-400">
-                                    {activeTournaments.length + readyTournaments.length + completedTournaments.length} tournaments
+                                    Join tournaments and compete for prizes
                                 </p>
                             </div>
                         </div>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setShowCreateModal(true)}
-                            className="bg-gradient-to-r from-[#6A3DF4] to-[#8B5CF6] hover:from-[#5A2DE4] hover:to-[#7B4CE6] text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
-                        >
-                            <Plus className="w-5 h-5" />
-                            Create Tournament
-                        </motion.button>
+                        <div className="flex items-center gap-3">
+                            {/* Seed Tournaments Button (Admin/Dev) */}
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={handleSeedTournaments}
+                                disabled={seeding}
+                                className="bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/50 text-gray-400 hover:text-white px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {seeding ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-[#6A3DF4]/30 border-t-[#6A3DF4] rounded-full animate-spin" />
+                                        <span>Creating...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus className="w-4 h-4" />
+                                        <span>Seed Tournaments</span>
+                                    </>
+                                )}
+                            </motion.button>
+                        </div>
                     </div>
+
+                    {/* Seed Message */}
+                    {seedMessage && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className={`mb-4 p-4 rounded-xl border ${
+                                seedMessage.includes('Successfully') 
+                                    ? 'bg-green-500/10 border-green-500/30 text-green-400' 
+                                    : 'bg-red-500/10 border-red-500/30 text-red-400'
+                            }`}
+                        >
+                            {seedMessage}
+                        </motion.div>
+                    )}
 
                     {/* Tabs */}
                     <div className="flex gap-4 mb-8 border-b border-white/10">
@@ -151,7 +349,7 @@ export default function TournamentsPage() {
                                         <p className="text-gray-400">Loading tournaments...</p>
                                     </div>
                                 ) : activeTournaments.length === 0 ? (
-                                    <div className="bg-[#1E2232] border border-white/10 rounded-xl p-12 text-center">
+                                    <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-center">
                                         <p className="text-gray-400">No active tournaments at the moment.</p>
                                     </div>
                                 ) : (
@@ -177,7 +375,7 @@ export default function TournamentsPage() {
                                         <p className="text-gray-400">Loading tournaments...</p>
                                     </div>
                                 ) : readyTournaments.length === 0 ? (
-                                    <div className="bg-[#1E2232] border border-white/10 rounded-xl p-12 text-center">
+                                    <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-center">
                                         <p className="text-gray-400">No tournaments ready to start.</p>
                                     </div>
                                 ) : (
@@ -203,7 +401,7 @@ export default function TournamentsPage() {
                                         <p className="text-gray-400">Loading tournaments...</p>
                                     </div>
                                 ) : completedTournaments.length === 0 ? (
-                                    <div className="bg-[#1E2232] border border-white/10 rounded-xl p-12 text-center">
+                                    <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-center">
                                         <p className="text-gray-400">No completed tournaments yet.</p>
                                     </div>
                                 ) : (
@@ -232,7 +430,7 @@ export default function TournamentsPage() {
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0.9, opacity: 0 }}
                                     onClick={(e) => e.stopPropagation()}
-                                    className="bg-[#1E2232] border border-white/10 rounded-2xl p-8 max-w-md w-full"
+                                    className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 max-w-md w-full"
                                 >
                                     <div className="flex items-center justify-between mb-6">
                                         <h2 className="text-2xl font-bold">Create Tournament</h2>
@@ -320,7 +518,10 @@ export default function TournamentsPage() {
                                                         description: createForm.description,
                                                         timeLimit: createForm.timeLimit,
                                                         maxDrawdown: createForm.maxDrawdown ? parseFloat(createForm.maxDrawdown) : undefined,
-                                                        maxParticipants: createForm.maxParticipants
+                                                        maxParticipants: createForm.maxParticipants,
+                                                        entryFee: createForm.entryFee ? parseFloat(createForm.entryFee) : undefined,
+                                                        prizePool: createForm.prizePool ? parseFloat(createForm.prizePool) : undefined,
+                                                        tournamentTier: createForm.tournamentTier
                                                     });
                                                     
                                                     setShowCreateModal(false);
@@ -330,7 +531,10 @@ export default function TournamentsPage() {
                                                         description: '',
                                                         timeLimit: 60,
                                                         maxDrawdown: '',
-                                                        maxParticipants: 1000
+                                                        maxParticipants: 8,
+                                                        entryFee: '',
+                                                        prizePool: '',
+                                                        tournamentTier: 'SUPER 8'
                                                     });
                                                     
                                                     // Refresh tournament lists

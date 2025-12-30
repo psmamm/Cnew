@@ -54,7 +54,7 @@ export default function RecentTrades() {
 
   if (loading) {
     return (
-      <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+      <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
         <h2 className="text-xl font-semibold text-white mb-6">Recent Trades</h2>
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -75,7 +75,7 @@ export default function RecentTrades() {
   }
 
   return (
-    <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+    <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
@@ -110,7 +110,7 @@ export default function RecentTrades() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="flex items-center space-x-4 p-4 bg-[#0D0F18]/30 hover:bg-[#2A2F42]/50 border border-white/5 hover:border-[#6A3DF4]/30 rounded-xl transition-all duration-200 group"
+              className="flex items-center space-x-4 p-4 bg-[#0D0F18] hover:bg-white/5 border border-white/10 rounded-xl transition-all duration-200 group"
             >
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-lg flex items-center justify-center">

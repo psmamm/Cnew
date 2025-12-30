@@ -2009,7 +2009,7 @@ export default function StudyPage() {
                           <motion.button
                             key={lesson.id}
                             onClick={() => setSelectedLesson(lesson)}
-                            className="bg-[#1E2232] border border-white/5 rounded-xl p-6 text-left hover:border-white/10 hover:bg-[#252A3D] transition-all duration-200 group relative overflow-hidden"
+                            className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-left hover:bg-white/5 transition-all duration-200 group relative overflow-hidden"
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                             initial={{ opacity: 0, y: 20 }}
@@ -2134,7 +2134,7 @@ export default function StudyPage() {
                 {/* Lesson Content */}
                 <div className="lg:col-span-2">
                   <motion.div 
-                    className="bg-[#1E2232] border border-white/5 rounded-xl p-8"
+                    className="bg-[#0D0F18] border border-white/10 rounded-xl p-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
@@ -2217,7 +2217,7 @@ export default function StudyPage() {
                         </div>
                       </div>
                     ) : selectedLesson.id === 'what-is-blockchain' ? (
-                      <div className="bg-[#1E2232] border border-white/5 rounded-xl p-6">
+                      <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4">
                         <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-2">
                           <Play className="w-5 h-5 text-[#6A3DF4]" />
                           <span>Video Lesson</span>
@@ -2461,7 +2461,7 @@ export default function StudyPage() {
                   {(() => {
                     const nextLesson = getNextLesson(selectedLesson);
                     return nextLesson && (
-                      <div className="bg-[#1E2232] border border-white/5 rounded-xl p-6">
+                      <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4">
                         <h3 className="font-semibold text-white mb-4 flex items-center space-x-2">
                           <ArrowRight className="w-5 h-5 text-[#6A3DF4]" />
                           <span>Next Lesson</span>
@@ -2485,7 +2485,7 @@ export default function StudyPage() {
                   })()}
 
                   {/* Progress in Category */}
-                  <div className="bg-[#1E2232] border border-white/5 rounded-xl p-6">
+                  <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4">
                     <h3 className="font-semibold text-white mb-4">Chapter Progress</h3>
                     {(() => {
                       const category = studyData.find(cat => 
@@ -2517,7 +2517,7 @@ export default function StudyPage() {
                   </div>
 
                   {/* Study Tips */}
-                  <div className="bg-[#1E2232] border border-white/5 rounded-xl p-6">
+                  <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4">
                     <h3 className="font-semibold text-white mb-4 flex items-center space-x-2">
                       <Brain className="w-5 h-5 text-[#6A3DF4]" />
                       <span>Study Tip</span>
@@ -2545,7 +2545,7 @@ export default function StudyPage() {
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0.9, opacity: 0 }}
-                      className="bg-[#1E2232] border border-white/10 rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                      className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {!showResults ? (

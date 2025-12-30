@@ -72,7 +72,7 @@ export default function CompetitionPage() {
                         <motion.div
                             initial={{ opacity: 0, y: -20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-[#1E2232] border border-white/10 rounded-xl px-6 py-3 flex items-center gap-3"
+                            className="bg-[#0D0F18] border border-white/10 rounded-xl px-6 py-3 flex items-center gap-3"
                         >
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                             <span className="text-sm font-medium text-gray-300">
@@ -88,7 +88,7 @@ export default function CompetitionPage() {
                             initial={{ opacity: 0, x: -50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-[#1E2232] border-2 border-white/10 rounded-2xl p-8 hover:border-[#6A3DF4]/50 transition-all cursor-pointer group"
+                            className="bg-[#0D0F18] border-2 border-white/10 rounded-xl p-4 hover:bg-white/5 transition-all cursor-pointer group"
                             onClick={handleRankedMatch}
                         >
                             <div className="flex items-start justify-between mb-6">
@@ -152,7 +152,7 @@ export default function CompetitionPage() {
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="bg-[#1E2232] border-2 border-white/10 rounded-2xl p-8 hover:border-[#6A3DF4]/50 transition-all cursor-pointer group"
+                            className="bg-[#0D0F18] border-2 border-white/10 rounded-xl p-4 hover:bg-white/5 transition-all cursor-pointer group"
                             onClick={handlePracticeMode}
                         >
                             <div className="bg-[#6A3DF4]/20 p-4 rounded-xl w-fit mb-6">
@@ -192,7 +192,7 @@ export default function CompetitionPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={handleCopyInviteLink}
-                            className="bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/50 rounded-xl px-6 py-3 flex items-center gap-3 transition-all"
+                            className="bg-[#0D0F18] border border-white/10 hover:bg-white/5 rounded-xl px-6 py-3 flex items-center gap-3 transition-all"
                         >
                             {copied ? (
                                 <>
@@ -213,7 +213,7 @@ export default function CompetitionPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-[#1E2232] border border-white/10 rounded-2xl p-8"
+                        className="bg-[#0D0F18] border border-white/10 rounded-xl p-4"
                     >
                         {friendsLoading ? (
                             <div className="text-center py-8">
@@ -274,7 +274,7 @@ export default function CompetitionPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => navigate('/competition/daily-challenge')}
-                            className="flex items-center gap-3 px-6 py-4 bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/50 rounded-2xl group transition-all min-w-[200px]"
+                            className="flex items-center gap-3 px-6 py-4 bg-[#0D0F18] border border-white/10 hover:bg-white/5 rounded-xl group transition-all min-w-[200px]"
                         >
                             <div className="p-2 bg-yellow-500/10 rounded-lg group-hover:bg-yellow-500/20 transition-colors">
                                 <Zap className="w-5 h-5 text-yellow-500" />
@@ -289,7 +289,7 @@ export default function CompetitionPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => navigate('/competition/tournaments')}
-                            className="flex items-center gap-3 px-6 py-4 bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/50 rounded-2xl group transition-all min-w-[200px]"
+                            className="flex items-center gap-3 px-6 py-4 bg-[#0D0F18] border border-white/10 hover:bg-white/5 rounded-xl group transition-all min-w-[200px]"
                         >
                             <div className="p-2 bg-[#6A3DF4]/10 rounded-lg group-hover:bg-[#6A3DF4]/20 transition-colors">
                                 <Trophy className="w-5 h-5 text-[#6A3DF4]" />
@@ -304,7 +304,7 @@ export default function CompetitionPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => navigate('/competition/leaderboard')}
-                            className="flex items-center gap-3 px-6 py-4 bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/50 rounded-2xl group transition-all min-w-[200px]"
+                            className="flex items-center gap-3 px-6 py-4 bg-[#0D0F18] border border-white/10 hover:bg-white/5 rounded-xl group transition-all min-w-[200px]"
                         >
                             <div className="p-2 bg-purple-500/10 rounded-lg group-hover:bg-purple-500/20 transition-colors">
                                 <Crown className="w-5 h-5 text-purple-500" />

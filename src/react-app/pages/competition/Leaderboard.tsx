@@ -84,7 +84,7 @@ export default function LeaderboardPage() {
 
                     {/* My Stats Card - NEW */}
                     {activeTab === 'elo' && eloData && (
-                        <div className="bg-gradient-to-r from-[#1E2232] to-[#2A2F45] border border-white/10 rounded-2xl p-6 mb-8 shadow-lg relative overflow-hidden">
+                        <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 mb-8 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-[#6A3DF4]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
                             <div className="flex items-center justify-between relative z-10">
@@ -162,7 +162,7 @@ export default function LeaderboardPage() {
                             <p className="text-gray-400">Loading leaderboard...</p>
                         </div>
                     ) : (
-                        <div className="bg-[#1E2232] border border-white/10 rounded-2xl overflow-hidden">
+                        <div className="bg-[#0D0F18] border border-white/10 rounded-xl overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full">
                                     <thead className="bg-[#0D0F18] border-b border-white/10">

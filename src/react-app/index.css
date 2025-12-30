@@ -17,7 +17,6 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-color: #0D0F18;
   /* iPhone-specific optimizations */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -27,13 +26,34 @@ body {
   overscroll-behavior-y: contain;
 }
 
+/* Dark mode (default) */
+html.dark,
+html.dark body {
+  background-color: #0D0F18;
+  color: #ffffff;
+}
+
+html.dark #root {
+  background-color: #0D0F18;
+}
+
+/* Light mode */
+html.light,
+html.light body {
+  background-color: #F5F7FA;
+  color: #1A1D23;
+}
+
+html.light #root {
+  background-color: #F5F7FA;
+}
+
 #root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-height: -webkit-fill-available;
   width: 100%;
-  background-color: #0D0F18;
   overflow: visible;
   align-items: stretch; /* Set to stretch to avoid layout side gutters */
   /* Safe area for iPhone notch/Dynamic Island - only for top */

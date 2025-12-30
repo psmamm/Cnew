@@ -63,7 +63,7 @@ export default function ReportsPage() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#1E2232] border border-white/10 rounded-lg p-3 shadow-lg">
+        <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
           <p className="text-[#7F8C8D] text-sm mb-1">{label}</p>
           <p className="text-white font-semibold">
             {formatCurrency(payload[0].value || 0)}
@@ -81,7 +81,7 @@ export default function ReportsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1E2232] rounded-xl p-8 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center space-x-4 mb-6 sm:mb-0">
@@ -107,7 +107,7 @@ export default function ReportsPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => window.location.reload()}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-[#1E2232] hover:bg-[#2A2F42] text-white px-4 py-3 rounded-xl font-medium transition-all border border-white/10 hover:border-white/20"
+                className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-[#0D0F18] hover:bg-white/5 text-white px-4 py-3 rounded-xl font-medium transition-all border border-white/10"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Refresh</span>
@@ -123,7 +123,7 @@ export default function ReportsPage() {
           transition={{ delay: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6"
         >
-          <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
             <h3 className="text-[#7F8C8D] text-sm font-medium mb-2">Total P&L</h3>
             <p className={`text-2xl font-bold ${keyMetrics.totalPnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
               {keyMetrics.totalPnl >= 0 ? '+' : ''}${keyMetrics.totalPnl}
@@ -140,7 +140,7 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
             <h3 className="text-[#7F8C8D] text-sm font-medium mb-2">Win Rate</h3>
             <p className="text-2xl font-bold text-white">{keyMetrics.winRate}%</p>
             <div className="flex items-center space-x-1 mt-1">
@@ -155,7 +155,7 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
             <h3 className="text-[#7F8C8D] text-sm font-medium mb-2">Avg Trade</h3>
             <p className={`text-2xl font-bold ${keyMetrics.avgTrade >= 0 ? 'text-white' : 'text-[#E74C3C]'}`}>
               {formatCurrency(keyMetrics.avgTrade)}
@@ -172,7 +172,7 @@ export default function ReportsPage() {
             </div>
           </div>
 
-          <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
             <h3 className="text-[#7F8C8D] text-sm font-medium mb-2">Sharpe Ratio</h3>
             <p className="text-2xl font-bold text-white">{keyMetrics.sharpeRatio}</p>
             <p className={`text-sm mt-1 ${keyMetrics.sharpeRatio > 2 ? 'text-[#2ECC71]' :
@@ -192,7 +192,7 @@ export default function ReportsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
           >
             <h3 className="text-xl font-semibold text-white mb-4">Monthly Performance</h3>
             <div className="h-80">
@@ -217,7 +217,7 @@ export default function ReportsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
           >
             <h3 className="text-xl font-semibold text-white mb-4">Win/Loss Distribution</h3>
             <div className="h-80">
@@ -257,7 +257,7 @@ export default function ReportsPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="lg:col-span-2 bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            className="lg:col-span-2 bg-[#0D0F18] rounded-xl p-4 border border-white/10"
           >
             <h3 className="text-xl font-semibold text-white mb-4">Strategy Performance</h3>
             <div className="h-80">
@@ -285,7 +285,7 @@ export default function ReportsPage() {
           transition={{ delay: 0.35 }}
           className="grid grid-cols-1 lg:grid-cols-2 gap-8"
         >
-          <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)] space-y-4">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-white">Monte Carlo Survival</h3>
@@ -358,7 +358,7 @@ export default function ReportsPage() {
             )}
           </div>
 
-          <div className="bg-[#1E2232] rounded-xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)] space-y-4">
+          <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-white">What-If Scenarios</h3>
@@ -420,14 +420,14 @@ export default function ReportsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-[#1E2232] rounded-xl border border-white/5 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          className="bg-[#0D0F18] rounded-xl border border-white/10 overflow-hidden"
         >
           <div className="px-6 py-4 border-b border-white/5">
             <h3 className="text-xl font-semibold text-white">Performance Breakdown</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-[#1E2232]/50">
+              <thead className="bg-[#0D0F18]/50">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-medium text-[#7F8C8D] uppercase tracking-wider">Period</th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-[#7F8C8D] uppercase tracking-wider">Trades</th>
