@@ -14,7 +14,8 @@ import { debugWhaleRouter } from "./routes/debug-whale";
 import { cryptoNewsRouter } from "./routes/crypto-news";
 import { competitionRouter } from "./routes/competition";
 import { exchangeConnectionsRouter } from "./routes/exchange-connections";
-import type { D1Database } from "@cloudflare/workers-types";
+import { audioRouter } from "./routes/audio";
+import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 
 
 
@@ -68,6 +69,8 @@ type Env = {
   TRON_API_KEY: string;
   SOLSCAN_API_KEY: string;
   DB: D1Database;
+  R2_BUCKET: R2Bucket;
+  AI: any; // Cloudflare Workers AI binding
 };
 
 const app = new Hono<{ Bindings: Env }>();
@@ -874,5 +877,6 @@ app.route('/api/trades', tradesRouter);
 app.route('/api/strategies', strategiesRouter);
 app.route('/api/competition', competitionRouter);
 app.route('/api/exchange-connections', exchangeConnectionsRouter);
+app.route('/api/audio', audioRouter);
 
 export default app;

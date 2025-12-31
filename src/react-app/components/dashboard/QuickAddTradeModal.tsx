@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { buildApiUrl } from '../../hooks/useApi';
 import { useTheme } from '../../contexts/ThemeContext';
 import { getCardBg, getCardBorder, getTextColor } from '../../utils/themeUtils';
+import VoiceRecorder from '../ui/VoiceRecorder';
 
 interface QuickAddTradeModalProps {
   isOpen: boolean;
@@ -30,7 +31,9 @@ export default function QuickAddTradeModal({ isOpen, onClose, onSuccess }: Quick
     entry_price: '',
     exit_price: '',
     size: '',
+    voice_transcription: '',
   });
+  const [voiceNoteUrl, setVoiceNoteUrl] = useState<string | null>(null);
 
   // Show toast notification
   const showToast = (message: string) => {
@@ -48,8 +51,20 @@ export default function QuickAddTradeModal({ isOpen, onClose, onSuccess }: Quick
       entry_price: '',
       exit_price: '',
       size: '',
+      voice_transcription: '',
     });
+    setVoiceNoteUrl(null);
     setError(null);
+  };
+
+  // Handle voice transcription complete
+  const handleTranscriptionComplete = (text: string, audioUrl: string) => {
+    setFormData(prev => ({
+      ...prev,
+      voice_transcription: prev.voice_transcription ? `${prev.voice_transcription}\n${text}` : text,
+    }));
+    setVoiceNoteUrl(audioUrl);
+    showToast('Voice note transcribed! 🎤');
   };
 
   // Handle form submission
@@ -100,6 +115,14 @@ export default function QuickAddTradeModal({ isOpen, onClose, onSuccess }: Quick
       if (exitPrice !== null) {
         tradeData.exit_price = exitPrice;
         tradeData.exit_timestamp = Math.floor(Date.now() / 1000);
+      }
+
+      // Add voice journaling data if provided
+      if (formData.voice_transcription) {
+        tradeData.voice_transcription = formData.voice_transcription;
+      }
+      if (voiceNoteUrl) {
+        tradeData.voice_note_url = voiceNoteUrl;
       }
 
       // Send POST request
@@ -289,6 +312,27 @@ export default function QuickAddTradeModal({ isOpen, onClose, onSuccess }: Quick
                     required
                     disabled={loading}
                     className={`w-full px-4 py-3 ${getCardBg(theme)} border ${getCardBorder(theme)} rounded-lg ${getTextColor(theme, 'primary')} placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#6A3DF4] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed`}
+                  />
+                </div>
+
+                {/* Notes / AI Journal */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className={`block text-sm font-medium ${getTextColor(theme, 'secondary')}`}>
+                      Trade Notes & Psychology
+                    </label>
+                    <VoiceRecorder
+                      onTranscriptionComplete={handleTranscriptionComplete}
+                      className="ml-2"
+                    />
+                  </div>
+                  <textarea
+                    value={formData.voice_transcription}
+                    onChange={(e) => setFormData({ ...formData, voice_transcription: e.target.value })}
+                    placeholder="Record voice note or type..."
+                    disabled={loading}
+                    rows={4}
+                    className={`w-full px-4 py-3 ${getCardBg(theme)} border ${getCardBorder(theme)} rounded-lg ${getTextColor(theme, 'primary')} placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#6A3DF4] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed resize-none`}
                   />
                 </div>
 

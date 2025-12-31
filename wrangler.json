@@ -23,5 +23,8 @@
       "binding": "R2_BUCKET",
       "bucket_name": "01990f45-1b59-711a-a742-26cd7a0e0415"
     }
-  ]
+  ],
+  "ai": {
+    "binding": "AI"
+  }
 }
