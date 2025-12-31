@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export function buildApiUrl(path: string): string {
   // In development, use relative path
@@ -14,7 +14,7 @@ export function useApi<T>(url: string, options?: RequestInit) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -34,11 +34,11 @@ export function useApi<T>(url: string, options?: RequestInit) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [url, options]);
 
   useEffect(() => {
     fetchData();
-  }, [url]);
+  }, [fetchData]);
 
   return { data, loading, error, refetch: fetchData };
 }

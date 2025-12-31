@@ -106,35 +106,279 @@ app.post("/api/sessions", async (c) => {
   return c.json({ success: true }, 200);
 });
 
-// Get the current user object for the frontend
+// Get user performance data
 app.get("/api/users/me", combinedAuthMiddleware, async (c) => {
-  const user = c.get("user");
-  if (!user) {
-    return c.json({ error: 'User not found' }, 401);
-  }
-
-  // Get userId - support both Mocha and Firebase auth
-  const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
-
-  // Fetch user data from database including avatar_icon
   try {
-    const dbUser = await c.env.DB.prepare(`
-      SELECT name, avatar_icon, email FROM users 
-      WHERE google_user_id = ?
-    `).bind(userId).first();
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
 
+    // Extract user_id from token (Firebase UID)
+    const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
+    const userEmail = user.email || user.google_user_data?.email;
+    const userName = user.google_user_data?.name || userEmail?.split('@')[0] || 'User';
+
+    if (!userId) {
+      return c.json({ error: 'User ID not found in token' }, 401);
+    }
+
+    // Try to fetch user from database
+    let dbUser;
+    try {
+      dbUser = await c.env.DB.prepare(`
+        SELECT 
+          username,
+          xp,
+          rank_tier,
+          reputation_score,
+          email,
+          name
+        FROM users 
+        WHERE google_user_id = ?
+      `).bind(userId).first<{
+        username: string | null;
+        xp: number | null;
+        rank_tier: string | null;
+        reputation_score: number | null;
+        email: string | null;
+        name: string | null;
+      }>();
+    } catch (queryError) {
+      // If columns don't exist yet, try simpler query
+      console.log('Full query failed, trying basic query:', queryError);
+      try {
+        dbUser = await c.env.DB.prepare(`
+          SELECT 
+            email,
+            name
+          FROM users 
+          WHERE google_user_id = ?
+        `).bind(userId).first<{
+          email: string | null;
+          name: string | null;
+        }>();
+        
+        // If user exists but columns are missing, return defaults
+        if (dbUser) {
+          dbUser = {
+            ...dbUser,
+            username: null,
+            xp: 0,
+            rank_tier: 'BRONZE',
+            reputation_score: 100,
+          };
+        }
+      } catch (basicError) {
+        console.error('Basic query also failed:', basicError);
+        dbUser = null;
+      }
+    }
+
+    // Auto-create user if they don't exist (first login)
+    if (!dbUser) {
+      console.log(`Auto-creating user ${userId} in database (first login)`);
+      
+      try {
+        // Try to insert with all new columns first
+        let insertResult;
+        try {
+          insertResult = await c.env.DB.prepare(`
+            INSERT INTO users (
+              email,
+              name,
+              google_user_id,
+              username,
+              xp,
+              rank_tier,
+              reputation_score,
+              created_at,
+              updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          `).bind(
+            userEmail || '',
+            userName,
+            userId,
+            null, // username will be set later by user
+            0, // Default XP
+            'BRONZE', // Default rank tier
+            100 // Default reputation score
+          ).run();
+        } catch (insertError: any) {
+          // If new columns don't exist, try basic insert
+          console.log('Full insert failed, trying basic insert:', insertError);
+          insertResult = await c.env.DB.prepare(`
+            INSERT INTO users (
+              email,
+              name,
+              google_user_id,
+              created_at,
+              updated_at
+            ) VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          `).bind(
+            userEmail || '',
+            userName,
+            userId
+          ).run();
+        }
+
+        if (!insertResult.success) {
+          console.error('Failed to create user:', insertResult);
+          return c.json({ error: 'Failed to create user account' }, 500);
+        }
+
+        // Fetch the newly created user
+        try {
+          dbUser = await c.env.DB.prepare(`
+            SELECT 
+              username,
+              xp,
+              rank_tier,
+              reputation_score,
+              email,
+              name
+            FROM users 
+            WHERE google_user_id = ?
+          `).bind(userId).first<{
+            username: string | null;
+            xp: number | null;
+            rank_tier: string | null;
+            reputation_score: number | null;
+            email: string | null;
+            name: string | null;
+          }>();
+        } catch (fetchError) {
+          // If columns don't exist, fetch basic data and add defaults
+          console.log('Full fetch failed, trying basic fetch:', fetchError);
+          const basicUser = await c.env.DB.prepare(`
+            SELECT email, name FROM users WHERE google_user_id = ?
+          `).bind(userId).first<{ email: string | null; name: string | null }>();
+          
+          if (basicUser) {
+            dbUser = {
+              ...basicUser,
+              username: null,
+              xp: 0,
+              rank_tier: 'BRONZE',
+              reputation_score: 100,
+            };
+          }
+        }
+
+        if (!dbUser) {
+          return c.json({ error: 'User created but could not be retrieved' }, 500);
+        }
+      } catch (createError) {
+        console.error('Error creating user:', createError);
+        return c.json({ 
+          error: 'Failed to create user account',
+          details: createError instanceof Error ? createError.message : String(createError)
+        }, 500);
+      }
+    }
+
+    // Calculate current_streak (consecutive days with at least one trade)
+    let currentStreak = 0;
+    try {
+      // Get all unique trading dates for this user, ordered by date descending
+      // Use a simpler query that works with both timestamp and date columns
+      let tradingDates;
+      
+      try {
+        // Try query with timestamps first (if columns exist)
+        tradingDates = await c.env.DB.prepare(`
+          SELECT DISTINCT 
+            CASE 
+              WHEN entry_timestamp IS NOT NULL THEN date(entry_timestamp, 'unixepoch')
+              WHEN exit_timestamp IS NOT NULL THEN date(exit_timestamp, 'unixepoch')
+              WHEN entry_date IS NOT NULL THEN date(entry_date)
+              ELSE date(created_at)
+            END as trade_date
+          FROM trades
+          WHERE user_id = ?
+          ORDER BY trade_date DESC
+          LIMIT 30
+        `).bind(userId).all<{ trade_date: string }>();
+      } catch (timestampError) {
+        // Fallback to simpler query if timestamp columns don't exist yet
+        console.log('Timestamp query failed, using date-only query:', timestampError);
+        tradingDates = await c.env.DB.prepare(`
+          SELECT DISTINCT 
+            date(COALESCE(exit_date, entry_date, created_at)) as trade_date
+          FROM trades
+          WHERE user_id = ?
+          ORDER BY trade_date DESC
+          LIMIT 30
+        `).bind(userId).all<{ trade_date: string }>();
+      }
+
+      if (tradingDates && tradingDates.results && tradingDates.results.length > 0) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.toISOString().split('T')[0];
+        
+        // Check if user traded today or yesterday (allow timezone differences)
+        const yesterday = new Date(today.getTime() - 86400000);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        
+        const firstTradeDate = tradingDates.results[0].trade_date;
+        const isRecent = firstTradeDate === todayStr || firstTradeDate === yesterdayStr;
+
+        if (!isRecent) {
+          // No recent trade, streak is 0
+          currentStreak = 0;
+        } else {
+          // Count consecutive days with trades
+          let expectedDate = new Date(today);
+          let streakCount = 0;
+          let isFirstCheck = true;
+
+          for (const trade of tradingDates.results) {
+            const tradeDate = new Date(trade.trade_date);
+            tradeDate.setHours(0, 0, 0, 0);
+            
+            const daysDiff = Math.floor((expectedDate.getTime() - tradeDate.getTime()) / 86400000);
+            
+            if (isFirstCheck && (daysDiff === 0 || daysDiff === 1)) {
+              // Today or yesterday - start the streak
+              streakCount = 1;
+              expectedDate = new Date(tradeDate.getTime() - 86400000);
+              isFirstCheck = false;
+            } else if (!isFirstCheck && daysDiff === 0) {
+              // Consecutive day found
+              streakCount++;
+              expectedDate = new Date(tradeDate.getTime() - 86400000);
+            } else if (!isFirstCheck && daysDiff > 0) {
+              // Gap found, streak is broken
+              break;
+            }
+          }
+          
+          currentStreak = streakCount;
+        }
+      }
+    } catch (streakError) {
+      console.error('Error calculating streak (non-critical):', streakError);
+      // Don't fail the request if streak calculation fails
+      currentStreak = 0;
+    }
+
+    // Return performance data (ensure all fields exist even if columns don't)
     return c.json({
-      ...user,
-      displayName: dbUser?.name || user.google_user_data?.name || user.email?.split('@')[0],
-      avatarIcon: dbUser?.avatar_icon || null
+      username: dbUser?.username ?? null,
+      xp: dbUser?.xp ?? 0, // Return as "reputation" in frontend
+      rank_tier: dbUser?.rank_tier ?? 'BRONZE',
+      reputation_score: dbUser?.reputation_score ?? 100,
+      current_streak: currentStreak,
+      email: dbUser?.email ?? userEmail ?? '',
+      name: dbUser?.name ?? userName ?? 'User'
     });
   } catch (error) {
-    // If query fails, return user without database data
+    console.error('Error in GET /api/users/me:', error);
     return c.json({
-      ...user,
-      displayName: user.google_user_data?.name || user.email?.split('@')[0],
-      avatarIcon: null
-    });
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500);
   }
 });
 

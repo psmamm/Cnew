@@ -12,18 +12,28 @@ type Env = {
 
 const TradeSchema = z.object({
   symbol: z.string().min(1),
-  asset_type: z.enum(['stocks', 'crypto', 'forex']),
-  direction: z.enum(['long', 'short']),
-  quantity: z.number().positive(),
+  asset_type: z.enum(['stocks', 'crypto', 'forex']).optional(),
+  direction: z.enum(['LONG', 'SHORT', 'long', 'short']), // Support both cases
+  quantity: z.number().positive().optional(), // Optional if size is provided
   entry_price: z.number().positive(),
   exit_price: z.number().positive().optional(),
-  entry_date: z.string(),
-  exit_date: z.string().optional(),
+  entry_date: z.string().optional(), // Optional if entry_timestamp is provided
+  exit_date: z.string().optional(), // Optional if exit_timestamp is provided
+  entry_timestamp: z.number().int().optional(), // Unix timestamp
+  exit_timestamp: z.number().int().optional(), // Unix timestamp
+  size: z.number().positive().optional(), // Position size (e.g., in USD)
   strategy_id: z.number().optional(),
   commission: z.number().nonnegative().optional(),
   notes: z.string().optional(),
   tags: z.string().optional(),
   leverage: z.number().min(0.1).max(100).optional(),
+  // AI Journaling fields
+  voice_note_url: z.string().url().optional(),
+  voice_transcription: z.string().optional(),
+  emotion_tag: z.string().optional(),
+  ai_analysis: z.string().optional(), // JSON string
+  screenshot_url: z.string().url().optional(),
+  playbook_validation: z.number().int().min(-1).max(1).optional(), // -1 = failed, 0 = not validated, 1 = passed
 });
 
 export const tradesRouter = new Hono<{ Bindings: Env; Variables: { user: any } }>();
@@ -208,50 +218,152 @@ tradesRouter.post('/', zValidator('json', TradeSchema), async (c) => {
   try {
     console.log('POST /api/trades hit');
     const user = c.get('user');
-    console.log('User object:', JSON.stringify(user, null, 2));
+    
+    // Get user_id from Firebase token (security)
+    const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
+    if (!userId) {
+      return c.json({ error: 'Unauthorized: User ID not found' }, 401);
+    }
 
     const trade = c.req.valid('json');
     console.log('Trade data:', JSON.stringify(trade));
 
+    // Normalize direction to uppercase
+    const direction = trade.direction.toUpperCase() as 'LONG' | 'SHORT';
+    
+    // Generate UUID for the trade
+    const uuid = crypto.randomUUID();
+    
+    // Handle timestamps: prefer entry_timestamp/exit_timestamp, fallback to entry_date/exit_date
+    let entryTimestamp: number | null = null;
+    let exitTimestamp: number | null = null;
+    
+    if (trade.entry_timestamp) {
+      entryTimestamp = trade.entry_timestamp;
+    } else if (trade.entry_date) {
+      // Convert date string to Unix timestamp
+      entryTimestamp = Math.floor(new Date(trade.entry_date).getTime() / 1000);
+    } else {
+      // Default to current time
+      entryTimestamp = Math.floor(Date.now() / 1000);
+    }
+    
+    if (trade.exit_timestamp) {
+      exitTimestamp = trade.exit_timestamp;
+    } else if (trade.exit_date) {
+      exitTimestamp = Math.floor(new Date(trade.exit_date).getTime() / 1000);
+    }
+
+    // Calculate position size: prefer size, fallback to quantity * entry_price
+    const positionSize = trade.size || (trade.quantity ? trade.quantity * trade.entry_price : null);
+    if (!positionSize) {
+      return c.json({ error: 'Either size or quantity must be provided' }, 400);
+    }
+
     // Calculate P&L if exit price is provided
     let pnl = null;
+    let pnlNet = null;
+    let pnlPercent = null;
+    let isWin = null;
     let is_closed = 0;
 
     if (trade.exit_price) {
-      const multiplier = trade.direction === 'long' ? 1 : -1;
+      const multiplier = direction === 'LONG' ? 1 : -1;
       const leverage = trade.leverage || 1;
-      pnl = (trade.exit_price - trade.entry_price) * trade.quantity * multiplier * leverage;
+      
+      // Calculate P&L: (exit_price - entry_price) * size * multiplier * leverage
+      const rawPnl = (trade.exit_price - trade.entry_price) * positionSize * multiplier * leverage;
+      
       // Subtract commission from P&L
-      if (trade.commission) {
-        pnl -= trade.commission;
-      }
+      const commission = trade.commission || 0;
+      pnlNet = rawPnl - commission;
+      pnl = pnlNet; // Keep pnl for backward compatibility
+      
+      // Calculate percentage P&L
+      pnlPercent = ((trade.exit_price - trade.entry_price) / trade.entry_price) * 100 * multiplier * leverage;
+      
+      // Determine if it's a win or loss
+      isWin = pnlNet > 0 ? 1 : (pnlNet < 0 ? 0 : null);
       is_closed = 1;
     }
 
     console.log('Attempting to insert trade into database...');
-    const result = await c.env.DB.prepare(`
-      INSERT INTO trades (
-        user_id, symbol, asset_type, direction, quantity, entry_price, exit_price,
-        entry_date, exit_date, strategy_id, commission, notes, tags, pnl, is_closed, leverage
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      user.google_user_data.sub,
-      trade.symbol.toUpperCase(),
-      trade.asset_type,
-      trade.direction,
-      trade.quantity,
-      trade.entry_price,
-      trade.exit_price || null,
-      trade.entry_date,
-      trade.exit_date || null,
-      trade.strategy_id || null,
-      trade.commission || null,
-      trade.notes || null,
-      trade.tags || null,
-      pnl,
-      is_closed,
-      trade.leverage || 1
-    ).run();
+    
+    // Try to insert with all new columns first, fallback to basic insert if columns don't exist
+    let result;
+    try {
+      result = await c.env.DB.prepare(`
+        INSERT INTO trades (
+          user_id, uuid, symbol, asset_type, direction, quantity, size, entry_price, exit_price,
+          entry_date, exit_date, entry_timestamp, exit_timestamp, strategy_id, commission, 
+          notes, tags, pnl, pnl_net, pnl_percent, is_closed, leverage,
+          voice_note_url, voice_transcription, emotion_tag, ai_analysis, screenshot_url, playbook_validation
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        userId,
+        uuid,
+        trade.symbol.toUpperCase(),
+        trade.asset_type || null,
+        direction,
+        trade.quantity || null,
+        positionSize,
+        trade.entry_price,
+        trade.exit_price || null,
+        trade.entry_date || null,
+        trade.exit_date || null,
+        entryTimestamp,
+        exitTimestamp,
+        trade.strategy_id || null,
+        trade.commission || null,
+        trade.notes || null,
+        trade.tags || null,
+        pnl,
+        pnlNet,
+        pnlPercent,
+        is_closed,
+        trade.leverage || 1,
+        trade.voice_note_url || null,
+        trade.voice_transcription || null,
+        trade.emotion_tag || null,
+        trade.ai_analysis || null,
+        trade.screenshot_url || null,
+        trade.playbook_validation || 0
+      ).run();
+    } catch (insertError: any) {
+      // If new columns don't exist, try basic insert
+      console.log('Full insert failed, trying basic insert:', insertError);
+      try {
+        // Calculate quantity from size if quantity is not provided
+        const calculatedQuantity = trade.quantity || (positionSize && trade.entry_price ? Math.round(positionSize / trade.entry_price) : null);
+        
+        result = await c.env.DB.prepare(`
+          INSERT INTO trades (
+            user_id, symbol, asset_type, direction, quantity, entry_price, exit_price,
+            entry_date, exit_date, strategy_id, commission, notes, tags, pnl, is_closed, leverage
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          userId,
+          trade.symbol.toUpperCase(),
+          trade.asset_type || null,
+          direction,
+          calculatedQuantity,
+          trade.entry_price,
+          trade.exit_price || null,
+          trade.entry_date || new Date().toISOString().split('T')[0],
+          trade.exit_date || null,
+          trade.strategy_id || null,
+          trade.commission || null,
+          trade.notes || null,
+          trade.tags || null,
+          pnl,
+          is_closed,
+          trade.leverage || 1
+        ).run();
+      } catch (basicError) {
+        console.error('Both insert attempts failed:', basicError);
+        throw new Error(`Failed to insert trade: ${basicError instanceof Error ? basicError.message : String(basicError)}`);
+      }
+    }
 
     console.log('Database insert result:', JSON.stringify(result));
 
@@ -261,6 +373,26 @@ tradesRouter.post('/', zValidator('json', TradeSchema), async (c) => {
     }
 
     console.log('Trade created successfully with ID:', result.meta.last_row_id);
+
+    // ============================================================================
+    // GAMIFICATION HOOK: Award XP for journaling
+    // ============================================================================
+    try {
+      // Increase user XP by +10 points for journaling a trade
+      const xpUpdate = await c.env.DB.prepare(`
+        UPDATE users 
+        SET xp = COALESCE(xp, 0) + 10,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE google_user_id = ?
+      `).bind(userId).run();
+
+      if (xpUpdate.success) {
+        console.log(`Awarded +10 XP to user ${userId} for journaling trade`);
+      }
+    } catch (xpError) {
+      console.error('Failed to award XP (non-critical):', xpError);
+      // Don't fail the trade creation if XP update fails
+    }
 
     // Create notification if trade alerts are enabled
     try {
@@ -329,9 +461,13 @@ tradesRouter.post('/', zValidator('json', TradeSchema), async (c) => {
               ? `✅ Trade Closed: ${trade.symbol} ${trade.direction.toUpperCase()}`
               : `📊 New Trade: ${trade.symbol} ${trade.direction.toUpperCase()}`;
 
+            const positionDisplay = trade.size 
+              ? `${trade.size.toFixed(2)} (size)` 
+              : (trade.quantity ? `${trade.quantity} units` : 'N/A');
+            
             const message = trade.exit_price && pnl
-              ? `${trade.quantity} ${trade.symbol} ${trade.direction} - P&L: ${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`
-              : `${trade.quantity} ${trade.symbol} ${trade.direction} @ ${trade.entry_price}`;
+              ? `${positionDisplay} ${trade.symbol} ${direction} - P&L: ${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}`
+              : `${positionDisplay} ${trade.symbol} ${direction} @ ${trade.entry_price}`;
 
             await c.env.DB.prepare(`
               INSERT INTO notifications (user_id, type, title, message, time, read, data, created_at, updated_at)
@@ -351,13 +487,30 @@ tradesRouter.post('/', zValidator('json', TradeSchema), async (c) => {
       // Don't fail the trade creation if notification fails
     }
 
-    return c.json({ id: result.meta.last_row_id, success: true }, 201);
+    return c.json({ 
+      id: result.meta.last_row_id,
+      uuid: uuid,
+      success: true,
+      pnl: pnl,
+      pnlNet: pnlNet,
+      pnlPercent: pnlPercent,
+      isWin: isWin,
+      isClosed: is_closed === 1,
+      xpAwarded: 10
+    }, 201);
   } catch (error) {
     console.error('Error in POST /api/trades:', error);
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    
+    // Provide more detailed error message
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isDatabaseError = errorMessage.includes('no such column') || errorMessage.includes('no such table');
+    
     return c.json({
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : String(error)
+      error: isDatabaseError 
+        ? 'Database schema mismatch. Please run migrations.' 
+        : 'Internal server error',
+      details: errorMessage
     }, 500);
   }
 });
@@ -368,51 +521,118 @@ tradesRouter.put('/:id', zValidator('json', TradeSchema), async (c) => {
   const tradeId = c.req.param('id');
   const trade = c.req.valid('json');
 
+  // Get existing trade to determine position size
+  const existingTrade = await c.env.DB.prepare(`
+    SELECT size, quantity, entry_price, direction, is_closed FROM trades WHERE id = ? AND user_id = ?
+  `).bind(tradeId, user.google_user_data?.sub || (user as any).firebase_user_id).first<{
+    size: number | null;
+    quantity: number | null;
+    entry_price: number;
+    direction: string;
+    is_closed: number;
+  }>();
+
+  if (!existingTrade) {
+    return c.json({ error: 'Trade not found' }, 404);
+  }
+
+  // Calculate position size: prefer new size, then existing size, then quantity * entry_price
+  const existingSize = existingTrade.size || null;
+  const existingQuantity = existingTrade.quantity || null;
+  const existingEntryPrice = existingTrade.entry_price;
+  
+  const positionSize = trade.size || existingSize || 
+    (trade.quantity ? trade.quantity * trade.entry_price : 
+     (existingQuantity ? existingQuantity * (trade.entry_price || existingEntryPrice) : null));
+
+  // Normalize direction
+  const direction = (trade.direction?.toUpperCase() || existingTrade.direction?.toUpperCase() || 'LONG') as 'LONG' | 'SHORT';
+
   // Calculate P&L if exit price is provided
-  let pnl = null;
+  let pnl: number | null = null;
+  let pnlNet: number | null = null;
+  let pnlPercent: number | null = null;
   let is_closed = 0;
 
-  if (trade.exit_price) {
-    const multiplier = trade.direction === 'long' ? 1 : -1;
+  if (trade.exit_price && positionSize) {
+    const multiplier = direction === 'LONG' ? 1 : -1;
     const leverage = trade.leverage || 1;
-    pnl = (trade.exit_price - trade.entry_price) * trade.quantity * multiplier * leverage;
+    const entryPrice = trade.entry_price || existingEntryPrice;
+    
+    // Calculate P&L: (exit_price - entry_price) * size * multiplier * leverage
+    const rawPnl = (trade.exit_price - entryPrice) * positionSize * multiplier * leverage;
+    
     // Subtract commission from P&L
-    if (trade.commission) {
-      pnl -= trade.commission;
-    }
+    const commission = trade.commission || 0;
+    pnlNet = rawPnl - commission;
+    pnl = pnlNet; // Keep pnl for backward compatibility
+    
+    // Calculate percentage P&L
+    pnlPercent = ((trade.exit_price - entryPrice) / entryPrice) * 100 * multiplier * leverage;
+    
     is_closed = 1;
   }
 
   // Check if trade was previously open and is now being closed
-  const oldTrade = await c.env.DB.prepare(`
-    SELECT is_closed, exit_price FROM trades WHERE id = ? AND user_id = ?
-  `).bind(tradeId, user.google_user_data?.sub || (user as any).firebase_user_id).first();
-
-  const wasOpen = oldTrade && oldTrade.is_closed === 0;
+  const wasOpen = existingTrade.is_closed === 0;
   const isNowClosed = trade.exit_price && is_closed === 1;
+
+  // Handle timestamps
+  let entryTimestamp: number | null = null;
+  let exitTimestamp: number | null = null;
+  
+  if (trade.entry_timestamp) {
+    entryTimestamp = trade.entry_timestamp;
+  } else if (trade.entry_date) {
+    entryTimestamp = Math.floor(new Date(trade.entry_date).getTime() / 1000);
+  }
+  
+  if (trade.exit_timestamp) {
+    exitTimestamp = trade.exit_timestamp;
+  } else if (trade.exit_date) {
+    exitTimestamp = Math.floor(new Date(trade.exit_date).getTime() / 1000);
+  }
 
   const result = await c.env.DB.prepare(`
     UPDATE trades SET 
-      symbol = ?, asset_type = ?, direction = ?, quantity = ?, entry_price = ?, exit_price = ?,
-      entry_date = ?, exit_date = ?, strategy_id = ?, commission = ?, notes = ?, tags = ?, 
-      pnl = ?, is_closed = ?, leverage = ?, updated_at = CURRENT_TIMESTAMP
+      symbol = ?, asset_type = ?, direction = ?, quantity = ?, size = ?, entry_price = ?, exit_price = ?,
+      entry_date = ?, exit_date = ?, entry_timestamp = COALESCE(?, entry_timestamp), 
+      exit_timestamp = COALESCE(?, exit_timestamp), strategy_id = ?, commission = ?, notes = ?, tags = ?, 
+      pnl = ?, pnl_net = ?, pnl_percent = ?, is_closed = ?, leverage = ?, updated_at = CURRENT_TIMESTAMP,
+      voice_note_url = COALESCE(?, voice_note_url),
+      voice_transcription = COALESCE(?, voice_transcription),
+      emotion_tag = COALESCE(?, emotion_tag),
+      ai_analysis = COALESCE(?, ai_analysis),
+      screenshot_url = COALESCE(?, screenshot_url),
+      playbook_validation = COALESCE(?, playbook_validation)
     WHERE id = ? AND user_id = ?
   `).bind(
-    trade.symbol.toUpperCase(),
-    trade.asset_type,
-    trade.direction,
-    trade.quantity,
-    trade.entry_price,
+    trade.symbol?.toUpperCase() || null,
+    trade.asset_type || null,
+    direction,
+    trade.quantity || null,
+    positionSize,
+    trade.entry_price || null,
     trade.exit_price || null,
-    trade.entry_date,
+    trade.entry_date || null,
     trade.exit_date || null,
+    entryTimestamp,
+    exitTimestamp,
     trade.strategy_id || null,
     trade.commission || null,
     trade.notes || null,
     trade.tags || null,
     pnl,
+    pnlNet,
+    pnlPercent,
     is_closed,
-    trade.leverage || 1,
+    trade.leverage || null,
+    trade.voice_note_url || null,
+    trade.voice_transcription || null,
+    trade.emotion_tag || null,
+    trade.ai_analysis || null,
+    trade.screenshot_url || null,
+    trade.playbook_validation || null,
     tradeId,
     user.google_user_data?.sub || (user as any).firebase_user_id
   ).run();

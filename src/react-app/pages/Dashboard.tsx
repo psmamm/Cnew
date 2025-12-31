@@ -3,6 +3,8 @@ import StatCard from "@/react-app/components/StatCard";
 import RecentTrades from "@/react-app/components/RecentTrades";
 import QuickActions from "@/react-app/components/QuickActions";
 import EquityChart from "@/react-app/components/EquityChart";
+import PerformanceCard from "@/react-app/components/dashboard/PerformanceCard";
+import QuickAddTradeModal from "@/react-app/components/dashboard/QuickAddTradeModal";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
 import {
@@ -33,6 +35,10 @@ export default function DashboardPage() {
   const { trades, loading } = useTrades();
   const { currency, convertCurrency } = useLanguageCurrency();
   const { theme } = useTheme();
+  
+  // State for QuickAddTradeModal
+  const [isQuickAddOpen, setQuickAddOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Zum Neuladen der User-Daten
   
   // State for currency conversion rate
   const [conversionRate, setConversionRate] = useState<number>(1);
@@ -292,10 +298,27 @@ export default function DashboardPage() {
                   <div className="text-3xl font-bold text-[#2ECC71]">{metrics.todaysTrades}</div>
                   <div className={`${getTextColor(theme, 'muted')} text-sm font-medium`}>Today's Trades</div>
                 </div>
+                <div className={`w-px h-16 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'}`} />
+                <button
+                  onClick={() => setQuickAddOpen(true)}
+                  className="flex items-center space-x-2 px-6 py-3 bg-[#6A3DF4] hover:bg-[#5A2DE4] text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Add Trade</span>
+                </button>
               </div>
             </div>
           </motion.div>
         )}
+
+        {/* Performance Card - Trader Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <PerformanceCard refreshTrigger={refreshKey} />
+        </motion.div>
 
         {/* KPI Cards */}
         <motion.div
@@ -558,6 +581,16 @@ export default function DashboardPage() {
           <RecentTrades />
         </motion.div>
       </div>
+
+      {/* Quick Add Trade Modal */}
+      <QuickAddTradeModal
+        isOpen={isQuickAddOpen}
+        onClose={() => setQuickAddOpen(false)}
+        onSuccess={() => {
+          // Trigger refresh of user data (PerformanceCard will update)
+          setRefreshKey(prev => prev + 1);
+        }}
+      />
     </DashboardLayout>
   );
 }
