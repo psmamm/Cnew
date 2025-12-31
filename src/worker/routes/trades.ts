@@ -225,6 +225,28 @@ tradesRouter.post('/', zValidator('json', TradeSchema), async (c) => {
       return c.json({ error: 'Unauthorized: User ID not found' }, 401);
     }
 
+    // Check if user is currently locked out (Risk Management Kill Switch)
+    try {
+      const userRecord = await c.env.DB.prepare(`
+        SELECT lockout_until FROM users WHERE google_user_id = ?
+      `).bind(userId).first();
+
+      if (userRecord?.lockout_until) {
+        const lockoutUntil = userRecord.lockout_until as number;
+        const now = Math.floor(Date.now() / 1000);
+        
+        if (lockoutUntil > now) {
+          const lockoutDate = new Date(lockoutUntil * 1000);
+          return c.json({ 
+            error: 'Risk Lock active. Trading Log disabled until ' + lockoutDate.toISOString() 
+          }, 403);
+        }
+      }
+    } catch (lockoutCheckError) {
+      // If columns don't exist yet (migration not run), continue normally
+      console.log('Lockout check failed (columns may not exist):', lockoutCheckError);
+    }
+
     const trade = c.req.valid('json');
     console.log('Trade data:', JSON.stringify(trade));
 
@@ -375,6 +397,69 @@ tradesRouter.post('/', zValidator('json', TradeSchema), async (c) => {
     console.log('Trade created successfully with ID:', result.meta.last_row_id);
 
     // ============================================================================
+    // RISK MANAGEMENT: Check daily loss and trigger lockout if limit reached
+    // ============================================================================
+    let riskLockTriggered = false;
+    if (is_closed === 1 && pnlNet !== null && pnlNet < 0) {
+      try {
+        // Get user risk settings
+        const riskSettings = await c.env.DB.prepare(`
+          SELECT risk_lock_enabled, max_daily_loss FROM users WHERE google_user_id = ?
+        `).bind(userId).first();
+
+        if (riskSettings?.risk_lock_enabled === 1 && riskSettings?.max_daily_loss) {
+          // Calculate start of today (UTC)
+          const now = new Date();
+          const startOfDay = new Date(Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate(),
+            0, 0, 0, 0
+          ));
+          const startOfDayTimestamp = Math.floor(startOfDay.getTime() / 1000);
+
+          // Calculate cumulative daily PnL (only losses count)
+          const dailyPnLResult: any = await c.env.DB.prepare(`
+            SELECT COALESCE(SUM(pnl_net), 0) as daily_loss
+            FROM trades
+            WHERE user_id = ? 
+              AND is_closed = 1 
+              AND pnl_net < 0
+              AND (
+                exit_timestamp >= ? OR 
+                (exit_timestamp IS NULL AND entry_timestamp >= ?) OR
+                (exit_timestamp IS NULL AND entry_timestamp IS NULL AND created_at >= ?)
+              )
+          `).bind(userId, startOfDayTimestamp, startOfDayTimestamp, startOfDay.toISOString()).first();
+
+          const dailyLoss = dailyPnLResult?.daily_loss || 0;
+          const maxDailyLoss = riskSettings.max_daily_loss as number;
+
+          // Trigger lockout if daily loss limit reached
+          if (Math.abs(dailyLoss) >= Math.abs(maxDailyLoss)) {
+            // Set lockout until tomorrow 06:00 UTC
+            const tomorrow = new Date(startOfDay);
+            tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+            tomorrow.setUTCHours(6, 0, 0, 0);
+            const lockoutUntil = Math.floor(tomorrow.getTime() / 1000);
+
+            await c.env.DB.prepare(`
+              UPDATE users 
+              SET lockout_until = ?, updated_at = CURRENT_TIMESTAMP
+              WHERE google_user_id = ?
+            `).bind(lockoutUntil, userId).run();
+
+            console.log(`Risk lock triggered for user ${userId}. Daily loss: ${dailyLoss}, Limit: ${maxDailyLoss}`);
+            riskLockTriggered = true;
+          }
+        }
+      } catch (riskError) {
+        console.error('Error checking risk lock (non-critical):', riskError);
+        // Don't fail trade creation if risk check fails
+      }
+    }
+
+    // ============================================================================
     // GAMIFICATION HOOK: Award XP for journaling
     // ============================================================================
     try {
@@ -496,7 +581,8 @@ tradesRouter.post('/', zValidator('json', TradeSchema), async (c) => {
       pnlPercent: pnlPercent,
       isWin: isWin,
       isClosed: is_closed === 1,
-      xpAwarded: 10
+      xpAwarded: 10,
+      risk_lock_triggered: riskLockTriggered
     }, 201);
   } catch (error) {
     console.error('Error in POST /api/trades:', error);
