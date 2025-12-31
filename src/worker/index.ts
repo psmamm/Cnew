@@ -127,7 +127,7 @@ app.get("/api/users/me", combinedAuthMiddleware, async (c) => {
     }
 
     // Try to fetch user from database
-    let dbUser;
+    let dbUser: any;
     try {
       dbUser = await c.env.DB.prepare(`
         SELECT 
@@ -136,17 +136,11 @@ app.get("/api/users/me", combinedAuthMiddleware, async (c) => {
           rank_tier,
           reputation_score,
           email,
-          name
+          name,
+          lockout_until
         FROM users 
         WHERE google_user_id = ?
-      `).bind(userId).first<{
-        username: string | null;
-        xp: number | null;
-        rank_tier: string | null;
-        reputation_score: number | null;
-        email: string | null;
-        name: string | null;
-      }>();
+      `).bind(userId).first();
     } catch (queryError) {
       // If columns don't exist yet, try simpler query
       console.log('Full query failed, trying basic query:', queryError);
@@ -170,6 +164,7 @@ app.get("/api/users/me", combinedAuthMiddleware, async (c) => {
             xp: 0,
             rank_tier: 'BRONZE',
             reputation_score: 100,
+            lockout_until: null,
           };
         }
       } catch (basicError) {
@@ -374,7 +369,8 @@ app.get("/api/users/me", combinedAuthMiddleware, async (c) => {
       reputation_score: dbUser?.reputation_score ?? 100,
       current_streak: currentStreak,
       email: dbUser?.email ?? userEmail ?? '',
-      name: dbUser?.name ?? userName ?? 'User'
+      name: dbUser?.name ?? userName ?? 'User',
+      lockout_until: dbUser?.lockout_until ?? null // Risk management lockout timestamp
     });
   } catch (error) {
     console.error('Error in GET /api/users/me:', error);
@@ -613,7 +609,7 @@ app.get('/api/users/settings', combinedAuthMiddleware, async (c) => {
 
   const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
   const settings = await c.env.DB.prepare(`
-    SELECT notification_settings, theme_preference FROM users WHERE google_user_id = ?
+    SELECT notification_settings, theme_preference, risk_lock_enabled, max_daily_loss FROM users WHERE google_user_id = ?
   `).bind(userId).first();
 
   return c.json({
@@ -622,7 +618,11 @@ app.get('/api/users/settings', combinedAuthMiddleware, async (c) => {
       performanceReports: true,
       productUpdates: false
     },
-    theme: settings?.theme_preference || 'dark'
+    theme: settings?.theme_preference || 'dark',
+    riskManagement: {
+      risk_lock_enabled: settings?.risk_lock_enabled === 1 || false,
+      max_daily_loss: settings?.max_daily_loss || null
+    }
   });
 });
 
@@ -633,20 +633,52 @@ app.put('/api/users/settings', combinedAuthMiddleware, async (c) => {
     return c.json({ error: 'User not found' }, 401);
   }
 
-  const { notifications, theme } = await c.req.json();
+  const { notifications, theme, riskManagement } = await c.req.json();
   const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
 
-  const result = await c.env.DB.prepare(`
-    UPDATE users SET 
-      notification_settings = ?, 
-      theme_preference = ?, 
-      updated_at = CURRENT_TIMESTAMP
-    WHERE google_user_id = ?
-  `).bind(
-    JSON.stringify(notifications),
-    theme,
-    userId
-  ).run();
+  // Prepare risk management values
+  const riskLockEnabled = riskManagement?.risk_lock_enabled ? 1 : 0;
+  const maxDailyLoss = riskManagement?.max_daily_loss !== undefined && riskManagement?.max_daily_loss !== null 
+    ? riskManagement.max_daily_loss 
+    : null;
+
+  // Try to update with risk management fields, fallback if columns don't exist
+  let result;
+  try {
+    result = await c.env.DB.prepare(`
+      UPDATE users SET 
+        notification_settings = ?, 
+        theme_preference = ?, 
+        risk_lock_enabled = ?,
+        max_daily_loss = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE google_user_id = ?
+    `).bind(
+      JSON.stringify(notifications),
+      theme,
+      riskLockEnabled,
+      maxDailyLoss,
+      userId
+    ).run();
+  } catch (updateError: any) {
+    // If risk management columns don't exist, update without them
+    if (updateError.message?.includes('no such column')) {
+      console.log('Risk management columns not found, updating without them');
+      result = await c.env.DB.prepare(`
+        UPDATE users SET 
+          notification_settings = ?, 
+          theme_preference = ?, 
+          updated_at = CURRENT_TIMESTAMP
+        WHERE google_user_id = ?
+      `).bind(
+        JSON.stringify(notifications),
+        theme,
+        userId
+      ).run();
+    } else {
+      throw updateError;
+    }
+  }
 
   if (!result.success) {
     return c.json({ error: 'Failed to update settings' }, 500);

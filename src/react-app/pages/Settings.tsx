@@ -1,6 +1,7 @@
 import DashboardLayout from "@/react-app/components/DashboardLayout";
 import SecuritySection from "@/react-app/components/SecuritySection";
 import SubscriptionSection from "@/react-app/components/SubscriptionSection";
+import RiskManagementSettings from "@/react-app/components/settings/RiskManagementSettings";
 import { useAuth } from "../contexts/AuthContext";
 import { User, Bell, Download, Upload, Save, Check } from "lucide-react";
 import { useSettings } from "@/react-app/hooks/useSettings";
@@ -1078,6 +1079,15 @@ export default function SettingsPage() {
               </motion.div>
             )}
           </AnimatePresence>
+        </motion.div>
+
+        {/* Risk Management */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <RiskManagementSettings />
         </motion.div>
 
         {/* Security */}

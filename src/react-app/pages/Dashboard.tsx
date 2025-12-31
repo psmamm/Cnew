@@ -5,6 +5,7 @@ import QuickActions from "@/react-app/components/QuickActions";
 import EquityChart from "@/react-app/components/EquityChart";
 import PerformanceCard from "@/react-app/components/dashboard/PerformanceCard";
 import QuickAddTradeModal from "@/react-app/components/dashboard/QuickAddTradeModal";
+import RiskLockdownOverlay from "@/react-app/components/dashboard/RiskLockdownOverlay";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
 import {
@@ -591,6 +592,9 @@ export default function DashboardPage() {
           setRefreshKey(prev => prev + 1);
         }}
       />
+
+      {/* Risk Lockdown Overlay */}
+      <RiskLockdownOverlay />
     </DashboardLayout>
   );
 }
