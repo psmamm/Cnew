@@ -25,7 +25,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNotifications } from '@/react-app/hooks/useNotifications';
 import { useLanguageCurrency } from '@/react-app/contexts/LanguageCurrencyContext';
 import { useTheme } from '@/react-app/contexts/ThemeContext';
-import WalletConnect from './WalletConnect';
+// import WalletConnect from './WalletConnect'; // Removed
 
 export default function TopNavigation() {
   const { user, logout } = useAuth();
@@ -118,6 +118,7 @@ export default function TopNavigation() {
     { name: t('Dashboard'), path: '/dashboard', hasDropdown: false, key: 'Dashboard' },
     { name: t('Competition'), path: '/competition', hasDropdown: false, key: 'Competition' },
     { name: t('Journal'), path: '/journal', hasDropdown: false, key: 'Journal' },
+    { name: t('Velo'), path: '/velo', hasDropdown: false, key: 'Velo' },
     { name: t('Markets'), path: '/markets', hasDropdown: false, key: 'Markets' },
     { name: t('Strategies'), path: '/strategies', hasDropdown: false, key: 'Strategies' },
     { name: t('Reports'), path: '/reports', hasDropdown: false, key: 'Reports' },
@@ -126,17 +127,16 @@ export default function TopNavigation() {
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors ${
-      theme === 'dark' 
-        ? 'bg-[#1A1D23] border-white/10' 
+    <nav className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors ${theme === 'dark'
+        ? 'bg-[#1A1D23] border-white/10'
         : 'bg-white border-gray-200 shadow-sm'
-    }`}>
+      }`}>
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left Section - Logo */}
           <div className="flex items-center space-x-6">
             {/* Logo */}
-              <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
               <div className="w-8 h-8 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/20">
                 <BarChart3 className="w-5 h-5 text-white" />
               </div>
@@ -146,9 +146,8 @@ export default function TopNavigation() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ${
-                theme === 'dark' ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
-              }`}
+              className={`lg:hidden p-2 rounded-lg transition-colors ${theme === 'dark' ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
+                }`}
             >
               {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -165,8 +164,8 @@ export default function TopNavigation() {
                       onClick={() => hasDropdown ? toggleDropdown(item.name) : navigate(item.path)}
                       className={`
                         flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-lg transition-all
-                        ${theme === 'dark' 
-                          ? `text-white ${isActive ? 'bg-white/5' : 'hover:bg-white/5'}` 
+                        ${theme === 'dark'
+                          ? `text-white ${isActive ? 'bg-white/5' : 'hover:bg-white/5'}`
                           : `text-gray-700 ${isActive ? 'bg-gray-100' : 'hover:bg-gray-100'}`
                         }
                       `}
@@ -218,9 +217,8 @@ export default function TopNavigation() {
           </div>
 
           {/* Right Section - Darker Background */}
-          <div className={`flex items-center rounded-lg px-3 py-2 space-x-2 ${
-            theme === 'dark' ? 'bg-[#151820]' : 'bg-gray-50'
-          }`}>
+          <div className={`flex items-center rounded-lg px-3 py-2 space-x-2 ${theme === 'dark' ? 'bg-[#151820]' : 'bg-gray-50'
+            }`}>
             {/* Search Icon Button */}
             <div className="relative hidden md:block">
               <button
@@ -415,7 +413,7 @@ export default function TopNavigation() {
                   </AnimatePresence>
                 </div>
 
-                <WalletConnect />
+                {/* WalletConnect removed */}
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
@@ -449,9 +447,8 @@ export default function TopNavigation() {
                               return (
                                 <div
                                   key={notification.id}
-                                  className={`p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer ${
-                                    !notification.read ? 'bg-[#6A3DF4]/5' : ''
-                                  }`}
+                                  className={`p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer ${!notification.read ? 'bg-[#6A3DF4]/5' : ''
+                                    }`}
                                   onClick={() => {
                                     if (!notification.read) {
                                       markAsRead(notification.id);
@@ -463,15 +460,14 @@ export default function TopNavigation() {
                                   }}
                                 >
                                   <div className="flex items-start space-x-3">
-                                    <div className={`p-2 rounded-lg ${
-                                      notification.type === 'trade' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
-                                      notification.type === 'performance' ? 'bg-[#6A3DF4]/20 text-[#6A3DF4]' :
-                                      notification.type === 'strategy' ? 'bg-[#F39C12]/20 text-[#F39C12]' :
-                                      notification.type === 'market' ? 'bg-[#3498DB]/20 text-[#3498DB]' :
-                                      notification.type === 'goal' ? 'bg-[#9B59B6]/20 text-[#9B59B6]' :
-                                      notification.type === 'whale' ? 'bg-[#E74C3C]/20 text-[#E74C3C]' :
-                                      'bg-[#7F8C8D]/20 text-[#7F8C8D]'
-                                    }`}>
+                                    <div className={`p-2 rounded-lg ${notification.type === 'trade' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
+                                        notification.type === 'performance' ? 'bg-[#6A3DF4]/20 text-[#6A3DF4]' :
+                                          notification.type === 'strategy' ? 'bg-[#F39C12]/20 text-[#F39C12]' :
+                                            notification.type === 'market' ? 'bg-[#3498DB]/20 text-[#3498DB]' :
+                                              notification.type === 'goal' ? 'bg-[#9B59B6]/20 text-[#9B59B6]' :
+                                                notification.type === 'whale' ? 'bg-[#E74C3C]/20 text-[#E74C3C]' :
+                                                  'bg-[#7F8C8D]/20 text-[#7F8C8D]'
+                                      }`}>
                                       <IconComponent className="w-4 h-4" />
                                     </div>
                                     <div className="flex-1">
@@ -591,11 +587,10 @@ export default function TopNavigation() {
                                 handleLanguageSelect(lang);
                                 setShowLanguageCurrency(false);
                               }}
-                              className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
-                                language === lang
+                              className={`w-full text-left px-3 py-2 rounded-lg transition-all ${language === lang
                                   ? 'text-[#6A3DF4] font-medium'
                                   : 'text-white hover:bg-white/5'
-                              }`}
+                                }`}
                             >
                               {lang}
                             </button>
@@ -609,11 +604,10 @@ export default function TopNavigation() {
 
               <button
                 onClick={toggleTheme}
-                className={`p-2 rounded-lg transition-colors ${
-                  theme === 'dark' 
-                    ? 'text-white hover:bg-white/5' 
+                className={`p-2 rounded-lg transition-colors ${theme === 'dark'
+                    ? 'text-white hover:bg-white/5'
                     : 'text-gray-700 hover:bg-gray-200'
-                }`}
+                  }`}
                 title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               >
                 {theme === 'dark' ? (

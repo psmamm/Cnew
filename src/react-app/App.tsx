@@ -18,7 +18,7 @@ const emitDebugLog = (payload: Record<string, any>) => {
       keepalive: true,
       headers: { 'Content-Type': 'application/json' },
       body
-    }).catch(() => {});
+    }).catch(() => { });
     if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
       const blob = new Blob([body], { type: 'application/json' });
       navigator.sendBeacon(url, blob);
@@ -125,6 +125,8 @@ const LoginPage = lazy(() => import("@/react-app/pages/Login"));
 const SignupPage = lazy(() => import("@/react-app/pages/Signup"));
 const ForgotPasswordPage = lazy(() => import("@/react-app/pages/ForgotPassword"));
 const AuthActionPage = lazy(() => import("@/react-app/pages/AuthAction"));
+const VeloPage = lazy(() => import("@/react-app/pages/Velo"));
+
 
 export default function App() {
   return (
@@ -137,118 +139,124 @@ export default function App() {
                 <Suspense fallback={<LoadingSpinner />}>
                   <LayoutProbe>
                     <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/auth-action" element={<AuthActionPage />} />
+                      {/* Public Routes */}
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/signup" element={<SignupPage />} />
+                      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                      <Route path="/auth-action" element={<AuthActionPage />} />
 
-                {/* Protected Routes */}
-                <Route path="/dashboard" element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/journal" element={
-                  <ProtectedRoute>
-                    <JournalPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/reports" element={
-                  <ProtectedRoute>
-                    <ReportsPage />
-                  </ProtectedRoute>
-                } />
+                      {/* Protected Routes */}
+                      <Route path="/dashboard" element={
+                        <ProtectedRoute>
+                          <DashboardPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/journal" element={
+                        <ProtectedRoute>
+                          <JournalPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/reports" element={
+                        <ProtectedRoute>
+                          <ReportsPage />
+                        </ProtectedRoute>
+                      } />
 
-                <Route path="/markets" element={
-                  <ProtectedRoute>
-                    <MarketsPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/markets/:symbol" element={
-                  <ProtectedRoute>
-                    <CoinDetailPage />
-                  </ProtectedRoute>
-                } />
-                {/* Temporarily disabled - Order Heatmap */}
-                {/* <Route path="/order-heatmap" element={
+                      <Route path="/markets" element={
+                        <ProtectedRoute>
+                          <MarketsPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/markets/:symbol" element={
+                        <ProtectedRoute>
+                          <CoinDetailPage />
+                        </ProtectedRoute>
+                      } />
+                      {/* Temporarily disabled - Order Heatmap */}
+                      {/* <Route path="/order-heatmap" element={
                   <ProtectedRoute>
                     <OrderHeatmapPage />
                   </ProtectedRoute>
                 } /> */}
 
-                <Route path="/strategies" element={
-                  <ProtectedRoute>
-                    <StrategiesPage />
-                  </ProtectedRoute>
-                } />
-                {/* Temporarily disabled - Bitcoin Halving */}
-                {/* <Route path="/bitcoin-halving" element={
+                      <Route path="/strategies" element={
+                        <ProtectedRoute>
+                          <StrategiesPage />
+                        </ProtectedRoute>
+                      } />
+                      {/* Temporarily disabled - Bitcoin Halving */}
+                      {/* <Route path="/bitcoin-halving" element={
                   <ProtectedRoute>
                     <BitcoinHalvingPage />
                   </ProtectedRoute>
                 } /> */}
-                <Route path="/us-debt" element={
-                  <ProtectedRoute>
-                    <USDebtPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/study" element={
-                  <ProtectedRoute>
-                    <StudyPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/alpha-hub" element={
-                  <ProtectedRoute>
-                    <AlphaHubPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition" element={
-                  <ProtectedRoute>
-                    <CompetitionPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition/play" element={
-                  <ProtectedRoute>
-                    <CompetitionPlayPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition/matchmaking" element={
-                  <ProtectedRoute>
-                    <MatchmakingPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition/match-complete" element={
-                  <ProtectedRoute>
-                    <MatchCompletePage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition/daily-challenge" element={
-                  <ProtectedRoute>
-                    <DailyChallengePage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition/tournaments" element={
-                  <ProtectedRoute>
-                    <TournamentsPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition/tournaments/:id" element={
-                  <ProtectedRoute>
-                    <TournamentDetailsPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/competition/leaderboard" element={
-                  <ProtectedRoute>
-                    <LeaderboardPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <SettingsPage />
-                  </ProtectedRoute>
-                } />
+                      <Route path="/us-debt" element={
+                        <ProtectedRoute>
+                          <USDebtPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/study" element={
+                        <ProtectedRoute>
+                          <StudyPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/alpha-hub" element={
+                        <ProtectedRoute>
+                          <AlphaHubPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition" element={
+                        <ProtectedRoute>
+                          <CompetitionPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition/play" element={
+                        <ProtectedRoute>
+                          <CompetitionPlayPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition/matchmaking" element={
+                        <ProtectedRoute>
+                          <MatchmakingPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition/match-complete" element={
+                        <ProtectedRoute>
+                          <MatchCompletePage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition/daily-challenge" element={
+                        <ProtectedRoute>
+                          <DailyChallengePage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition/tournaments" element={
+                        <ProtectedRoute>
+                          <TournamentsPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition/tournaments/:id" element={
+                        <ProtectedRoute>
+                          <TournamentDetailsPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/competition/leaderboard" element={
+                        <ProtectedRoute>
+                          <LeaderboardPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/settings" element={
+                        <ProtectedRoute>
+                          <SettingsPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/velo" element={
+                        <ProtectedRoute>
+                          <VeloPage />
+                        </ProtectedRoute>
+                      } />
+
                     </Routes>
                   </LayoutProbe>
                 </Suspense>
