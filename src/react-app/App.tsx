@@ -125,7 +125,6 @@ const LoginPage = lazy(() => import("@/react-app/pages/Login"));
 const SignupPage = lazy(() => import("@/react-app/pages/Signup"));
 const ForgotPasswordPage = lazy(() => import("@/react-app/pages/ForgotPassword"));
 const AuthActionPage = lazy(() => import("@/react-app/pages/AuthAction"));
-const VeloPage = lazy(() => import("@/react-app/pages/Velo"));
 
 
 export default function App() {
@@ -249,11 +248,6 @@ export default function App() {
                       <Route path="/settings" element={
                         <ProtectedRoute>
                           <SettingsPage />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/velo" element={
-                        <ProtectedRoute>
-                          <VeloPage />
                         </ProtectedRoute>
                       } />
 

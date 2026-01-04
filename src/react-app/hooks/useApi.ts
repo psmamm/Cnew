@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { auth } from '../lib/firebase';
 
 export function buildApiUrl(path: string): string {
   // In development, use relative path
@@ -7,6 +8,21 @@ export function buildApiUrl(path: string): string {
     return path;
   }
   return `/${path}`;
+}
+
+// Helper to get auth headers with Firebase token
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = {};
+  const user = auth.currentUser;
+  if (user) {
+    try {
+      const token = await user.getIdToken();
+      headers['Authorization'] = `Bearer ${token}`;
+    } catch (e) {
+      console.error('Failed to get Firebase token:', e);
+    }
+  }
+  return headers;
 }
 
 export function useApi<T>(url: string, options?: RequestInit) {
@@ -18,9 +34,16 @@ export function useApi<T>(url: string, options?: RequestInit) {
     try {
       setLoading(true);
       setError(null);
+      
+      const authHeaders = await getAuthHeaders();
+      
       const response = await fetch(url, {
         credentials: 'include',
         ...options,
+        headers: {
+          ...authHeaders,
+          ...options?.headers,
+        },
       });
       
       if (!response.ok) {
@@ -55,10 +78,13 @@ export function useApiMutation<T = any>(
       setLoading(true);
       setError(null);
       
+      const authHeaders = await getAuthHeaders();
+      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         credentials: 'include',
         body: data ? JSON.stringify(data) : undefined,
