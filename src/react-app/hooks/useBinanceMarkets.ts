@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiConfig } from '@/react-app/config/apiConfig';
+import { getLogoUrl } from '@/react-app/utils/coinLogos';
 
 export interface BinanceSymbol {
   symbol: string;
@@ -69,27 +70,6 @@ export interface MarketStats {
   totalQuoteVolume: number;
   topGainer: { symbol: string; change: number } | null;
   topLoser: { symbol: string; change: number } | null;
-}
-
-// Get CoinGecko ID for a base asset
-function getCoinGeckoId(baseAsset: string): string {
-  const baseAssetLower = baseAsset.toLowerCase();
-  
-  // CoinGecko ID mapping
-  const coinGeckoMap: Record<string, string> = {
-    'BTC': 'bitcoin', 'ETH': 'ethereum', 'BNB': 'binancecoin', 'SOL': 'solana', 'XRP': 'ripple',
-    'DOGE': 'dogecoin', 'ADA': 'cardano', 'TRX': 'tron', 'AVAX': 'avalanche-2', 'TON': 'the-open-network',
-    'SHIB': 'shiba-inu', 'DOT': 'polkadot', 'BCH': 'bitcoin-cash', 'LINK': 'chainlink', 'NEAR': 'near',
-    'MATIC': 'matic-network', 'UNI': 'uniswap', 'LTC': 'litecoin', 'PEPE': 'pepe', 'ICP': 'internet-computer',
-    'ETC': 'ethereum-classic', 'APT': 'aptos', 'SUI': 'sui', 'CRO': 'crypto-com-chain', 'ATOM': 'cosmos',
-    'FIL': 'filecoin', 'OP': 'optimism', 'ARB': 'arbitrum', 'INJ': 'injective-protocol', 'STX': 'blockstack',
-    'IMX': 'immutable-x', 'TAO': 'bittensor', 'RENDER': 'render-token', 'LUNA': 'terra-luna',
-    'VTHO': 'vethor-token', 'ASR': 'as-roma-fan-token', 'BANK': 'bankless-dao', 'AT': 'artemis-token',
-    'ASTER': 'aster', 'VIRTUAL': 'virtual-protocol', 'USDT': 'tether', 'USDC': 'usd-coin', 'DAI': 'dai',
-    'TUSD': 'true-usd', 'BUSD': 'binance-usd', 'FDUSD': 'first-digital-usd', 'PAX': 'paxos-standard'
-  };
-  
-  return coinGeckoMap[baseAsset] || baseAssetLower;
 }
 
 export function useBinanceMarkets() {
@@ -273,11 +253,8 @@ export function useBinanceMarkets() {
       symbolsList.forEach(symbolInfo => {
         const ticker = tickerData[symbolInfo.symbol];
         if (ticker) {
-          // Use GitHub CDN as primary (most reliable, direct image URLs)
-          // CoinGecko's /image endpoint returns JSON/redirects which causes issues
-          // The getLogoUrl function handles the fallback chain
-          const baseAssetLower = symbolInfo.baseAsset.toLowerCase();
-          const logoUrl = `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${baseAssetLower}.png`;
+          // Use CoinMarketCap CDN as primary (best coverage for all Binance coins)
+          const logoUrl = getLogoUrl(symbolInfo.baseAsset);
           
           enhanced[symbolInfo.symbol] = {
             ...ticker,
