@@ -9,7 +9,6 @@ import {
   Menu,
   X,
   User,
-  Wallet,
   Bell,
   ArrowDown,
   BarChart3,
