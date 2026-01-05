@@ -124,3 +124,4 @@ CREATE INDEX IF NOT EXISTS idx_trades_playbook_validation ON trades(playbook_val
 
 -- Set pnl_net from pnl:
 -- UPDATE trades SET pnl_net = pnl WHERE pnl_net IS NULL AND pnl IS NOT NULL;
+

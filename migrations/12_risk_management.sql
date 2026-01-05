@@ -12,3 +12,4 @@ ALTER TABLE users ADD COLUMN max_daily_loss REAL;
 
 -- Create index for lockout_until for faster queries
 CREATE INDEX IF NOT EXISTS idx_users_lockout_until ON users(lockout_until) WHERE lockout_until IS NOT NULL;
+

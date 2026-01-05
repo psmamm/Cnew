@@ -5,3 +5,4 @@ ALTER TABLE tournaments DROP COLUMN prize_pool;
 ALTER TABLE tournaments DROP COLUMN tournament_tier;
 
 
+

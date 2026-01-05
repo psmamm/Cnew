@@ -39,3 +39,4 @@ export function getHoverBg(_theme: Theme): string {
 export function getCardClasses(_theme: Theme): string {
   return `${getCardBg(_theme)} ${getCardBorder(_theme)} rounded-xl p-4 border`;
 }
+

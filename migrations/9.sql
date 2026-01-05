@@ -10,3 +10,4 @@ ALTER TABLE tournaments ADD COLUMN tournament_tier TEXT DEFAULT 'SUPER 8';
 -- The default in CREATE TABLE is already set, but we ensure consistency
 
 
+

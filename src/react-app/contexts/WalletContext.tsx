@@ -464,3 +464,4 @@ declare global {
     coinbaseWalletExtension?: any;
   }
 }
+

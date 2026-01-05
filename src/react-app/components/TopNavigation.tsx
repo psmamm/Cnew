@@ -111,6 +111,7 @@ export default function TopNavigation() {
   // Navigation items - defined after hooks to ensure context is available
   const navigation = [
     { name: t('Dashboard'), path: '/dashboard', hasDropdown: false, key: 'Dashboard' },
+    { name: t('Trading'), path: '/trading', hasDropdown: false, key: 'Trading' },
     { name: t('Competition'), path: '/competition', hasDropdown: false, key: 'Competition' },
     { name: t('Journal'), path: '/journal', hasDropdown: false, key: 'Journal' },
     { name: t('Markets'), path: '/markets', hasDropdown: false, key: 'Markets' },

@@ -386,3 +386,4 @@ export default function QuickAddTradeModal({ isOpen, onClose, onSuccess }: Quick
     </>
   );
 }
+

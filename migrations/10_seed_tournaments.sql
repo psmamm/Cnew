@@ -28,3 +28,4 @@ VALUES
     ('system', 'ETH Active Challenge', 'ETHUSDT', 'Active Ethereum tournament. Still accepting participants!', 25, 16, 60.00, 960.00, 'SWEET 16', 'active', datetime('now', '-3 minutes'), datetime('now', '-8 minutes'));
 
 
+

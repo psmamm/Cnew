@@ -290,3 +290,4 @@ export default function PerformanceCard({ refreshTrigger }: PerformanceCardProps
     </motion.div>
   );
 }
+

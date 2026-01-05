@@ -271,3 +271,4 @@ export function useWalletTransactions() {
     refetch: fetchTransactions,
   };
 }
+
