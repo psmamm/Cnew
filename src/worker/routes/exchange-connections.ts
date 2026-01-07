@@ -4,10 +4,12 @@ import { z } from "zod";
 import { authMiddleware } from "@getmocha/users-service/backend";
 import { getCookie } from "hono/cookie";
 import { D1Database } from "@cloudflare/workers-types";
+import { encrypt, decrypt } from "../utils/encryption";
 
 type Env = {
     MOCHA_USERS_SERVICE_API_URL: string;
     MOCHA_USERS_SERVICE_API_KEY: string;
+    ENCRYPTION_MASTER_KEY: string;
     DB: D1Database;
 };
 
@@ -106,19 +108,30 @@ exchangeConnectionsRouter.post('/', zValidator('json', CreateConnectionSchema), 
         // Let's just insert.
     }
 
-    // exchange_name column does not exist in DB, derive it in frontend or select
+    // Encrypt API keys before storing
+    const masterKey = c.env.ENCRYPTION_MASTER_KEY;
+    if (!masterKey) {
+      return c.json({ error: 'Encryption service unavailable' }, 500);
+    }
 
+    const encryptedKey = await encrypt(data.api_key, masterKey);
+    const encryptedSecret = await encrypt(data.api_secret, masterKey);
+    const encryptedPassphrase = data.passphrase 
+      ? await encrypt(data.passphrase, masterKey)
+      : null;
+
+    // Store encrypted keys in exchange_connections table
     const result = await c.env.DB.prepare(`
-    INSERT INTO exchange_connections (
-      user_id, exchange_id, api_key_encrypted, api_secret_encrypted, passphrase_encrypted, 
-      auto_sync_enabled, sync_interval_hours, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-  `).bind(
+      INSERT INTO exchange_connections (
+        user_id, exchange_id, api_key_encrypted, api_secret_encrypted, passphrase_encrypted, 
+        auto_sync_enabled, sync_interval_hours, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `).bind(
         userId,
         data.exchange_id,
-        data.api_key, // TODO: Encrypt
-        data.api_secret, // TODO: Encrypt
-        data.passphrase || null,
+        encryptedKey,
+        encryptedSecret,
+        encryptedPassphrase,
         data.auto_sync_enabled ? 1 : 0,
         data.sync_interval_hours || 24
     ).run();
@@ -210,6 +223,15 @@ exchangeConnectionsRouter.post('/:id/sync', async (c) => {
 
     if (conn.exchange_id === 'bybit') {
         try {
+            // Decrypt API keys for order execution (only in RAM)
+            const masterKey = c.env.ENCRYPTION_MASTER_KEY;
+            if (!masterKey) {
+                return c.json({ error: 'Encryption service unavailable' }, 500);
+            }
+
+            const apiKey = await decrypt(conn.api_key_encrypted, masterKey);
+            const apiSecret = await decrypt(conn.api_secret_encrypted, masterKey);
+
             // Fetch closed PnL from Bybit V5 API (Linear Perps / Futures)
             // Doc: https://bybit-exchange.github.io/docs/v5/position/close-pnl
             // category=linear is for USDT Perps which is most common
@@ -218,17 +240,21 @@ exchangeConnectionsRouter.post('/:id/sync', async (c) => {
                 limit: '50' // Get last 50 trades
             };
 
-            const signed = await signBybitRequest(conn.api_key_encrypted, conn.api_secret_encrypted, params);
+            const signed = await signBybitRequest(apiKey, apiSecret, params);
+            
+            // Keys are now in RAM - use them immediately and let them go out of scope
 
             const response = await fetch(`https://api.bybit.com/v5/position/closed-pnl?${signed.queryString}`, {
                 method: 'GET',
                 headers: {
-                    'X-BAPI-API-KEY': conn.api_key_encrypted,
+                    'X-BAPI-API-KEY': apiKey, // Use decrypted key
                     'X-BAPI-TIMESTAMP': signed.timestamp,
                     'X-BAPI-RECV-WINDOW': signed.recvWindow,
                     'X-BAPI-SIGN': signed.signature
                 }
             });
+            
+            // Keys go out of scope here - they are no longer in RAM
 
             if (!response.ok) {
                 const text = await response.text();

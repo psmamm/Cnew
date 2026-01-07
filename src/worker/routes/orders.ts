@@ -8,6 +8,8 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { placeBybitOrder, validateBybitRisk, type BybitOrderRequest } from '../utils/exchanges/BybitOrderExecution';
+import { decrypt } from '../utils/encryption';
+import type { D1Database } from '@cloudflare/workers-types';
 
 const BybitOrderSchema = z.object({
   connectionId: z.string().uuid(),
@@ -26,6 +28,7 @@ const BybitOrderSchema = z.object({
 export const ordersRouter = new Hono<{
   Bindings: {
     DB: D1Database;
+    ENCRYPTION_MASTER_KEY: string;
   };
 }>();
 
@@ -70,14 +73,19 @@ ordersRouter.post(
 
       const conn = connection as any;
 
-      // TODO: Decrypt API keys (currently stored as plaintext in TODO comment)
-      // For now, assuming they're already decrypted or stored securely
-      const apiKey = conn.api_key_encrypted;
-      const apiSecret = conn.api_secret_encrypted;
+      // Decrypt API keys for order execution (only in RAM)
+      const masterKey = c.env.ENCRYPTION_MASTER_KEY;
+      if (!masterKey) {
+        return c.json({ error: 'Encryption service unavailable' }, 500);
+      }
 
-      if (!apiKey || !apiSecret) {
+      if (!conn.api_key_encrypted || !conn.api_secret_encrypted) {
         return c.json({ error: 'API credentials not found' }, 400);
       }
+
+      // Decrypt keys - they will only exist in RAM during this request
+      const apiKey = await decrypt(conn.api_key_encrypted, masterKey);
+      const apiSecret = await decrypt(conn.api_secret_encrypted, masterKey);
 
       // Validate risk before placing order
       if (data.price && data.stopLoss) {
@@ -124,6 +132,9 @@ ordersRouter.post(
       };
 
       const orderResponse = await placeBybitOrder(orderRequest);
+
+      // Keys go out of scope here - they are no longer in RAM
+      // The decrypted keys are never logged or stored
 
       // Store order in database
       await c.env.DB.prepare(`

@@ -6,8 +6,6 @@
 Erstelle eine `.env` Datei im Root-Verzeichnis:
 
 ```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_SBT_CONTRACT_ADDRESS=0x0000000000000000000000000000000000000000
 VITE_POLYGON_RPC_URL=https://polygon-rpc.com
 ```

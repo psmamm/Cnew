@@ -10,6 +10,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
+import { useAuthSync } from '../hooks/useAuthSync';
 
 const emitDebugLog = (payload: Record<string, any>) => {
   const url = 'http://127.0.0.1:7242/ingest/f3961031-a2d1-4bfa-88fe-0afd58d89888';
@@ -58,6 +59,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => unsubscribe();
   }, []);
+
+  // Auto-sync user to backend after authentication
+  useAuthSync(user);
 
   const signIn = async (email: string, password: string) => {
     try {

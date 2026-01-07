@@ -19,6 +19,8 @@ import { audioRouter } from "./routes/audio";
 import { sbtIssuerRouter } from "./routes/sbt-issuer";
 import { emotionLogsRouter } from "./routes/emotion-logs";
 import { ordersRouter } from "./routes/orders";
+import { apiKeysRouter } from "./routes/api-keys";
+import { errorHandlerMiddleware } from "./utils/errorHandler";
 import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 
 
@@ -74,6 +76,8 @@ type Env = {
   SOLSCAN_API_KEY: string;
   HUME_API_KEY: string;
   HUME_SECRET_KEY: string;
+  ISSUER_PRIVATE_KEY: string;
+  ENCRYPTION_MASTER_KEY: string;
   DB: D1Database;
   R2_BUCKET: R2Bucket;
   AI: any; // Cloudflare Workers AI binding
@@ -83,6 +87,9 @@ const app = new Hono<{ Bindings: Env }>();
 
 // Middleware: CORS für alle Routen aktivieren
 app.use("*", cors());
+
+// Middleware: Centralized error handling
+app.use("*", errorHandlerMiddleware());
 
 // Obtain redirect URL from the Authentication Service
 app.get('/api/oauth/google/redirect_url', async (c) => {
@@ -1039,5 +1046,6 @@ app.route('/api/audio', audioRouter);
 app.route('/api/sbt', sbtIssuerRouter);
 app.route('/api/emotion-logs', emotionLogsRouter);
 app.route('/api/orders', ordersRouter);
+app.route('/api/keys', apiKeysRouter);
 
 export default app;

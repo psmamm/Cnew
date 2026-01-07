@@ -18,8 +18,6 @@ Dieser Guide führt dich durch die nächsten Schritte nach dem Code-Setup.
    ```
 
 2. **Fülle die Werte aus:**
-   - `VITE_SUPABASE_URL` - Deine Supabase Projekt-URL
-   - `VITE_SUPABASE_ANON_KEY` - Dein Supabase Anon Key
    - `VITE_SBT_CONTRACT_ADDRESS` - Wird nach Contract Deployment gesetzt
    - `VITE_POLYGON_RPC_URL` - Polygon RPC Endpoint (Standard: https://polygon-rpc.com)
 
