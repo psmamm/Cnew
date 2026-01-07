@@ -34,10 +34,29 @@ export function useDataExport() {
         return { success: false, error: 'Invalid file format - no trade or strategy data found' };
       }
       
-      // TODO: Implement actual data import to backend
-      console.log('Import data:', data);
+      // Send data to backend for import
+      const response = await fetch('/api/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Import failed');
+      }
+
+      const result = await response.json();
       
-      return { success: true };
+      return { 
+        success: true, 
+        tradesImported: result.tradesImported,
+        strategiesImported: result.strategiesImported,
+        errors: result.errors
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to import data';
       setError(errorMessage);
