@@ -266,7 +266,13 @@ export default function WalletConnect() {
                                 trustwallet: 'https://trustwallet.com/download',
                                 coinbase: 'https://www.coinbase.com/wallet',
                               };
-                              window.open(urls[walletOption.type] || '#', '_blank');
+                              const walletType = walletOption.type;
+                              if (walletType && walletType in urls) {
+                                const url = urls[walletType];
+                                if (url) {
+                                  window.open(url, '_blank');
+                                }
+                              }
                               return;
                             }
                             handleConnect(walletOption.type, 'ethereum');

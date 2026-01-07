@@ -98,8 +98,8 @@ export function useRiskEngine(trades: Trade[] = []) {
     const currentDailyLoss = dailyPnl < 0 ? Math.abs(dailyPnl) : 0;
     const totalLoss = Math.max(0, startingCapital - equity.currentEquity);
     
-    const exceedsMDL = settings.enforcePropFirmLimits && currentDailyLoss >= mdlLimit;
-    const exceedsML = settings.enforcePropFirmLimits && totalLoss >= mlLimit;
+    const exceedsMDL: boolean = settings.enforcePropFirmLimits ? (currentDailyLoss >= mdlLimit) : false;
+    const exceedsML: boolean = settings.enforcePropFirmLimits ? (totalLoss >= mlLimit) : false;
 
     const status: RiskStatus =
       exceedsML || exceedsMDL ? 'tilt' :

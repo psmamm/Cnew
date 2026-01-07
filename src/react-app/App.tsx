@@ -126,6 +126,7 @@ const SignupPage = lazy(() => import("@/react-app/pages/Signup"));
 const ForgotPasswordPage = lazy(() => import("@/react-app/pages/ForgotPassword"));
 const AuthActionPage = lazy(() => import("@/react-app/pages/AuthAction"));
 const TradingPage = lazy(() => import("@/react-app/pages/TradingPage"));
+const TerminalPage = lazy(() => import("@/react-app/pages/Terminal"));
 
 
 export default function App() {
@@ -176,6 +177,11 @@ export default function App() {
                       <Route path="/trading" element={
                         <ProtectedRoute>
                           <TradingPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/terminal" element={
+                        <ProtectedRoute>
+                          <TerminalPage />
                         </ProtectedRoute>
                       } />
                       {/* Temporarily disabled - Order Heatmap */}

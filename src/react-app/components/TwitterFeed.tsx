@@ -22,7 +22,7 @@ interface TwitterFeedProps {
   }>;
 }
 
-export default function TwitterFeed({ accounts }: TwitterFeedProps) {
+export default function TwitterFeed({}: TwitterFeedProps) {
   const [posts, setPosts] = useState<TwitterPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

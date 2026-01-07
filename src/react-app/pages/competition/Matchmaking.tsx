@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import DashboardLayout from '@/react-app/components/DashboardLayout';
 import { useMatchmaking } from '@/react-app/hooks/useMatchmaking';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Gamepad2, Zap, RotateCcw } from 'lucide-react';
+import { buildApiUrl } from '@/react-app/hooks/useApi';
 
 export default function MatchmakingPage() {
     const navigate = useNavigate();
@@ -12,6 +13,8 @@ export default function MatchmakingPage() {
     const { status, cancelQueue, refetchStatus } = useMatchmaking();
     const [elapsed, setElapsed] = useState(0);
     const [matchFound, setMatchFound] = useState(false);
+    const wasInQueueRef = useRef(false);
+    const cancelledRef = useRef(false);
 
     useEffect(() => {
         if (!status?.inQueue) {
@@ -22,29 +25,63 @@ export default function MatchmakingPage() {
 
     useEffect(() => {
         if (status?.inQueue) {
+            wasInQueueRef.current = true;
+            cancelledRef.current = false;
             setElapsed(status.elapsed || 0);
             const interval = setInterval(() => {
                 setElapsed(prev => prev + 1);
             }, 1000);
 
             return () => clearInterval(interval);
-        }
-    }, [status]);
-
-    // Poll for match found
-    useEffect(() => {
-        if (!status?.inQueue && !matchFound) {
-            // Check if match was found
-            const checkMatch = async () => {
-                await refetchStatus();
-                // If status is null but we were in queue, match might be found
-                // This would be handled by the backend redirect or we check match status
+        } else if (wasInQueueRef.current && !status?.inQueue && !cancelledRef.current) {
+            // User was in queue but is no longer - check if match was found
+            const checkForMatch = async () => {
+                try {
+                    // Check if user has an active match by querying matches endpoint
+                    const response = await fetch(buildApiUrl('/api/competition/matches'), {
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        // If user has an active match, navigate to it
+                        if (data.matches && Array.isArray(data.matches) && data.matches.length > 0) {
+                            interface Match {
+                                id: number;
+                                status: string;
+                            }
+                            const activeMatch = data.matches.find((m: Match) => m.status === 'active');
+                            if (activeMatch) {
+                                setMatchFound(true);
+                                setTimeout(() => {
+                                    navigate(`/competition/matches/${activeMatch.id}`);
+                                }, 2000);
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // If no active match found, assume match was found and navigate to competition
+                    // The competition page will show active matches if any exist
+                    setMatchFound(true);
+                    setTimeout(() => {
+                        navigate('/competition');
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error checking for match:', error);
+                    // On error, still navigate to competition page
+                    setMatchFound(true);
+                    setTimeout(() => {
+                        navigate('/competition');
+                    }, 2000);
+                }
             };
-            checkMatch();
+            checkForMatch();
         }
-    }, [status, matchFound, refetchStatus]);
+    }, [status, navigate]);
 
     const handleCancel = async () => {
+        cancelledRef.current = true;
         await cancelQueue();
         navigate('/competition');
     };
@@ -149,4 +186,3 @@ export default function MatchmakingPage() {
         </DashboardLayout>
     );
 }
-

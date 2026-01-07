@@ -11,8 +11,23 @@ function getFirstDayOfMonth(year: number, month: number) {
     return new Date(year, month, 1).getDay();
 }
 
+interface DailyStat {
+    date: string;
+    trade_count: number;
+    daily_pnl: number;
+    wins: number;
+    losses: number;
+}
+
+interface CalendarDay {
+    day: number;
+    dateStr: string;
+    data: DailyStat | undefined;
+    isCurrentMonth: boolean;
+}
+
 interface CalendarViewProps {
-    dailyStats: any[];
+    dailyStats: DailyStat[];
     selectedDate?: string | null;
     onSelectDate?: (date: string | null) => void;
 }
@@ -26,7 +41,7 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
     const month = currentDate.getMonth();
 
     const statsMap = useMemo(() => {
-        const map: Record<string, any> = {};
+        const map: Record<string, DailyStat> = {};
         dailyStats.forEach(stat => {
             const dateKey = stat.date.split('T')[0];
             map[dateKey] = stat;
@@ -34,62 +49,63 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
         return map;
     }, [dailyStats]);
 
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
+    // Generate calendar grid with weeks - wrapped in useMemo for performance
+    const weeks = useMemo(() => {
+        const weeksArray: (CalendarDay | null)[][] = [];
+        let currentWeek: (CalendarDay | null)[] = [];
+        const daysInMonthCalc = getDaysInMonth(year, month);
+        const firstDayCalc = getFirstDayOfMonth(year, month);
+        const startDayCalc = firstDayCalc;
 
-    // Sunday start (0 = Sunday)
-    const startDay = firstDay;
-
-    // Generate calendar grid with weeks
-    const weeks: ({ day: number; dateStr: string; data: any; isCurrentMonth: boolean } | null)[][] = [];
-    let currentWeek: ({ day: number; dateStr: string; data: any; isCurrentMonth: boolean } | null)[] = [];
-
-    // Previous month filler
-    const prevMonthDays = getDaysInMonth(year, month - 1);
-    for (let i = 0; i < startDay; i++) {
-        const day = prevMonthDays - startDay + i + 1;
-        const prevMonth = month === 0 ? 11 : month - 1;
-        const prevYear = month === 0 ? year - 1 : year;
-        const dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        currentWeek.push({ day, dateStr, data: statsMap[dateStr], isCurrentMonth: false });
-    }
-
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        currentWeek.push({ day: i, dateStr, data: statsMap[dateStr], isCurrentMonth: true });
-
-        if (currentWeek.length === 7) {
-            weeks.push(currentWeek);
-            currentWeek = [];
+        // Previous month filler
+        const prevMonthDays = getDaysInMonth(year, month - 1);
+        for (let i = 0; i < startDayCalc; i++) {
+            const day = prevMonthDays - startDayCalc + i + 1;
+            const prevMonth = month === 0 ? 11 : month - 1;
+            const prevYear = month === 0 ? year - 1 : year;
+            const dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            currentWeek.push({ day, dateStr, data: statsMap[dateStr], isCurrentMonth: false });
         }
-    }
 
-    // Next month filler
-    let nextDay = 1;
-    while (currentWeek.length < 7 && currentWeek.length > 0) {
-        const nextMonth = month === 11 ? 0 : month + 1;
-        const nextYear = month === 11 ? year + 1 : year;
-        const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(nextDay).padStart(2, '0')}`;
-        currentWeek.push({ day: nextDay, dateStr, data: statsMap[dateStr], isCurrentMonth: false });
-        nextDay++;
-    }
-    if (currentWeek.length > 0) {
-        weeks.push(currentWeek);
-    }
+        // Current month days
+        for (let i = 1; i <= daysInMonthCalc; i++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            currentWeek.push({ day: i, dateStr, data: statsMap[dateStr], isCurrentMonth: true });
 
-    // Ensure we have at least 5 weeks for consistent layout
-    while (weeks.length < 5) {
-        const week: ({ day: number; dateStr: string; data: any; isCurrentMonth: boolean } | null)[] = [];
-        for (let i = 0; i < 7; i++) {
+            if (currentWeek.length === 7) {
+                weeksArray.push(currentWeek);
+                currentWeek = [];
+            }
+        }
+
+        // Next month filler
+        let nextDay = 1;
+        while (currentWeek.length < 7 && currentWeek.length > 0) {
             const nextMonth = month === 11 ? 0 : month + 1;
             const nextYear = month === 11 ? year + 1 : year;
             const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(nextDay).padStart(2, '0')}`;
-            week.push({ day: nextDay, dateStr, data: statsMap[dateStr], isCurrentMonth: false });
+            currentWeek.push({ day: nextDay, dateStr, data: statsMap[dateStr], isCurrentMonth: false });
             nextDay++;
         }
-        weeks.push(week);
-    }
+        if (currentWeek.length > 0) {
+            weeksArray.push(currentWeek);
+        }
+
+        // Ensure we have at least 5 weeks for consistent layout
+        while (weeksArray.length < 5) {
+            const week: (CalendarDay | null)[] = [];
+            for (let i = 0; i < 7; i++) {
+                const nextMonth = month === 11 ? 0 : month + 1;
+                const nextYear = month === 11 ? year + 1 : year;
+                const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(nextDay).padStart(2, '0')}`;
+                week.push({ day: nextDay, dateStr, data: statsMap[dateStr], isCurrentMonth: false });
+                nextDay++;
+            }
+            weeksArray.push(week);
+        }
+
+        return weeksArray;
+    }, [year, month, statsMap]);
 
     const prevMonth = () => {
         setCurrentDate(new Date(year, month - 1, 1));
@@ -511,6 +527,3 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
     );
 }
 
-export const useDailyStats = () => {
-    return {};
-}

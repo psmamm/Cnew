@@ -93,6 +93,59 @@ html.dark #root {
   background-color: #0D0F18;
 }
 
+/* Bybit Terminal Theme Variables */
+:root {
+  /* Bybit Dark Mode Color Palette */
+  --bybit-bg-primary: #0B0E11;      /* Main background */
+  --bybit-bg-panel: #161A1E;         /* Panel background */
+  --bybit-border: #2B2F36;           /* Border/divider color */
+  --bybit-text-primary: #EAECEF;     /* Primary text */
+  --bybit-text-muted: #848E9C;       /* Muted/secondary text */
+  --bybit-bid: #2EAD65;               /* Bid/Green color */
+  --bybit-ask: #F6465D;               /* Ask/Red color */
+  --bybit-accent: #F0B90B;            /* Bybit Gold accent */
+  
+  /* Terminal Typography */
+  --terminal-font-size: 11px;
+  --terminal-font-size-small: 10px;
+  --terminal-line-height: 1.2;
+  --terminal-font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', 'Source Code Pro', monospace;
+}
+
+/* Terminal-specific styles */
+.terminal {
+  background-color: var(--bybit-bg-primary);
+  color: var(--bybit-text-primary);
+  font-size: var(--terminal-font-size);
+  line-height: var(--terminal-line-height);
+  font-family: var(--terminal-font-mono);
+}
+
+.terminal-panel {
+  background-color: var(--bybit-bg-panel);
+  border: 1px solid var(--bybit-border);
+}
+
+.terminal-text-primary {
+  color: var(--bybit-text-primary);
+}
+
+.terminal-text-muted {
+  color: var(--bybit-text-muted);
+}
+
+.terminal-bid {
+  color: var(--bybit-bid);
+}
+
+.terminal-ask {
+  color: var(--bybit-ask);
+}
+
+.terminal-accent {
+  color: var(--bybit-accent);
+}
+
 /* Light mode */
 html.light,
 html.light body {

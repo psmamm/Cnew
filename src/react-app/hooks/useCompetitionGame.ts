@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { buildApiUrl } from './useApi';
 
 export interface TournamentStats {
     totalBalance: number;
@@ -32,7 +31,7 @@ const DEFAULT_STATS: TournamentStats = {
 
 export function useCompetitionGame(
     gameMode: 'speed' | 'survival' | 'tournament',
-    matchId: string | null,
+    _matchId: string | null,
     matchData: any,
     onGameOver?: () => void
 ) {

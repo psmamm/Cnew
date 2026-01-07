@@ -2,7 +2,6 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { ReactNode } from 'react';
-import { motion } from 'framer-motion';
 
 interface DraggableCardProps {
   id: string;

@@ -43,7 +43,7 @@ interface ChatMessage {
 }
 
 export function useTournaments(status?: string) {
-    const { user } = useAuth();
+    const { } = useAuth();
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -252,7 +252,7 @@ export function useTournament(tournamentId: number | null) {
     // Check if user has joined
     useEffect(() => {
         if (user && participants.length > 0) {
-            const userParticipant = participants.find(p => p.user_id === (user.google_user_data?.sub || (user as any).firebase_user_id));
+            const userParticipant = participants.find(p => p.user_id === ((user as any).google_user_data?.sub || (user as any).firebase_user_id));
             setJoined(!!userParticipant);
         }
     }, [user, participants]);

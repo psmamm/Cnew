@@ -69,17 +69,17 @@ export default function QuickActions() {
 
   return (
     <>
-      <div className={`${getCardBg(theme)} rounded-lg p-3 sm:p-4 border ${getCardBorder(theme)} h-full`}>
-        <div className="flex items-center space-x-2 sm:space-x-3 mb-4">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#6A3DF4]/10 rounded-lg flex items-center justify-center">
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-[#6A3DF4]" />
+      <div className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)} h-full`}>
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
+            <Plus className="w-5 h-5 text-[#6A3DF4]" />
           </div>
           <div>
-            <h2 className={`text-base sm:text-lg font-semibold ${getTextColor(theme, 'primary')}`}>Quick Actions</h2>
-            <p className={`${getTextColor(theme, 'muted')} text-xs sm:text-sm`}>Common tasks</p>
+            <h2 className={`text-xl font-semibold ${getTextColor(theme, 'primary')}`}>Quick Actions</h2>
+            <p className={`${getTextColor(theme, 'muted')} text-sm`}>Common tasks</p>
           </div>
         </div>
-        <div className="space-y-2 sm:space-y-2.5">
+        <div className="space-y-3">
           {actions.map((action, index) => (
             <motion.button
               key={action.title}
@@ -90,17 +90,17 @@ export default function QuickActions() {
               whileTap={{ scale: action.disabled ? 1 : 0.98 }}
               onClick={action.disabled ? undefined : action.onClick}
               disabled={action.disabled}
-              className={`w-full flex items-center space-x-3 p-2.5 sm:p-3 ${getCardBg(theme)} ${getHoverBg(theme)} border ${getCardBorder(theme)} rounded-lg transition-all duration-200 group relative ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              className={`w-full flex items-center space-x-4 p-4 ${getCardBg(theme)} ${getHoverBg(theme)} border ${getCardBorder(theme)} rounded-xl transition-all duration-200 group relative ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                 }`}
             >
-              <div className={`${action.color} p-2 sm:p-2.5 rounded-lg transition-all shadow-md group-hover:shadow-lg group-hover:shadow-[#6A3DF4]/20 relative`}>
-                <action.icon className={`w-4 h-4 sm:w-5 sm:h-5 text-white ${action.disabled && action.title === 'Export Data' ? 'animate-pulse' : ''}`} />
+              <div className={`${action.color} p-3 rounded-xl transition-all shadow-md group-hover:shadow-lg group-hover:shadow-[#6A3DF4]/20 relative`}>
+                <action.icon className={`w-5 h-5 text-white ${action.disabled && action.title === 'Export Data' ? 'animate-pulse' : ''}`} />
               </div>
-              <div className="flex-1 text-left min-w-0">
-                <div className="flex items-center space-x-1.5 sm:space-x-2">
-                  <h3 className={`${getTextColor(theme, 'primary')} text-sm sm:text-base font-semibold truncate`}>{action.title}</h3>
+              <div className="flex-1 text-left">
+                <div className="flex items-center space-x-2">
+                  <h3 className={`${getTextColor(theme, 'primary')} font-semibold`}>{action.title}</h3>
                   {action.badge && (
-                    <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full flex-shrink-0 ${action.badge === 'NEW'
+                    <span className={`px-2 py-1 text-xs font-bold rounded-full ${action.badge === 'NEW'
                         ? 'bg-[#E74C3C] text-white animate-pulse'
                         : 'bg-[#6A3DF4] text-white'
                       }`}>
@@ -108,13 +108,13 @@ export default function QuickActions() {
                     </span>
                   )}
                 </div>
-                <p className={`${getTextColor(theme, 'muted')} text-xs sm:text-sm truncate`}>{action.description}</p>
+                <p className={`${getTextColor(theme, 'muted')} text-sm`}>{action.description}</p>
               </div>
 
               {/* Loading indicator for export */}
               {action.disabled && action.title === 'Export Data' && (
-                <div className="absolute right-3">
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="absolute right-4">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 </div>
               )}
             </motion.button>

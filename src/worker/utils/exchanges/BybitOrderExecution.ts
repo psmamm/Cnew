@@ -5,7 +5,7 @@
  * Supports UTA 2.0 Cross-Margin calculations.
  */
 
-import { createBybitSignature, type BybitApiResponse } from './BybitExchange';
+import type { BybitApiResponse } from './BybitExchange';
 
 export interface BybitOrderRequest {
   apiKey: string;
@@ -151,8 +151,8 @@ export async function calculateBybitPositionSize(
   entryPrice: number,
   stopLossPrice: number,
   leverage: number,
-  marginMode: 'isolated' | 'cross',
-  symbol: string
+  _marginMode: 'isolated' | 'cross',
+  _symbol: string
 ): Promise<BybitPositionSizeResult> {
   // Get available balance
   const balances = await getBybitWalletBalance(apiKey, apiSecret, 'UNIFIED');

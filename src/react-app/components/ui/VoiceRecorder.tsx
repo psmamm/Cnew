@@ -19,7 +19,7 @@ interface ToastState {
 export default function VoiceRecorder({ onTranscriptionComplete, className = '' }: VoiceRecorderProps) {
   const [state, setState] = useState<RecordingState>('idle');
   const [toast, setToast] = useState<ToastState>({ show: false, message: '', type: 'error' });
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);

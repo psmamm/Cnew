@@ -2,7 +2,21 @@
  * Maps normalized exchange trades to the internal Trade schema
  */
 
-import { NormalizedTrade } from './ExchangeImporter';
+export interface NormalizedTrade {
+  symbol: string;
+  side: 'buy' | 'sell';
+  amount: number;
+  price: number;
+  timestamp: number;
+  fee: { cost: number; currency: string };
+  external_id: string;
+  exchange: string;
+  isClosedPosition?: boolean;
+  exitTimestamp?: number;
+  avgExitPrice?: number;
+  avgEntryPrice?: number;
+  closedPnl?: number;
+}
 
 export interface MappedTrade {
   symbol: string;

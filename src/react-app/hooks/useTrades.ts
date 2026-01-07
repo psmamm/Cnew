@@ -26,7 +26,7 @@ export interface Trade {
   session?: string;
   emotion?: string;
   checklist?: string[];
-  source?: 'api' | 'imported';
+  source?: 'api' | 'imported' | 'wallet';
   rating?: number;
 }
 

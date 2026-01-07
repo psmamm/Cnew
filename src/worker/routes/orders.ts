@@ -53,7 +53,10 @@ ordersRouter.post(
   async (c) => {
     try {
       const user = c.get('user');
-      const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
+      if (!user) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+      const userId = (user as any).google_user_data?.sub || (user as any).firebase_user_id;
       
       if (!userId) {
         return c.json({ error: 'Unauthorized' }, 401);

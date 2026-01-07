@@ -26,7 +26,7 @@ interface TrendingCardProps {
   quoteAssetPrices: Record<string, number>;
 }
 
-function TrendingCard({ title, icon, items, color, onMoreClick, quoteAssetPrices }: TrendingCardProps) {
+function TrendingCard({ title, icon, items, color, quoteAssetPrices }: TrendingCardProps) {
   const navigate = useNavigate();
 
   // Convert price to USDT if needed
@@ -93,7 +93,7 @@ function TrendingCard({ title, icon, items, color, onMoreClick, quoteAssetPrices
 
       <div className="space-y-2.5">
         {items.length > 0 ? (
-          items.map((item, index) => (
+          items.map((item) => (
             <div
               key={item.symbol}
               onClick={() => navigate(`/markets/${item.symbol}`)}

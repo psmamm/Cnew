@@ -4,7 +4,7 @@ import DashboardLayout from '@/react-app/components/DashboardLayout';
 import { useAuth } from '@/react-app/contexts/AuthContext';
 import { useELO } from '@/react-app/hooks/useELO';
 import { motion } from 'framer-motion';
-import { Trophy, TrendingUp, TrendingDown, ArrowRight, Wrench, Crown } from 'lucide-react';
+import { Trophy, Wrench } from 'lucide-react';
 import { getDivisionColor } from '@/react-app/hooks/useELO';
 
 export default function MatchCompletePage() {
@@ -71,7 +71,7 @@ export default function MatchCompletePage() {
         );
     }
 
-    const userId = user?.google_user_data?.sub || (user as any)?.firebase_user_id;
+    const userId = (user as any)?.google_user_data?.sub || (user as any)?.firebase_user_id;
     const isPlayer1 = matchData.player1_id === userId;
     const yourResults = isPlayer1 ? {
         pnl: matchData.player1_pnl,

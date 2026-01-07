@@ -5,7 +5,7 @@
  * Records audio during open positions and correlates emotions with PnL.
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Mic, Square, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { buildApiUrl } from '../../hooks/useApi';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -20,11 +20,6 @@ interface HumeVoiceJournalProps {
   onAnalysisComplete?: (analysis: any) => void;
 }
 
-interface EmotionDisplay {
-  name: string;
-  score: number;
-  color: string;
-}
 
 export default function HumeVoiceJournal({
   positionId,

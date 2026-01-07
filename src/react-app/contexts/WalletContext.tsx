@@ -333,13 +333,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
       // Try to switch chain
       try {
+        if (!window.ethereum) {
+          throw new Error('Ethereum provider not found');
+        }
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: `0x${targetChain.id.toString(16)}` }],
         });
       } catch (switchError: any) {
         // If chain doesn't exist, add it
-        if (switchError.code === 4902) {
+        if (switchError.code === 4902 && window.ethereum) {
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
             params: [
