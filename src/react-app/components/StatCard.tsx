@@ -54,7 +54,7 @@ export default function StatCard({
 
   return (
     <motion.div 
-      className={`${getCardBg(theme)} rounded-xl p-4 border ${getCardBorder(theme)} transition-all duration-200 group h-full relative overflow-hidden ${
+      className={`${getCardBg(theme)} rounded-lg p-3 sm:p-4 border ${getCardBorder(theme)} transition-all duration-200 group h-full relative overflow-hidden ${
         isClickable 
           ? `${getHoverBg(theme)} cursor-pointer` 
           : getHoverBg(theme)
@@ -69,19 +69,19 @@ export default function StatCard({
       )}
 
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <div className={`p-3 rounded-xl border transition-all duration-300 ${
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className={`p-2 sm:p-2.5 rounded-lg border transition-all duration-300 ${
             loading 
               ? 'bg-[#6A3DF4]/20 border-[#6A3DF4]/30 animate-pulse' 
               : 'bg-[#6A3DF4]/10 border-[#6A3DF4]/20 group-hover:bg-[#6A3DF4]/20 group-hover:border-[#6A3DF4]/40'
           }`}>
-            <Icon className={`w-6 h-6 text-[#6A3DF4] ${loading ? 'animate-pulse' : ''}`} />
+            <Icon className={`w-4 h-4 sm:w-5 sm:h-5 text-[#6A3DF4] ${loading ? 'animate-pulse' : ''}`} />
           </div>
           
           {!loading && change !== "N/A" && (
             <div className="flex items-center space-x-1">
-              {ChangeIcon && <ChangeIcon className={`w-4 h-4 ${getChangeColor()}`} />}
-              <span className={`text-sm font-medium ${getChangeColor()}`}>
+              {ChangeIcon && <ChangeIcon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${getChangeColor()}`} />}
+              <span className={`text-xs sm:text-sm font-medium ${getChangeColor()}`}>
                 {change}
               </span>
             </div>
@@ -89,20 +89,20 @@ export default function StatCard({
         </div>
         
         <div className="flex-1">
-          <h3 className={`${getTextColor(theme, 'muted')} text-sm font-semibold mb-2 uppercase tracking-wide`}>{title}</h3>
+          <h3 className={`${getTextColor(theme, 'muted')} text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 uppercase tracking-wide`}>{title}</h3>
           
           {loading ? (
             <div className="space-y-2">
-              <div className={`h-8 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'} rounded animate-pulse`} />
-              {subtitle && <div className={`h-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'} rounded animate-pulse w-2/3`} />}
+              <div className={`h-6 sm:h-7 ${theme === 'dark' ? 'bg-white/10' : 'bg-gray-200'} rounded animate-pulse`} />
+              {subtitle && <div className={`h-3 sm:h-4 ${theme === 'dark' ? 'bg-white/5' : 'bg-gray-100'} rounded animate-pulse w-2/3`} />}
             </div>
           ) : (
             <>
-              <div className="flex items-baseline space-x-2 mb-2">
-                <p className={`text-3xl font-bold ${getTextColor(theme, 'primary')}`}>{value}</p>
+              <div className="flex items-baseline space-x-2 mb-1.5 sm:mb-2">
+                <p className={`text-2xl sm:text-3xl font-bold ${getTextColor(theme, 'primary')}`}>{value}</p>
               </div>
               {subtitle && (
-                <p className={`${getTextColor(theme, 'secondary')} text-sm`}>{subtitle}</p>
+                <p className={`${getTextColor(theme, 'secondary')} text-xs sm:text-sm`}>{subtitle}</p>
               )}
             </>
           )}
@@ -110,26 +110,26 @@ export default function StatCard({
         
         {/* Progress bar for Win Rate */}
         {title === "Win Rate" && value !== "..." && !loading && (
-          <div className="mt-4">
-            <div className={`w-full ${theme === 'dark' ? 'bg-[#0D0F18]/50' : 'bg-gray-200'} rounded-full h-2`}>
+          <div className="mt-3">
+            <div className={`w-full ${theme === 'dark' ? 'bg-[#0D0F18]/50' : 'bg-gray-200'} rounded-full h-1.5`}>
               <motion.div 
-                className={`bg-gradient-to-r ${getProgressColor()} h-2 rounded-full`}
+                className={`bg-gradient-to-r ${getProgressColor()} h-1.5 rounded-full`}
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(100, parseFloat(value))}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}
               />
             </div>
             <div className="flex justify-between mt-1">
-              <span className={`text-xs ${getTextColor(theme, 'muted')}`}>0%</span>
-              <span className={`text-xs ${getTextColor(theme, 'muted')}`}>100%</span>
+              <span className={`text-[10px] ${getTextColor(theme, 'muted')}`}>0%</span>
+              <span className={`text-[10px] ${getTextColor(theme, 'muted')}`}>100%</span>
             </div>
           </div>
         )}
         
         {/* Status indicator for Profit Factor */}
         {title === "Profit Factor" && value !== "..." && !loading && (
-          <div className="mt-3">
-            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+          <div className="mt-2">
+            <span className={`text-[10px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
               parseFloat(value) >= 1.5 ? 'bg-[#2ECC71]/10 text-[#2ECC71]' :
               parseFloat(value) >= 1.0 ? 'bg-[#6A3DF4]/10 text-[#6A3DF4]' : 'bg-[#E74C3C]/10 text-[#E74C3C]'
             }`}>
@@ -141,8 +141,8 @@ export default function StatCard({
 
         {/* Mini trend chart for Active Trades */}
         {title === "Active Trades" && trend && trend.length > 0 && !loading && (
-          <div className="mt-3">
-            <div className="flex items-end space-x-1 h-8">
+          <div className="mt-2">
+            <div className="flex items-end space-x-0.5 sm:space-x-1 h-6 sm:h-7">
               {trend.slice(-7).map((point, index) => (
                 <div
                   key={index}
@@ -151,7 +151,7 @@ export default function StatCard({
                 />
               ))}
             </div>
-            <p className={`text-xs ${getTextColor(theme, 'muted')} mt-1`}>Last 7 days</p>
+            <p className={`text-[10px] sm:text-xs ${getTextColor(theme, 'muted')} mt-1`}>Last 7 days</p>
           </div>
         )}
 

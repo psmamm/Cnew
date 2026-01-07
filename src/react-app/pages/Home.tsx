@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SignInForm from '../components/auth/SignInForm';
+import { Button } from '../components/ui/button';
 
 const emitDebugLog = (payload: Record<string, any>) => {
   const url = 'http://127.0.0.1:7242/ingest/f3961031-a2d1-4bfa-88fe-0afd58d89888';
@@ -178,7 +179,7 @@ export default function Home() {
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex justify-between items-center py-6 gap-4">
             <motion.div
               className="flex items-center space-x-3 flex-shrink-0"
@@ -188,7 +189,7 @@ export default function Home() {
               <div className="bg-[#6A3DF4] p-2.5 rounded-xl shadow-lg">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <span className="text-2xl font-bold text-white">Tradecircle</span>
+              <span className="text-xl font-bold text-white">Tradecircle</span>
             </motion.div>
 
             <nav className="hidden md:flex items-center gap-4 ml-auto">
@@ -205,38 +206,43 @@ export default function Home() {
                 Features
               </a>
               {user ? (
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => navigate('/dashboard')}
-                  className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
+                  className="text-[#AAB0C0] hover:text-white"
                 >
                   Dashboard
-                </button>
+                </Button>
               ) : (
                 <>
-                  <button
+                  <Button
+                    variant="outline"
                     onClick={() => setShowLoginModal(true)}
-                    className="bg-[#1E2232] hover:bg-[#2A2F42] border border-white/10 hover:border-white/20 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-300 whitespace-nowrap"
+                    className="bg-[#1E2232] hover:bg-[#2A2F42] border-white/10"
                   >
                     Log In
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="default"
                     onClick={() => navigate('/signup')}
-                    className="bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                    className="bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
                   >
                     Sign Up
-                  </button>
+                  </Button>
                 </>
               )}
             </nav>
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="text-white hover:bg-white/10"
               >
-                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
             </div>
           </div>
         </div>
@@ -267,35 +273,38 @@ export default function Home() {
                 </a>
                 <div className="pt-4 border-t border-white/5 flex flex-col space-y-3">
                   {user ? (
-                    <button
+                    <Button
+                      variant="default"
                       onClick={() => {
                         navigate('/dashboard');
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
+                      className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg"
                     >
                       Dashboard
-                    </button>
+                    </Button>
                   ) : (
                     <>
-                      <button
+                      <Button
+                        variant="outline"
                         onClick={() => {
                           setShowLoginModal(true);
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-full bg-[#1E2232] hover:bg-[#2A2F42] border border-white/10 hover:border-white/20 text-white px-6 py-3 rounded-xl font-medium transition-all"
+                        className="w-full bg-[#1E2232] hover:bg-[#2A2F42] border-white/10"
                       >
                         Log In
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="default"
                         onClick={() => {
                           navigate('/signup');
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                        className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
                       >
                         Sign Up
-                      </button>
+                      </Button>
                     </>
                   )}
                 </div>
@@ -327,7 +336,7 @@ export default function Home() {
         </div>
 
         <motion.div
-          className="w-full max-w-screen-2xl px-4 sm:px-8 lg:px-12 mx-auto text-center relative z-10"
+          className="w-full max-w-[1920px] px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 mx-auto text-center relative z-10"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -369,7 +378,7 @@ export default function Home() {
           </motion.div>
 
           <motion.h1
-            className="text-6xl md:text-8xl font-black text-white mb-8 leading-tight"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -394,7 +403,7 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            className="text-2xl text-[#AAB0C0] mb-8 max-w-3xl mx-auto leading-relaxed font-light"
+            className="text-base sm:text-lg md:text-xl text-[#AAB0C0] mb-6 max-w-3xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -408,21 +417,26 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
-            <motion.button
-              onClick={() => navigate('/signup')}
-              className="bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-12 py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+            <motion.div
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              Start your Journey Now
-            </motion.button>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => navigate('/signup')}
+                className="bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] px-8 sm:px-12"
+              >
+                Start your Journey Now
+              </Button>
+            </motion.div>
           </motion.div>
         </motion.div>
       </section>
 
       {/* Pricing Section */}
       <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <motion.div
             className="text-center mb-20"
             initial={{ opacity: 0, y: 50 }}
@@ -430,14 +444,14 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-5xl font-bold text-white mb-6">Simple Pricing</h2>
-            <p className="text-2xl text-[#AAB0C0] font-light">Choose what works for you</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Simple Pricing</h2>
+            <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] font-light">Choose what works for you</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8 xl:gap-12 w-full">
             {/* Free Plan */}
             <motion.div
-              className="bg-[#1E2232] rounded-xl border border-white/5 p-10 relative group hover:border-white/10 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+              className="bg-[#1E2232] rounded-xl border border-white/5 p-6 sm:p-8 lg:p-10 relative group hover:border-white/10 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -445,12 +459,12 @@ export default function Home() {
               whileHover={{ scale: 1.02, y: -5 }}
             >
               <div className="text-center mb-10">
-                <h3 className="text-3xl font-bold text-white mb-4">Free</h3>
-                <div className="mb-6">
-                  <span className="text-6xl font-black text-white">$0</span>
-                  <span className="text-[#AAB0C0] ml-2 text-xl">/forever</span>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">Free</h3>
+                <div className="mb-4">
+                  <span className="text-4xl sm:text-5xl md:text-6xl font-black text-white">$0</span>
+                  <span className="text-[#AAB0C0] ml-2 text-base sm:text-lg md:text-xl">/forever</span>
                 </div>
-                <p className="text-[#AAB0C0] text-lg">Perfect for getting started</p>
+                <p className="text-[#AAB0C0] text-sm sm:text-base md:text-lg">Perfect for getting started</p>
               </div>
 
               <div className="space-y-4 mb-10">
@@ -476,19 +490,23 @@ export default function Home() {
                 ))}
               </div>
 
-              <motion.button
-                onClick={handleGetStarted}
-                className="w-full bg-[#1E2232] hover:bg-[#2A2F42] border border-white/20 hover:border-white/30 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300"
+              <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Get Started Free
-              </motion.button>
+                <Button
+                  variant="outline"
+                  onClick={handleGetStarted}
+                  className="w-full bg-[#1E2232] hover:bg-[#2A2F42] border-white/20"
+                >
+                  Get Started Free
+                </Button>
+              </motion.div>
             </motion.div>
 
             {/* Pro Plan */}
             <motion.div
-              className="bg-[#1E2232] rounded-xl border-2 border-[#6A3DF4]/50 p-10 relative group hover:border-[#6A3DF4]/70 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+              className="bg-[#1E2232] rounded-xl border-2 border-[#6A3DF4]/50 p-6 sm:p-8 lg:p-10 relative group hover:border-[#6A3DF4]/70 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -502,12 +520,12 @@ export default function Home() {
               </div>
 
               <div className="text-center mb-10">
-                <h3 className="text-3xl font-bold text-white mb-4">Pro</h3>
-                <div className="mb-6">
-                  <span className="text-6xl font-black text-white">$19.99</span>
-                  <span className="text-[#AAB0C0] ml-2 text-xl">/month</span>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">Pro</h3>
+                <div className="mb-4">
+                  <span className="text-4xl sm:text-5xl md:text-6xl font-black text-white">$19.99</span>
+                  <span className="text-[#AAB0C0] ml-2 text-base sm:text-lg md:text-xl">/month</span>
                 </div>
-                <p className="text-[#AAB0C0] text-lg">For serious traders</p>
+                <p className="text-[#AAB0C0] text-sm sm:text-base md:text-lg">For serious traders</p>
               </div>
 
               <div className="space-y-4 mb-10">
@@ -542,14 +560,18 @@ export default function Home() {
                 ))}
               </div>
 
-              <motion.button
-                onClick={handleGetStarted}
-                className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+              <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Start Free Trial
-              </motion.button>
+                <Button
+                  variant="default"
+                  onClick={handleGetStarted}
+                  className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                >
+                  Start Free Trial
+                </Button>
+              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -557,7 +579,7 @@ export default function Home() {
 
       {/* Features Section */}
       <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <motion.div
             className="text-center mb-20"
             initial={{ opacity: 0, y: 50 }}
@@ -565,11 +587,11 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-5xl font-bold text-white mb-6">Powerful Features</h2>
-            <p className="text-2xl text-[#AAB0C0] font-light">Everything you need to succeed</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Powerful Features</h2>
+            <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] font-light">Everything you need to succeed</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full">
             {[
               {
                 icon: BarChart3,
@@ -619,7 +641,7 @@ export default function Home() {
             ].map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-[#1E2232] rounded-xl border border-white/5 p-8 group hover:border-white/10 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+                className="bg-[#1E2232] rounded-xl border border-white/5 p-6 sm:p-8 group hover:border-white/10 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2, duration: 0.8 }}
@@ -629,8 +651,8 @@ export default function Home() {
                 <div className="bg-[#6A3DF4]/10 rounded-xl p-4 w-16 h-16 flex items-center justify-center mb-6">
                   <feature.icon className="w-8 h-8 text-[#BDC3C7]" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
-                <p className="text-[#AAB0C0] leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-sm sm:text-base text-[#AAB0C0] leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -639,7 +661,7 @@ export default function Home() {
 
       {/* FAQ Section */}
       <section id="faq" className="py-32 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <motion.div
             className="text-center mb-20"
             initial={{ opacity: 0, y: 50 }}
@@ -647,8 +669,8 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-5xl font-bold text-white mb-6">Frequently Asked Questions</h2>
-            <p className="text-2xl text-[#AAB0C0] font-light">Everything you need to know about Tradecircle</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Frequently Asked Questions</h2>
+            <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] font-light">Everything you need to know about Tradecircle</p>
           </motion.div>
 
           <div className="space-y-4">
@@ -702,11 +724,12 @@ export default function Home() {
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
               >
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
-                  className="w-full px-8 py-6 flex items-center justify-between text-left group"
+                  className="w-full px-6 sm:px-8 py-4 sm:py-6 flex items-center justify-between text-left group h-auto"
                 >
-                  <h3 className="text-xl font-semibold text-white group-hover:text-[#6A3DF4] transition-colors pr-8">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white group-hover:text-[#6A3DF4] transition-colors pr-8">
                     {faq.question}
                   </h3>
                   <motion.div
@@ -714,9 +737,9 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="flex-shrink-0"
                   >
-                    <ChevronDown className="w-6 h-6 text-[#AAB0C0] group-hover:text-[#6A3DF4] transition-colors" />
+                    <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-[#AAB0C0] group-hover:text-[#6A3DF4] transition-colors" />
                   </motion.div>
-                </button>
+                </Button>
                 <AnimatePresence>
                   {openFAQ === index && (
                     <motion.div
@@ -740,9 +763,9 @@ export default function Home() {
 
       {/* Final CTA */}
       <section className="py-32 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <motion.div
-            className="bg-[#1E2232] rounded-xl border border-white/10 p-16 text-center relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            className="bg-[#1E2232] rounded-xl border border-white/10 p-8 sm:p-12 lg:p-16 text-center relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
@@ -751,7 +774,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-[#6A3DF4]/5 to-[#6A3DF4]/10" />
             <div className="relative z-10">
               <motion.h2
-                className="text-5xl font-bold text-white mb-6"
+                className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4"
                 animate={{
                   textShadow: [
                     '0 0 20px rgba(106, 61, 244, 0.1)',
@@ -763,25 +786,30 @@ export default function Home() {
               >
                 Ready to Transform Your Trading?
               </motion.h2>
-              <p className="text-2xl text-[#AAB0C0] mb-8 font-light">
+              <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] mb-6 font-light">
                 Join traders who are making a difference
               </p>
-              <motion.button
-                onClick={handleGetStarted}
-                className="bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-12 py-5 rounded-xl font-bold text-xl transition-all duration-300 shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+              <motion.div
                 whileHover={{ scale: 1.05, y: -3 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Start Your Journey
-              </motion.button>
+                <Button
+                  variant="default"
+                  size="lg"
+                  onClick={handleGetStarted}
+                  className="bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] px-8 sm:px-12"
+                >
+                  Start Your Journey
+                </Button>
+              </motion.div>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1E2232]/50 backdrop-blur-xl border-t border-white/5 py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
+      <footer className="bg-[#1E2232]/50 backdrop-blur-xl border-t border-white/5 py-12 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
+        <div className="w-full max-w-[1920px] mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-6 md:mb-0">
               <div className="bg-[#6A3DF4] p-2.5 rounded-xl">
@@ -819,12 +847,14 @@ export default function Home() {
               className="relative bg-[#1E2232] rounded-2xl shadow-2xl max-w-md w-full border border-white/10"
             >
               {/* Close Button */}
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowLoginModal(false)}
-                className="absolute top-4 right-4 text-[#AAB0C0] hover:text-white transition-colors"
+                className="absolute top-4 right-4 text-[#AAB0C0] hover:text-white"
               >
-                <X className="w-6 h-6" />
-              </button>
+                <X className="w-5 h-5" />
+              </Button>
 
               {/* Sign In Form */}
               <div className="p-8">

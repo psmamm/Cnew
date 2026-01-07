@@ -45,6 +45,8 @@ import { useLanguageCurrency } from "@/react-app/contexts/LanguageCurrencyContex
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { SymbolSearchDropdown, Modern3DDropdown, ModernInput, ModernDateInput } from "@/react-app/components/FormComponents";
 import { CalendarView } from "@/react-app/components/CalendarView";
+import { Button } from "@/react-app/components/ui/button";
+import { DashboardGrid } from "@/react-app/components/dashboard/DashboardGrid";
 
 /**
  * Trade form data structure
@@ -921,7 +923,7 @@ export default function JournalPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 pb-24 pt-2 w-full max-w-7xl mx-auto overflow-x-hidden px-4 sm:px-6 lg:px-8">
+      <div className="space-y-4 sm:space-y-6 pb-24 pt-2 w-full max-w-[1920px] mx-auto overflow-x-hidden px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         {/* Clean Header */}
         <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -930,8 +932,8 @@ export default function JournalPage() {
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Trade Journal</h1>
-                <p className="text-[#7F8C8D] text-sm">Track and analyze your trading performance</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-white">Trade Journal</h1>
+                <p className="text-[#7F8C8D] text-xs sm:text-sm">Track and analyze your trading performance</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -941,45 +943,49 @@ export default function JournalPage() {
                   <span className="text-sm font-medium">{trades.length} of {rawTrades.length}</span>
                 </div>
               )}
-              <button
+              <Button
+                variant="default"
                 onClick={() => {
                   setShowAddForm(true);
                   setShowEditForm(false);
                   setFormData(initialFormData);
                 }}
-                className="flex items-center space-x-2 h-11 bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:from-[#7B8EF0] hover:to-[#8A5CFF] text-white px-5 rounded-xl font-medium transition-all shadow-lg shadow-purple-500/20"
+                className="bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:from-[#7B8EF0] hover:to-[#8A5CFF] shadow-lg shadow-purple-500/20"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5 mr-2" />
                 <span>Add Trade</span>
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Performance Widgets - 8 Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {/* Performance Widgets - 8 Cards - Draggable */}
+        <DashboardGrid 
+          storageKey="journal-performance-widgets" 
+          defaultOrder={['net-pnl', 'profit-factor', 'expectancy', 'win-rate', 'max-drawdown', 'best-streak', 'loss-streak', 'avg-r-multiple']}
+        >
           {[
-            { label: 'Net P&L', value: `$${portfolioStats.totalPnl.toFixed(0)}`, sub: 'Closed trades', icon: DollarSign, color: portfolioStats.totalPnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]' },
-            { label: 'Profit Factor', value: riskMetrics.profitFactor === Infinity ? '∞' : riskMetrics.profitFactor.toFixed(2), sub: 'Gross win / loss', icon: Activity, color: 'text-white' },
-            { label: 'Expectancy', value: `$${riskMetrics.expectancy.toFixed(2)}`, sub: 'Avg per trade', icon: Zap, color: riskMetrics.expectancy >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]' },
-            { label: 'Win Rate', value: `${portfolioStats.winRate.toFixed(1)}%`, sub: 'Closed trades', icon: Target, color: portfolioStats.winRate >= 50 ? 'text-[#2ECC71]' : 'text-[#E74C3C]' },
-            { label: 'Max Drawdown', value: `${riskMetrics.maxDrawdown.toFixed(1)}%`, sub: 'vs equity', icon: TrendingDown, color: 'text-[#E74C3C]' },
-            { label: 'Best Streak', value: `${riskMetrics.bestStreak} wins`, sub: 'In a row', icon: Award, color: 'text-[#2ECC71]' },
-            { label: 'Loss Streak', value: `${riskMetrics.worstStreak} losses`, sub: 'In a row', icon: TrendingDown, color: 'text-[#E74C3C]' },
-            { label: 'Avg R Multiple', value: riskMetrics.avgRR > 10 ? '∞' : riskMetrics.avgRR.toFixed(2), sub: 'estimated', icon: TrendingUpIcon, color: 'text-white' },
+            { id: 'net-pnl', label: 'Net P&L', value: `$${portfolioStats.totalPnl.toFixed(0)}`, sub: 'Closed trades', icon: DollarSign, color: portfolioStats.totalPnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]' },
+            { id: 'profit-factor', label: 'Profit Factor', value: riskMetrics.profitFactor === Infinity ? '∞' : riskMetrics.profitFactor.toFixed(2), sub: 'Gross win / loss', icon: Activity, color: 'text-white' },
+            { id: 'expectancy', label: 'Expectancy', value: `$${riskMetrics.expectancy.toFixed(2)}`, sub: 'Avg per trade', icon: Zap, color: riskMetrics.expectancy >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]' },
+            { id: 'win-rate', label: 'Win Rate', value: `${portfolioStats.winRate.toFixed(1)}%`, sub: 'Closed trades', icon: Target, color: portfolioStats.winRate >= 50 ? 'text-[#2ECC71]' : 'text-[#E74C3C]' },
+            { id: 'max-drawdown', label: 'Max Drawdown', value: `${riskMetrics.maxDrawdown.toFixed(1)}%`, sub: 'vs equity', icon: TrendingDown, color: 'text-[#E74C3C]' },
+            { id: 'best-streak', label: 'Best Streak', value: `${riskMetrics.bestStreak} wins`, sub: 'In a row', icon: Award, color: 'text-[#2ECC71]' },
+            { id: 'loss-streak', label: 'Loss Streak', value: `${riskMetrics.worstStreak} losses`, sub: 'In a row', icon: TrendingDown, color: 'text-[#E74C3C]' },
+            { id: 'avg-r-multiple', label: 'Avg R Multiple', value: riskMetrics.avgRR > 10 ? '∞' : riskMetrics.avgRR.toFixed(2), sub: 'estimated', icon: TrendingUpIcon, color: 'text-white' },
           ].map((card) => (
-            <div key={card.label} className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 hover:bg-white/5 transition-all">
+            <div key={card.id} className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 hover:bg-white/5 transition-all">
               <div className="flex items-center justify-between mb-3">
                 <div className="p-2 bg-[#6A3DF4]/10 rounded-lg">
                   <card.icon className="w-4 h-4 text-[#6A3DF4]" />
                 </div>
                 <span className="text-xs text-[#7F8C8D]">{card.sub}</span>
               </div>
-              <div className={`text-2xl font-bold ${card.color}`}>{card.value}</div>
-              <div className="text-sm text-[#BDC3C7] mt-1">{card.label}</div>
+              <div className={`text-xl sm:text-2xl font-bold ${card.color}`}>{card.value}</div>
+              <div className="text-xs sm:text-sm text-[#BDC3C7] mt-1">{card.label}</div>
             </div>
           ))}
-        </div>
+        </DashboardGrid>
 
         {/* Calendar - Full Width */}
         <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
@@ -998,7 +1004,7 @@ export default function JournalPage() {
               <div className="p-2 bg-[#667eea]/10 rounded-lg">
                 <TrendingUp className="w-4 h-4 text-[#667eea]" />
               </div>
-              <h3 className="text-lg font-semibold text-white">Equity Curve</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-white">Equity Curve</h3>
             </div>
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
@@ -1019,7 +1025,7 @@ export default function JournalPage() {
               <div className="p-2 bg-[#667eea]/10 rounded-lg">
                 <BarChart3 className="w-4 h-4 text-[#667eea]" />
               </div>
-              <h3 className="text-lg font-semibold text-white">Top Traded Symbols</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-white">Top Traded Symbols</h3>
             </div>
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
@@ -1050,14 +1056,14 @@ export default function JournalPage() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-xs text-[#7F8C8D]">
-              <button type="button" onClick={() => setChecklist(prev => prev.map(i => ({ ...i, checked: true })))} className="px-2 py-1 rounded bg-white/5 hover:text-white hover:bg-white/10">All</button>
-              <button type="button" onClick={() => setChecklist(prev => prev.map(i => ({ ...i, checked: false })))} className="px-2 py-1 rounded bg-white/5 hover:text-white hover:bg-white/10">None</button>
-              <button type="button" onClick={() => setChecklist([
+              <Button variant="ghost" size="sm" type="button" onClick={() => setChecklist(prev => prev.map(i => ({ ...i, checked: true })))} className="bg-white/5 hover:text-white hover:bg-white/10 h-7 px-2 py-1">All</Button>
+              <Button variant="ghost" size="sm" type="button" onClick={() => setChecklist(prev => prev.map(i => ({ ...i, checked: false })))} className="bg-white/5 hover:text-white hover:bg-white/10 h-7 px-2 py-1">None</Button>
+              <Button variant="ghost" size="sm" type="button" onClick={() => setChecklist([
                 { id: 'plan', label: 'Followed plan & rules', checked: false },
                 { id: 'risk', label: 'Respected risk limits', checked: false },
                 { id: 'docs', label: 'Documented trades & tags', checked: false },
                 { id: 'emotion', label: 'No revenge trading', checked: false },
-              ])} className="px-2 py-1 rounded bg-white/5 hover:text-white hover:bg-white/10">Reset</button>
+              ])} className="bg-white/5 hover:text-white hover:bg-white/10 h-7 px-2 py-1">Reset</Button>
             </div>
           </div>
 
@@ -1166,44 +1172,45 @@ export default function JournalPage() {
 
               {/* View Toggle */}
               <div className="flex bg-[#0D0F18] rounded-xl p-1 border border-white/10">
-                <button
+                <Button
+                  variant={viewMode === 'card' ? 'default' : 'ghost'}
+                  size="sm"
                   onClick={() => setViewMode('card')}
-                  className={`flex items-center px-3 py-2 rounded-lg transition-all ${viewMode === 'card'
-                    ? 'bg-[#667eea] text-white'
-                    : 'text-[#7F8C8D] hover:text-white'
-                    }`}
+                  className={`${viewMode === 'card' ? 'bg-[#667eea] text-white' : 'text-[#7F8C8D] hover:text-white'}`}
                 >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
+                  <Grid3X3 className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  variant={viewMode === 'table' ? 'default' : 'ghost'}
+                  size="sm"
                   onClick={() => setViewMode('table')}
-                  className={`flex items-center px-3 py-2 rounded-lg transition-all ${viewMode === 'table'
-                    ? 'bg-[#667eea] text-white'
-                    : 'text-[#7F8C8D] hover:text-white'
-                    }`}
+                  className={`${viewMode === 'table' ? 'bg-[#667eea] text-white' : 'text-[#7F8C8D] hover:text-white'}`}
                 >
-                  <List className="w-4 h-4" />
-                </button>
+                  <List className="w-3.5 h-3.5" />
+                </Button>
               </div>
 
               {/* Filter */}
-              <button
+              <Button
+                variant={showFilters ? 'default' : 'outline'}
+                size="default"
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center space-x-2 h-11 px-4 rounded-xl transition-all ${showFilters
-                  ? 'bg-[#667eea] text-white'
-                  : 'bg-[#0D0F18] border border-white/10 text-white hover:border-[#667eea]/50'
-                  }`}
+                className={`${showFilters ? 'bg-[#667eea] text-white' : 'bg-[#0D0F18] border-white/10 hover:border-[#667eea]/50'}`}
               >
-                <Filter className="w-4 h-4" />
-              </button>
+                <Filter className="w-3.5 h-3.5 mr-2" />
+                Filter
+              </Button>
 
               {/* Import/Export */}
-              <button
+              <Button
+                variant="outline"
+                size="default"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center h-11 bg-[#0D0F18] border border-white/10 hover:border-[#667eea]/50 text-white px-4 rounded-xl transition-all"
+                className="bg-[#0D0F18] border-white/10 hover:border-[#667eea]/50"
               >
-                <Upload className="w-4 h-4" />
-              </button>
+                <Upload className="w-3.5 h-3.5 mr-2" />
+                Import
+              </Button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -1212,12 +1219,15 @@ export default function JournalPage() {
                 onChange={(e) => handleImportFile(e.target.files?.[0])}
               />
 
-              <button
+              <Button
+                variant="outline"
+                size="default"
                 onClick={handleExportFiltered}
-                className="flex items-center h-11 bg-[#0D0F18] border border-white/10 hover:border-[#667eea]/50 text-white px-4 rounded-xl transition-all"
+                className="bg-[#0D0F18] border-white/10 hover:border-[#667eea]/50"
               >
-                <Download className="w-4 h-4" />
-              </button>
+                <Download className="w-3.5 h-3.5 mr-2" />
+                Export
+              </Button>
             </div>
           </div>
         </div>
@@ -1249,16 +1259,15 @@ export default function JournalPage() {
                       { label: 'Crypto', value: 'crypto' },
                       { label: 'Forex', value: 'forex' },
                     ].map(opt => (
-                      <button
+                      <Button
                         key={opt.label}
+                        variant={assetTypeFilter === opt.value ? 'default' : 'outline'}
+                        size="default"
                         onClick={() => setAssetTypeFilter(opt.value)}
-                        className={`flex-1 h-12 rounded-lg border text-sm font-semibold transition-all duration-150 active:scale-95 ${assetTypeFilter === opt.value
-                          ? 'bg-[#6A3DF4] border-[#6A3DF4] text-white'
-                          : 'bg-[#0D0F18] border-white/10 text-[#BDC3C7] hover:border-[#6A3DF4]/40'
-                          }`}
+                        className={`flex-1 ${assetTypeFilter === opt.value ? 'bg-[#6A3DF4] border-[#6A3DF4]' : 'bg-[#0D0F18] border-white/10 text-[#BDC3C7] hover:border-[#6A3DF4]/40'}`}
                       >
                         {opt.label}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -1286,12 +1295,12 @@ export default function JournalPage() {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <button onClick={clearFilters} className="h-10 px-3 rounded-lg border border-white/10 text-white hover:border-white/30">Clear All</button>
-                <button onClick={() => applyPreset('all')} className="h-10 px-3 rounded-lg bg-white/5 text-white border border-white/10 hover:border-[#6A3DF4]/40">All</button>
-                <button onClick={() => applyPreset('last7')} className="h-10 px-3 rounded-lg bg-white/5 text-white border border-white/10 hover:border-[#6A3DF4]/40">Last 7d</button>
-                <button onClick={() => applyPreset('profitable')} className="h-10 px-3 rounded-lg bg-white/5 text-white border border-white/10 hover:border-[#6A3DF4]/40">Profitable</button>
-                <button onClick={() => applyPreset('losing')} className="h-10 px-3 rounded-lg bg-white/5 text-white border border-white/10 hover:border-[#6A3DF4]/40">Losing</button>
-                <button onClick={() => applyPreset('crypto')} className="h-10 px-3 rounded-lg bg-white/5 text-white border border-white/10 hover:border-[#6A3DF4]/40">Crypto only</button>
+                <Button variant="outline" size="sm" onClick={clearFilters} className="border-white/10 hover:border-white/30">Clear All</Button>
+                <Button variant="outline" size="sm" onClick={() => applyPreset('all')} className="bg-white/5 border-white/10 hover:border-[#6A3DF4]/40">All</Button>
+                <Button variant="outline" size="sm" onClick={() => applyPreset('last7')} className="bg-white/5 border-white/10 hover:border-[#6A3DF4]/40">Last 7d</Button>
+                <Button variant="outline" size="sm" onClick={() => applyPreset('profitable')} className="bg-white/5 border-white/10 hover:border-[#6A3DF4]/40">Profitable</Button>
+                <Button variant="outline" size="sm" onClick={() => applyPreset('losing')} className="bg-white/5 border-white/10 hover:border-[#6A3DF4]/40">Losing</Button>
+                <Button variant="outline" size="sm" onClick={() => applyPreset('crypto')} className="bg-white/5 border-white/10 hover:border-[#6A3DF4]/40">Crypto only</Button>
               </div>
 
               <div className="flex flex-col gap-2">

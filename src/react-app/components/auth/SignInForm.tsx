@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Button } from '../ui/button';
 
 type SignInFormProps = {
   layout?: 'card' | 'plain';
@@ -207,14 +208,16 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white transition-colors"
+                className="absolute inset-y-0 right-0 text-gray-400 hover:text-white h-auto"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -252,20 +255,21 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
         </div>
 
         <div className="space-y-3 pt-2">
-          <button
+          <Button
             type="submit"
+            variant="default"
             disabled={loading}
-            className="w-full rounded-xl bg-[#6A3DF4] hover:bg-[#8A5CFF] px-4 py-3 text-sm font-semibold text-white shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 <span>Signing in...</span>
               </>
             ) : (
               'Sign in'
             )}
-          </button>
+          </Button>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -276,19 +280,20 @@ export const SignInForm = ({ layout = 'card' }: SignInFormProps) => {
             </div>
           </div>
 
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#0D0F18]/50 px-4 py-3 text-sm font-medium text-white hover:bg-white/5 hover:border-white/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-[#0D0F18]/50 border-white/10 hover:bg-white/5 hover:border-white/20"
           >
             {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
-              <img className="h-5 w-5" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
+              <img className="h-4 w-4 mr-2" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
             )}
             Sign in with Google
-          </button>
+          </Button>
         </div>
       </form>
 

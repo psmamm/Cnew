@@ -152,69 +152,105 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
     return (
         <div className="w-full relative">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+            <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6"
+            >
                 <div className="flex items-center gap-3">
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={prevMonth}
-                        className="p-2 hover:bg-white/5 rounded-lg text-[#7F8C8D] hover:text-white transition-all border border-white/10"
+                        className="p-2.5 hover:bg-[#667eea]/20 rounded-xl text-[#7F8C8D] hover:text-white transition-all border border-white/10 hover:border-[#667eea]/50 bg-[#0D0F18]"
                     >
-                        <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <h2 className="text-xl font-bold text-white min-w-[180px] text-center">
+                        <ChevronLeft className="w-5 h-5" />
+                    </motion.button>
+                    <motion.h2 
+                        key={`${year}-${month}`}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="text-2xl sm:text-3xl font-bold text-white min-w-[200px] text-center bg-gradient-to-r from-white to-white/80 bg-clip-text"
+                    >
                         {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                    </h2>
-                    <button
+                    </motion.h2>
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={nextMonth}
-                        className="p-2 hover:bg-white/5 rounded-lg text-[#7F8C8D] hover:text-white transition-all border border-white/10"
+                        className="p-2.5 hover:bg-[#667eea]/20 rounded-xl text-[#7F8C8D] hover:text-white transition-all border border-white/10 hover:border-[#667eea]/50 bg-[#0D0F18]"
                     >
-                        <ChevronRight className="w-4 h-4" />
-                    </button>
-                    <button
+                        <ChevronRight className="w-5 h-5" />
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setCurrentDate(new Date())}
-                        className="px-3 py-1.5 text-xs font-medium text-[#667eea] bg-[#667eea]/10 rounded-lg border border-[#667eea]/30 hover:bg-[#667eea]/20 transition-all"
+                        className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#667eea] to-[#764ba2] rounded-xl border border-[#667eea]/30 hover:from-[#7B8EF0] hover:to-[#8A5CFF] transition-all shadow-lg shadow-purple-500/20"
                     >
                         Today
-                    </button>
+                    </motion.button>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="px-3 py-2 rounded-lg bg-[#0D0F18] border border-white/10 text-sm">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] border border-white/10 hover:border-[#2ECC71]/30 text-sm shadow-lg transition-all"
+                    >
                         <span className="text-[#7F8C8D] mr-2">Monthly P&L:</span>
-                        <span className={`font-bold ${monthStats.totalPnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
+                        <span className={`font-bold text-base ${monthStats.totalPnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
                             {monthStats.totalPnl >= 0 ? '+' : ''}${monthStats.totalPnl.toFixed(2)}
                         </span>
-                    </div>
-                    <div className="px-3 py-2 rounded-lg bg-[#0D0F18] border border-white/10 text-sm">
+                    </motion.div>
+                    <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] border border-white/10 hover:border-[#667eea]/30 text-sm shadow-lg transition-all"
+                    >
                         <span className="text-[#7F8C8D] mr-2">Trades:</span>
-                        <span className="text-white font-bold">{monthStats.trades}</span>
-                    </div>
-                    <div className="px-3 py-2 rounded-lg bg-[#0D0F18] border border-white/10 text-sm">
+                        <span className="text-white font-bold text-base">{monthStats.trades}</span>
+                    </motion.div>
+                    <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] border border-white/10 hover:border-[#667eea]/30 text-sm shadow-lg transition-all"
+                    >
                         <span className="text-[#7F8C8D] mr-2">Win Rate:</span>
-                        <span className={`font-bold ${monthStats.winRate >= 50 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
+                        <span className={`font-bold text-base ${monthStats.winRate >= 50 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
                             {monthStats.winRate.toFixed(1)}%
                         </span>
-                    </div>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Calendar Table */}
-            <div className="border border-white/10 rounded-xl overflow-hidden shadow-lg">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="border border-white/10 rounded-2xl overflow-hidden shadow-2xl bg-[#0D0F18]"
+            >
                 {/* Header Row */}
-                <div className="grid grid-cols-8 bg-gradient-to-r from-[#667eea]/20 to-[#764ba2]/20 border-b border-white/10">
+                <div className="grid grid-cols-8 bg-gradient-to-r from-[#667eea]/30 via-[#764ba2]/30 to-[#667eea]/30 border-b border-white/20 backdrop-blur-sm">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Total'].map((day, idx) => (
-                        <div
+                        <motion.div
                             key={day}
-                            className={`py-3 px-2 text-center text-xs font-semibold text-white/80 uppercase tracking-wider ${idx < 7 ? 'border-r border-white/10' : ''}`}
+                            whileHover={{ backgroundColor: 'rgba(102, 126, 234, 0.2)' }}
+                            className={`py-4 px-3 text-center text-xs font-bold text-white uppercase tracking-widest ${idx < 7 ? 'border-r border-white/20' : ''}`}
                         >
                             {day}
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
 
                 {/* Week Rows */}
                 {weeks.map((week, weekIdx) => (
-                    <div key={weekIdx} className="grid grid-cols-8 border-b border-white/5 last:border-b-0">
+                    <motion.div 
+                        key={weekIdx} 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: weekIdx * 0.05 }}
+                        className="grid grid-cols-8 border-b border-white/10 last:border-b-0 hover:bg-white/2 transition-colors"
+                    >
                         {week.map((date, dayIdx) => {
-                            if (!date) return <div key={`empty-${dayIdx}`} className="border-r border-white/5 p-2" />;
+                            if (!date) return <div key={`empty-${dayIdx}`} className="border-r border-white/5 p-2 bg-[#0D0F18]/30" />;
 
                             const pnl = date.data?.daily_pnl || 0;
                             const trades = date.data?.trade_count || 0;
@@ -223,63 +259,89 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
                             const isToday = date.dateStr === new Date().toISOString().split('T')[0];
 
                             return (
-                                <div
+                                <motion.div
                                     key={date.dateStr}
+                                    whileHover={{ scale: 1.02, zIndex: 10 }}
+                                    whileTap={{ scale: 0.98 }}
                                     onClick={() => handleSelect(date.dateStr, hasData)}
                                     className={`
-                                        border-r border-white/5 p-2 min-h-[75px] cursor-pointer transition-all relative group
-                                        ${date.isCurrentMonth ? 'bg-[#0D0F18]' : 'bg-[#0D0F18]/40'}
-                                        ${isSelected ? 'ring-2 ring-[#667eea] ring-inset' : ''}
-                                        ${hasData && pnl > 0 ? 'hover:bg-[#2ECC71]/10' : hasData && pnl < 0 ? 'hover:bg-[#E74C3C]/10' : 'hover:bg-white/5'}
+                                        border-r border-white/5 p-3 min-h-[90px] cursor-pointer transition-all relative group
+                                        ${date.isCurrentMonth ? 'bg-[#0D0F18]' : 'bg-[#0D0F18]/30'}
+                                        ${isSelected ? 'ring-2 ring-[#667eea] ring-inset bg-[#667eea]/10' : ''}
+                                        ${hasData && pnl > 0 ? 'hover:bg-[#2ECC71]/15 hover:border-[#2ECC71]/30' : hasData && pnl < 0 ? 'hover:bg-[#E74C3C]/15 hover:border-[#E74C3C]/30' : 'hover:bg-white/5 hover:border-white/20'}
                                     `}
                                 >
                                     {/* Day number */}
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className={`text-sm font-medium ${isToday
-                                                ? 'bg-[#667eea] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs'
-                                                : date.isCurrentMonth ? 'text-white' : 'text-[#4A5568]'
-                                            }`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <motion.span 
+                                            whileHover={{ scale: 1.1 }}
+                                            className={`text-sm font-semibold transition-all ${isToday
+                                                    ? 'bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-lg shadow-purple-500/30'
+                                                    : date.isCurrentMonth ? 'text-white' : 'text-[#4A5568]'
+                                                }`}
+                                        >
                                             {date.day}
-                                        </span>
+                                        </motion.span>
                                         {hasData && (
-                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-white/70">
+                                            <motion.span 
+                                                whileHover={{ scale: 1.1 }}
+                                                className="text-[10px] px-2 py-1 rounded-full bg-gradient-to-r from-[#667eea]/20 to-[#764ba2]/20 border border-[#667eea]/30 text-white font-medium"
+                                            >
                                                 {trades}
-                                            </span>
+                                            </motion.span>
                                         )}
                                     </div>
 
                                     {/* P&L */}
-                                    <div className={`text-sm font-bold ${pnl > 0 ? 'text-[#2ECC71]' : pnl < 0 ? 'text-[#E74C3C]' : 'text-[#4A5568]'
-                                        }`}>
+                                    <motion.div 
+                                        className={`text-base font-bold mb-1 ${pnl > 0 ? 'text-[#2ECC71]' : pnl < 0 ? 'text-[#E74C3C]' : 'text-[#4A5568]'
+                                            }`}
+                                    >
                                         {pnl !== 0 ? (pnl > 0 ? '+' : '') + '$' + pnl.toFixed(0) : '$0'}
-                                    </div>
+                                    </motion.div>
 
                                     {/* Trade count */}
-                                    <div className="text-[10px] text-[#7F8C8D]">
+                                    <div className="text-[10px] text-[#7F8C8D] font-medium">
                                         {trades} trade{trades !== 1 ? 's' : ''}
                                     </div>
 
-                                    {/* Hover indicator for clickable dates */}
+                                    {/* Hover glow effect */}
                                     {hasData && (
-                                        <div className="absolute inset-0 border-2 border-[#667eea]/0 group-hover:border-[#667eea]/50 rounded transition-all pointer-events-none" />
+                                        <motion.div 
+                                            className="absolute inset-0 border-2 border-[#667eea]/0 group-hover:border-[#667eea]/60 rounded-lg transition-all pointer-events-none"
+                                            whileHover={{ boxShadow: '0 0 20px rgba(102, 126, 234, 0.3)' }}
+                                        />
                                     )}
-                                </div>
+
+                                    {/* Background gradient for profitable/losing days */}
+                                    {hasData && (
+                                        <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg ${
+                                            pnl > 0 ? 'bg-gradient-to-br from-[#2ECC71]/5 to-transparent' : 'bg-gradient-to-br from-[#E74C3C]/5 to-transparent'
+                                        }`} />
+                                    )}
+                                </motion.div>
                             );
                         })}
 
                         {/* Weekly Total */}
-                        <div className="p-2 min-h-[75px] bg-[#0D0F18] border-l border-white/10">
-                            <div className="text-[10px] text-[#7F8C8D] font-medium uppercase tracking-wider">Week {weekIdx + 1}</div>
-                            <div className={`text-base font-bold mt-1 ${weeklyStats[weekIdx].pnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
-                                {weeklyStats[weekIdx].pnl >= 0 ? '+' : ''}${weeklyStats[weekIdx].pnl.toFixed(0)}
+                        <motion.div 
+                            whileHover={{ scale: 1.02, backgroundColor: 'rgba(102, 126, 234, 0.1)' }}
+                            className="p-3 min-h-[90px] bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] border-l border-white/20 relative overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-[#667eea]/5 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                            <div className="relative z-10">
+                                <div className="text-[10px] text-[#7F8C8D] font-bold uppercase tracking-widest mb-2">Week {weekIdx + 1}</div>
+                                <div className={`text-lg font-bold mb-1 ${weeklyStats[weekIdx].pnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
+                                    {weeklyStats[weekIdx].pnl >= 0 ? '+' : ''}${weeklyStats[weekIdx].pnl.toFixed(0)}
+                                </div>
+                                <div className="text-[10px] text-[#7F8C8D] font-medium">
+                                    {weeklyStats[weekIdx].trades} trades
+                                </div>
                             </div>
-                            <div className="text-[10px] text-[#7F8C8D]">
-                                {weeklyStats[weekIdx].trades} trades
-                            </div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 ))}
-            </div>
+            </motion.div>
 
             {/* Popup Modal for Date Details */}
             <AnimatePresence>
@@ -299,14 +361,15 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="relative z-50 w-full max-w-sm"
+                            className="relative z-50 w-full max-w-md"
                         >
-                            <div className="bg-[#0D0F18] rounded-xl border border-white/10 overflow-hidden">
+                            <div className="bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] rounded-2xl border border-white/20 overflow-hidden shadow-2xl">
                                 {/* Popup Header */}
-                                <div className="bg-gradient-to-r from-[#667eea] to-[#764ba2] p-4">
-                                    <div className="flex items-center justify-between">
+                                <div className="bg-gradient-to-r from-[#667eea] via-[#764ba2] to-[#667eea] p-6 relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                                    <div className="relative z-10 flex items-center justify-between">
                                         <div>
-                                            <h3 className="text-xl font-bold text-white">
+                                            <h3 className="text-2xl font-bold text-white mb-1">
                                                 {new Date(popupDate).toLocaleDateString('en-US', {
                                                     weekday: 'long',
                                                     month: 'long',
@@ -314,43 +377,65 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
                                                     year: 'numeric'
                                                 })}
                                             </h3>
-                                            <p className="text-white/70 text-sm mt-1">Daily Trading Summary</p>
+                                            <p className="text-white/80 text-sm font-medium">Daily Trading Summary</p>
                                         </div>
-                                        <button
+                                        <motion.button
+                                            whileHover={{ scale: 1.1, rotate: 90 }}
+                                            whileTap={{ scale: 0.9 }}
                                             onClick={closePopup}
-                                            className="p-2 hover:bg-white/20 rounded-lg transition-all"
+                                            className="p-2 hover:bg-white/20 rounded-xl transition-all backdrop-blur-sm"
                                         >
                                             <X className="w-5 h-5 text-white" />
-                                        </button>
+                                        </motion.button>
                                     </div>
                                 </div>
 
                                 {/* Popup Content */}
                                 <div className="p-6">
                                     {/* Main P&L */}
-                                    <div className="text-center mb-6">
-                                        <div className="text-sm text-[#7F8C8D] mb-1">Net P&L</div>
-                                        <div className={`text-4xl font-bold ${popupData.daily_pnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
+                                    <motion.div 
+                                        initial={{ scale: 0.9, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        transition={{ delay: 0.1 }}
+                                        className="text-center mb-8"
+                                    >
+                                        <div className="text-sm text-[#7F8C8D] mb-2 font-medium uppercase tracking-wider">Net P&L</div>
+                                        <motion.div 
+                                            className={`text-5xl font-black ${popupData.daily_pnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}
+                                            initial={{ y: -10, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                        >
                                             {popupData.daily_pnl >= 0 ? '+' : ''}${popupData.daily_pnl.toFixed(2)}
-                                        </div>
-                                    </div>
+                                        </motion.div>
+                                    </motion.div>
 
                                     {/* Stats Grid */}
                                     <div className="grid grid-cols-2 gap-4 mb-6">
-                                        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/5">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <BarChart3 className="w-4 h-4 text-[#667eea]" />
-                                                <span className="text-xs text-[#7F8C8D]">Total Trades</span>
+                                        <motion.div 
+                                            whileHover={{ scale: 1.05, y: -2 }}
+                                            className="bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] rounded-xl p-5 border border-white/10 hover:border-[#667eea]/50 transition-all shadow-lg"
+                                        >
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <div className="p-2 bg-[#667eea]/20 rounded-lg">
+                                                    <BarChart3 className="w-5 h-5 text-[#667eea]" />
+                                                </div>
+                                                <span className="text-xs text-[#7F8C8D] font-medium uppercase tracking-wider">Total Trades</span>
                                             </div>
-                                            <div className="text-2xl font-bold text-white">{popupData.trade_count}</div>
-                                        </div>
+                                            <div className="text-3xl font-bold text-white">{popupData.trade_count}</div>
+                                        </motion.div>
 
-                                        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/5">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Target className="w-4 h-4 text-[#667eea]" />
-                                                <span className="text-xs text-[#7F8C8D]">Win Rate</span>
+                                        <motion.div 
+                                            whileHover={{ scale: 1.05, y: -2 }}
+                                            className="bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] rounded-xl p-5 border border-white/10 hover:border-[#667eea]/50 transition-all shadow-lg"
+                                        >
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <div className="p-2 bg-[#667eea]/20 rounded-lg">
+                                                    <Target className="w-5 h-5 text-[#667eea]" />
+                                                </div>
+                                                <span className="text-xs text-[#7F8C8D] font-medium uppercase tracking-wider">Win Rate</span>
                                             </div>
-                                            <div className={`text-2xl font-bold ${popupData.trade_count > 0 && (popupData.wins / popupData.trade_count) >= 0.5
+                                            <div className={`text-3xl font-bold ${popupData.trade_count > 0 && (popupData.wins / popupData.trade_count) >= 0.5
                                                     ? 'text-[#2ECC71]'
                                                     : 'text-[#E74C3C]'
                                                 }`}>
@@ -358,42 +443,63 @@ export function CalendarView({ dailyStats, selectedDate: externalSelected, onSel
                                                     ? Math.round((popupData.wins / popupData.trade_count) * 100)
                                                     : 0}%
                                             </div>
-                                        </div>
+                                        </motion.div>
 
-                                        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/5">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <TrendingUp className="w-4 h-4 text-[#2ECC71]" />
-                                                <span className="text-xs text-[#7F8C8D]">Winning Trades</span>
+                                        <motion.div 
+                                            whileHover={{ scale: 1.05, y: -2 }}
+                                            className="bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] rounded-xl p-5 border border-white/10 hover:border-[#2ECC71]/50 transition-all shadow-lg"
+                                        >
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <div className="p-2 bg-[#2ECC71]/20 rounded-lg">
+                                                    <TrendingUp className="w-5 h-5 text-[#2ECC71]" />
+                                                </div>
+                                                <span className="text-xs text-[#7F8C8D] font-medium uppercase tracking-wider">Winning Trades</span>
                                             </div>
-                                            <div className="text-2xl font-bold text-[#2ECC71]">{popupData.wins || 0}</div>
-                                        </div>
+                                            <div className="text-3xl font-bold text-[#2ECC71]">{popupData.wins || 0}</div>
+                                        </motion.div>
 
-                                        <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/5">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <TrendingDown className="w-4 h-4 text-[#E74C3C]" />
-                                                <span className="text-xs text-[#7F8C8D]">Losing Trades</span>
+                                        <motion.div 
+                                            whileHover={{ scale: 1.05, y: -2 }}
+                                            className="bg-gradient-to-br from-[#0D0F18] to-[#1A1D2E] rounded-xl p-5 border border-white/10 hover:border-[#E74C3C]/50 transition-all shadow-lg"
+                                        >
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <div className="p-2 bg-[#E74C3C]/20 rounded-lg">
+                                                    <TrendingDown className="w-5 h-5 text-[#E74C3C]" />
+                                                </div>
+                                                <span className="text-xs text-[#7F8C8D] font-medium uppercase tracking-wider">Losing Trades</span>
                                             </div>
-                                            <div className="text-2xl font-bold text-[#E74C3C]">{popupData.losses || 0}</div>
-                                        </div>
+                                            <div className="text-3xl font-bold text-[#E74C3C]">{popupData.losses || 0}</div>
+                                        </motion.div>
                                     </div>
 
                                     {/* Day Performance Indicator */}
-                                    <div className={`p-4 rounded-xl ${popupData.daily_pnl >= 0 ? 'bg-[#2ECC71]/10 border border-[#2ECC71]/30' : 'bg-[#E74C3C]/10 border border-[#E74C3C]/30'}`}>
-                                        <div className="flex items-center gap-3">
-                                            {popupData.daily_pnl >= 0
-                                                ? <TrendingUp className="w-6 h-6 text-[#2ECC71]" />
-                                                : <TrendingDown className="w-6 h-6 text-[#E74C3C]" />
-                                            }
+                                    <motion.div 
+                                        whileHover={{ scale: 1.02 }}
+                                        className={`p-5 rounded-xl border-2 ${popupData.daily_pnl >= 0 
+                                            ? 'bg-gradient-to-br from-[#2ECC71]/10 to-[#2ECC71]/5 border-[#2ECC71]/40' 
+                                            : 'bg-gradient-to-br from-[#E74C3C]/10 to-[#E74C3C]/5 border-[#E74C3C]/40'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <motion.div
+                                                animate={{ rotate: popupData.daily_pnl >= 0 ? [0, -10, 10, -10, 0] : [0, 10, -10, 10, 0] }}
+                                                transition={{ duration: 0.5 }}
+                                            >
+                                                {popupData.daily_pnl >= 0
+                                                    ? <TrendingUp className="w-8 h-8 text-[#2ECC71]" />
+                                                    : <TrendingDown className="w-8 h-8 text-[#E74C3C]" />
+                                                }
+                                            </motion.div>
                                             <div>
-                                                <div className={`font-semibold ${popupData.daily_pnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
+                                                <div className={`text-lg font-bold ${popupData.daily_pnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
                                                     {popupData.daily_pnl >= 0 ? 'Profitable Day' : 'Loss Day'}
                                                 </div>
-                                                <div className="text-xs text-[#7F8C8D]">
+                                                <div className="text-sm text-[#7F8C8D] font-medium">
                                                     {popupData.wins || 0} wins, {popupData.losses || 0} losses
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 </div>
                             </div>
                         </motion.div>

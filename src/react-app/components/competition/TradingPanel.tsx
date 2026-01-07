@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Plus } from 'lucide-react';
+import { Button } from '../ui/button';
 import { TournamentStats } from '@/react-app/hooks/useCompetitionGame';
 import { PracticeSettings } from '@/react-app/hooks/useCompetitionGame';
 
@@ -106,7 +107,7 @@ export function TradingPanel({
                 <div className="space-y-2">
                     <div className="flex justify-between items-center text-xs text-gray-400 mb-2">
                         <span>Quantity</span>
-                        <button className="text-[#6A3DF4] hover:text-[#8B5CF6] text-xs">Switch to USD</button>
+                        <Button variant="ghost" size="sm" className="text-[#6A3DF4] hover:text-[#8B5CF6] h-auto p-0 text-xs">Switch to USD</Button>
                     </div>
                     <div className="relative">
                         <input
@@ -251,30 +252,34 @@ export function TradingPanel({
 
                 {/* Buttons */}
                 <div className="grid grid-cols-2 gap-3 pt-2">
-                    <motion.button
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => onExecuteTrade('Long')}
-                        className="bg-[#2EBD85] hover:bg-[#25a573] text-white py-3 rounded-lg font-bold shadow-[0_4px_14px_rgba(46,189,133,0.3)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!gameStarted || gameOver || exchangeOutage}
-                    >
-                        Open Long
-                    </motion.button>
-                    <motion.button
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => onExecuteTrade('Short')}
-                        className="bg-[#F6465D] hover:bg-[#d93d52] text-white py-3 rounded-lg font-bold shadow-[0_4px_14px_rgba(246,70,93,0.3)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!gameStarted || gameOver || exchangeOutage}
-                    >
-                        Open Short
-                    </motion.button>
+                    <motion.div whileTap={{ scale: 0.95 }}>
+                        <Button
+                            variant="default"
+                            onClick={() => onExecuteTrade('Long')}
+                            className="w-full bg-[#2EBD85] hover:bg-[#25a573] shadow-[0_4px_14px_rgba(46,189,133,0.3)]"
+                            disabled={!gameStarted || gameOver || exchangeOutage}
+                        >
+                            Open Long
+                        </Button>
+                    </motion.div>
+                    <motion.div whileTap={{ scale: 0.95 }}>
+                        <Button
+                            variant="default"
+                            onClick={() => onExecuteTrade('Short')}
+                            className="w-full bg-[#F6465D] hover:bg-[#d93d52] shadow-[0_4px_14px_rgba(246,70,93,0.3)]"
+                            disabled={!gameStarted || gameOver || exchangeOutage}
+                        >
+                            Open Short
+                        </Button>
+                    </motion.div>
                 </div>
                 
                 {/* Add Strategy Link */}
                 <div className="pt-2">
-                    <button className="text-[#6A3DF4] hover:text-[#8B5CF6] text-xs flex items-center gap-1 transition-colors">
-                        <Plus className="w-3 h-3" />
+                    <Button variant="ghost" size="sm" className="text-[#6A3DF4] hover:text-[#8B5CF6] h-auto p-0 text-xs">
+                        <Plus className="w-3 h-3 mr-1" />
                         Add Strategy
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
