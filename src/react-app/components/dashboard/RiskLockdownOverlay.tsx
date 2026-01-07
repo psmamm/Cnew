@@ -2,10 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { buildApiUrl } from '../../hooks/useApi';
 
-interface UserLockoutData {
-  lockout_until: number | null;
-}
-
 export default function RiskLockdownOverlay() {
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');

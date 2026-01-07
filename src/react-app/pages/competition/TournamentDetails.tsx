@@ -5,7 +5,7 @@ import { useTournament } from '@/react-app/hooks/useTournaments';
 import { useAuth } from '@/react-app/contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { 
-    Trophy, ArrowLeft, Users, Clock, Calendar, User, DollarSign, 
+    Trophy, ArrowLeft, Users, Clock, User, DollarSign, 
     TrendingDown, Send, CheckCircle, MessageSquare, TrendingUp 
 } from 'lucide-react';
 
@@ -288,7 +288,7 @@ export default function TournamentDetailsPage() {
                                         </div>
                                     ) : (
                                         chatMessages.map((message) => {
-                                            const isOwn = message.user_id === (user?.google_user_data?.sub || (user as any)?.firebase_user_id);
+                                            const isOwn = Boolean(user?.uid) && message.user_id === user?.uid;
                                             
                                             return (
                                                 <div

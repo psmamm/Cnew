@@ -2,15 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import DashboardLayout from '@/react-app/components/DashboardLayout';
 import { useDailyChallenge } from '@/react-app/hooks/useDailyChallenge';
-import { useELO } from '@/react-app/hooks/useELO';
 import { motion } from 'framer-motion';
-import { Trophy, Clock, Users, TrendingUp, ChevronLeft, ChevronRight, Play, Crown, Medal, Award } from 'lucide-react';
-import { getDivisionColor } from '@/react-app/hooks/useELO';
+import { Trophy, Clock, Users, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, Play, Crown, Medal, Award } from 'lucide-react';
 
 export default function DailyChallengePage() {
     const navigate = useNavigate();
     const { challenge, participants, loading, joined, joinChallenge, timeRemaining } = useDailyChallenge();
-    const { eloData } = useELO();
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const formatTime = (seconds: number) => {
@@ -30,7 +27,6 @@ export default function DailyChallengePage() {
     };
 
     const top3 = participants.slice(0, 3);
-    const rest = participants.slice(3);
 
     const handleJoin = async () => {
         try {

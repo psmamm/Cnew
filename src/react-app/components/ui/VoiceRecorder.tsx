@@ -19,7 +19,6 @@ interface ToastState {
 export default function VoiceRecorder({ onTranscriptionComplete, className = '' }: VoiceRecorderProps) {
   const [state, setState] = useState<RecordingState>('idle');
   const [toast, setToast] = useState<ToastState>({ show: false, message: '', type: 'error' });
-  const [error, setError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -50,8 +49,6 @@ export default function VoiceRecorder({ onTranscriptionComplete, className = '' 
   // Start recording
   const startRecording = async () => {
     try {
-      setError(null);
-
       // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -123,7 +120,6 @@ export default function VoiceRecorder({ onTranscriptionComplete, className = '' 
       // Handle errors
       mediaRecorder.onerror = (event) => {
         console.error('MediaRecorder error:', event);
-        setError('Recording error occurred');
         setState('idle');
         showToast('Recording error occurred', 'error');
       };
@@ -148,7 +144,6 @@ export default function VoiceRecorder({ onTranscriptionComplete, className = '' 
         }
       }
 
-      setError(errorMessage);
       setState('idle');
       showToast(errorMessage, 'error');
     }
@@ -166,7 +161,6 @@ export default function VoiceRecorder({ onTranscriptionComplete, className = '' 
   const uploadAndTranscribe = async (audioBlob: Blob, mimeType: string) => {
     try {
       setState('uploading');
-      setError(null);
 
       // Create FormData
       const formData = new FormData();
@@ -214,7 +208,6 @@ export default function VoiceRecorder({ onTranscriptionComplete, className = '' 
     } catch (err) {
       console.error('Error uploading/transcribing audio:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to upload or transcribe audio';
-      setError(errorMessage);
       setState('idle');
       showToast(errorMessage, 'error');
     }

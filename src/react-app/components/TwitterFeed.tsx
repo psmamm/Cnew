@@ -43,7 +43,12 @@ export default function TwitterFeed({ accounts }: TwitterFeedProps) {
     
     try {
       // Fetch from backend API
-      const response = await fetch('/api/twitter-feed');
+      const usernames = accounts.map(a => a.username).filter(Boolean);
+      const url =
+        usernames.length > 0
+          ? `/api/twitter-feed?accounts=${encodeURIComponent(usernames.join(','))}`
+          : '/api/twitter-feed';
+      const response = await fetch(url);
       
       const data = await response.json();
       

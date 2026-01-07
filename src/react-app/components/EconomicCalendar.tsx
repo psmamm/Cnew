@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Calendar, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface EconomicEvent {
@@ -16,7 +16,6 @@ interface EconomicEvent {
 export default function EconomicCalendar() {
   const [events, setEvents] = useState<EconomicEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     // Mock data for now - can be replaced with real API later
