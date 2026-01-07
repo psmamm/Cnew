@@ -620,6 +620,129 @@ app.post('/api/export', authMiddleware, async (c) => {
   }
 });
 
+// Import functionality
+app.post('/api/import', combinedAuthMiddleware, async (c) => {
+  const user = c.get('user');
+  if (!user) {
+    return c.json({ error: 'User not found' }, 401);
+  }
+
+  const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
+  if (!userId) {
+    return c.json({ error: 'User ID not found' }, 401);
+  }
+
+  try {
+    const data = await c.req.json();
+    const results = {
+      strategiesImported: 0,
+      tradesImported: 0,
+      errors: [] as string[]
+    };
+
+    // Map old strategy IDs to new strategy IDs
+    const strategyIdMap = new Map<number, number>();
+
+    // Import strategies first (if any)
+    if (data.strategies && Array.isArray(data.strategies)) {
+      for (const strategy of data.strategies) {
+        try {
+          const result = await c.env.DB.prepare(`
+            INSERT INTO strategies (
+              user_id, name, description, category, rules, 
+              risk_per_trade, target_rr, timeframe, is_active
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            userId,
+            strategy.name || 'Imported Strategy',
+            strategy.description || null,
+            strategy.category || null,
+            strategy.rules || null,
+            strategy.risk_per_trade || null,
+            strategy.target_rr || null,
+            strategy.timeframe || null,
+            strategy.is_active !== false && strategy.is_active !== 0 ? 1 : 0
+          ).run();
+
+          if (result.success && result.meta.last_row_id) {
+            // Map old ID to new ID
+            if (strategy.id) {
+              strategyIdMap.set(strategy.id, result.meta.last_row_id as number);
+            }
+            results.strategiesImported++;
+          }
+        } catch (strategyError) {
+          results.errors.push(`Failed to import strategy "${strategy.name}": ${strategyError instanceof Error ? strategyError.message : String(strategyError)}`);
+        }
+      }
+    }
+
+    // Import trades (if any)
+    if (data.trades && Array.isArray(data.trades)) {
+      for (const trade of data.trades) {
+        try {
+          // Map strategy_id to new ID if available
+          let newStrategyId = null;
+          if (trade.strategy_id && strategyIdMap.has(trade.strategy_id)) {
+            newStrategyId = strategyIdMap.get(trade.strategy_id);
+          }
+
+          // Normalize direction to uppercase
+          const direction = (trade.direction || 'LONG').toUpperCase();
+
+          // Calculate position size
+          const positionSize = trade.size || (trade.quantity && trade.entry_price ? trade.quantity * trade.entry_price : null);
+
+          // Calculate is_closed based on exit_price
+          const isClosed = trade.exit_price ? 1 : (trade.is_closed ? 1 : 0);
+
+          const result = await c.env.DB.prepare(`
+            INSERT INTO trades (
+              user_id, symbol, asset_type, direction, quantity, size, entry_price, exit_price,
+              entry_date, exit_date, strategy_id, commission, notes, tags, pnl, is_closed, leverage
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(
+            userId,
+            (trade.symbol || 'UNKNOWN').toUpperCase(),
+            trade.asset_type || null,
+            direction,
+            trade.quantity || null,
+            positionSize,
+            trade.entry_price || 0,
+            trade.exit_price || null,
+            trade.entry_date || new Date().toISOString().split('T')[0],
+            trade.exit_date || null,
+            newStrategyId,
+            trade.commission || null,
+            trade.notes || null,
+            trade.tags || null,
+            trade.pnl || null,
+            isClosed,
+            trade.leverage || 1
+          ).run();
+
+          if (result.success) {
+            results.tradesImported++;
+          }
+        } catch (tradeError) {
+          results.errors.push(`Failed to import trade "${trade.symbol}": ${tradeError instanceof Error ? tradeError.message : String(tradeError)}`);
+        }
+      }
+    }
+
+    return c.json({
+      success: true,
+      ...results
+    });
+  } catch (error) {
+    console.error('Import error:', error);
+    return c.json({
+      error: 'Failed to import data',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500);
+  }
+});
+
 // Public whale transactions route (no auth required)
 app.route('/api/whale-transactions', whaleTransactionsRouter);
 app.route('/api/whale', debugWhaleRouter);
