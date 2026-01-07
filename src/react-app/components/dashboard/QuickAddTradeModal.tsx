@@ -143,7 +143,7 @@ export default function QuickAddTradeModal({ isOpen, onClose, onSuccess }: Quick
         throw new Error(errorMessage);
       }
 
-      const result = await response.json();
+      await response.json();
 
       // Success! Show toast and close modal
       showToast('Trade saved! 🚀 +10 Reputation earned');

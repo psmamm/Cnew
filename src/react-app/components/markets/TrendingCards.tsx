@@ -22,11 +22,10 @@ interface TrendingCardProps {
   icon: React.ReactNode;
   items: EnhancedMarketData[];
   color: string;
-  onMoreClick: () => void;
   quoteAssetPrices: Record<string, number>;
 }
 
-function TrendingCard({ title, icon, items, color, onMoreClick, quoteAssetPrices }: TrendingCardProps) {
+function TrendingCard({ title, icon, items, color, quoteAssetPrices }: TrendingCardProps) {
   const navigate = useNavigate();
 
   // Convert price to USDT if needed
@@ -93,7 +92,7 @@ function TrendingCard({ title, icon, items, color, onMoreClick, quoteAssetPrices
 
       <div className="space-y-2.5">
         {items.length > 0 ? (
-          items.map((item, index) => (
+          items.map((item) => (
             <div
               key={item.symbol}
               onClick={() => navigate(`/markets/${item.symbol}`)}
@@ -223,7 +222,6 @@ export default function TrendingCards({ hot, newCoins, topGainer, topVolume }: T
         icon={<Flame className="w-4 h-4 text-white" />}
         items={hot}
         color="bg-[#E74C3C]/20"
-        onMoreClick={() => {}}
         quoteAssetPrices={quoteAssetPrices}
       />
       <TrendingCard
@@ -231,7 +229,6 @@ export default function TrendingCards({ hot, newCoins, topGainer, topVolume }: T
         icon={<Sparkles className="w-4 h-4 text-white" />}
         items={newCoins}
         color="bg-[#6A3DF4]/20"
-        onMoreClick={() => {}}
         quoteAssetPrices={quoteAssetPrices}
       />
       <TrendingCard
@@ -239,7 +236,6 @@ export default function TrendingCards({ hot, newCoins, topGainer, topVolume }: T
         icon={<TrendingUp className="w-4 h-4 text-white" />}
         items={topGainer}
         color="bg-[#2ECC71]/20"
-        onMoreClick={() => {}}
         quoteAssetPrices={quoteAssetPrices}
       />
       <TrendingCard
@@ -247,7 +243,6 @@ export default function TrendingCards({ hot, newCoins, topGainer, topVolume }: T
         icon={<BarChart3 className="w-4 h-4 text-white" />}
         items={topVolume}
         color="bg-[#3498DB]/20"
-        onMoreClick={() => {}}
         quoteAssetPrices={quoteAssetPrices}
       />
     </div>

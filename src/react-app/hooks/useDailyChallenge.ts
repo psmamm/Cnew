@@ -108,7 +108,8 @@ export function useDailyChallenge() {
     // Check if user has joined
     useEffect(() => {
         if (user && participants.length > 0) {
-            const userParticipant = participants.find(p => p.user_id === (user.google_user_data?.sub || (user as any).firebase_user_id));
+            // Client auth uses Firebase; use its stable UID for participant identity.
+            const userParticipant = participants.find(p => p.user_id === user.uid);
             setJoined(!!userParticipant);
         }
     }, [user, participants]);

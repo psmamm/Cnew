@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import DashboardLayout from '@/react-app/components/DashboardLayout';
 import { useMatchmaking } from '@/react-app/hooks/useMatchmaking';
@@ -12,6 +12,7 @@ export default function MatchmakingPage() {
     const { status, cancelQueue, refetchStatus } = useMatchmaking();
     const [elapsed, setElapsed] = useState(0);
     const [matchFound, setMatchFound] = useState(false);
+    const wasInQueueRef = useRef(false);
 
     useEffect(() => {
         if (!status?.inQueue) {
@@ -21,6 +22,16 @@ export default function MatchmakingPage() {
     }, [status, refetchStatus]);
 
     useEffect(() => {
+        const inQueue = Boolean(status?.inQueue);
+        // If we were in queue and now we aren't, we likely matched (backend may redirect).
+        if (wasInQueueRef.current && !inQueue) {
+            setMatchFound(true);
+        }
+        if (inQueue) {
+            setMatchFound(false);
+        }
+        wasInQueueRef.current = inQueue;
+
         if (status?.inQueue) {
             setElapsed(status.elapsed || 0);
             const interval = setInterval(() => {

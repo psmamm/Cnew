@@ -92,7 +92,7 @@ const initialFormData: TradeFormData = {
 };
 
 type ExtendedTrade = TradeEntity & {
-  source?: 'api' | 'imported';
+  source?: 'api' | 'imported' | 'wallet';
   screenshot_url?: string;
   setup?: string;
   mistakes?: string;
@@ -292,7 +292,7 @@ export default function JournalPage() {
   const { trades: rawTrades, loading, refetch } = useTrades(500, 0, searchTerm, symbolFilter, directionFilter, assetTypeFilter);
   const { dailyStats } = useDailyStats();
   const { wallet } = useWallet();
-  const { trades: walletTrades, loading: walletTradesLoading } = useWalletTransactions();
+  const { trades: walletTrades } = useWalletTransactions();
 
   const allTrades: ExtendedTrade[] = useMemo(() => {
     return [

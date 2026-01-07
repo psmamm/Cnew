@@ -4,7 +4,7 @@ import DashboardLayout from '@/react-app/components/DashboardLayout';
 import { useTournaments, useTournament } from '@/react-app/hooks/useTournaments';
 import { buildApiUrl } from '@/react-app/hooks/useApi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Plus, Play, Clock, CheckCircle, Users, Calendar, ArrowRight, X, Crown, TrendingUp } from 'lucide-react';
+import { Trophy, Plus, Play, Clock, CheckCircle, X, Crown, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/react-app/contexts/AuthContext';
 
 export default function TournamentsPage() {
@@ -76,24 +76,6 @@ export default function TournamentsPage() {
         prizePool: '',
         tournamentTier: 'SUPER 8'
     });
-
-    const handleCreateTournament = async () => {
-        // This will be handled by the TournamentDetails component
-        // For now, just navigate to a new tournament creation flow
-        navigate('/competition/tournaments/new');
-    };
-
-    const formatTimeAgo = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        
-        if (diffHours < 1) return 'Just now';
-        if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-        const diffDays = Math.floor(diffHours / 24);
-        return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    };
 
     // Determine tournament tier badge
     const getTournamentTier = (tournament: any) => {

@@ -43,7 +43,6 @@ interface ChatMessage {
 }
 
 export function useTournaments(status?: string) {
-    const { user } = useAuth();
     const [tournaments, setTournaments] = useState<Tournament[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -252,7 +251,8 @@ export function useTournament(tournamentId: number | null) {
     // Check if user has joined
     useEffect(() => {
         if (user && participants.length > 0) {
-            const userParticipant = participants.find(p => p.user_id === (user.google_user_data?.sub || (user as any).firebase_user_id));
+            // Client auth uses Firebase; use its stable UID for participant identity.
+            const userParticipant = participants.find(p => p.user_id === user.uid);
             setJoined(!!userParticipant);
         }
     }, [user, participants]);

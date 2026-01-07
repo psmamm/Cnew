@@ -95,10 +95,6 @@ export function useWalletTransactions() {
         transport: http(),
       });
 
-      // Get transaction count to determine how many to fetch
-      const transactionCount = await publicClient.getTransactionCount({ address: address as Address });
-      const limit = Math.min(100, transactionCount); // Fetch last 100 transactions
-
       // Fetch transactions from block explorer API (using Etherscan-like APIs)
       // For now, we'll use a simplified approach - fetch from the last 1000 blocks
       const currentBlock = await publicClient.getBlockNumber();
@@ -132,7 +128,7 @@ export function useWalletTransactions() {
         hash: log.transactionHash,
         timestamp: Date.now(), // Would need to fetch block timestamp
         from: address,
-        to: log.address,
+        to: String(log.address),
         value: '0',
         type: 'swap',
         chain,
@@ -155,18 +151,24 @@ export function useWalletTransactions() {
       // Fetch recent transactions
       const signatures = await connection.getSignaturesForAddress(publicKey, { limit: 100 });
 
-      const txList: BlockchainTransaction[] = await Promise.all(
+      const txList = await Promise.all(
         signatures.map(async (sig) => {
           try {
             const tx = await connection.getTransaction(sig.signature, {
               maxSupportedTransactionVersion: 0,
             });
 
+            const message: any = tx?.transaction.message;
+            const accountKeys =
+              message && typeof message.getAccountKeys === 'function'
+                ? message.getAccountKeys().staticAccountKeys
+                : message?.accountKeys;
+
             return {
               hash: sig.signature,
               timestamp: sig.blockTime ? sig.blockTime * 1000 : Date.now(),
               from: address,
-              to: tx?.transaction.message.accountKeys[1]?.toString() || '',
+              to: accountKeys?.[1]?.toString?.() ?? '',
               value: '0',
               type: 'swap',
               chain: 'solana',

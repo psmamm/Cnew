@@ -2,7 +2,29 @@
  * Maps normalized exchange trades to the internal Trade schema
  */
 
-import { NormalizedTrade } from './ExchangeImporter';
+/**
+ * Trade shape produced by exchange importers (Bybit, etc.).
+ * Kept local to avoid a hard dependency on a missing/optional importer module.
+ */
+export interface NormalizedTrade {
+  symbol: string;
+  side: 'buy' | 'sell';
+  amount: number;
+  price: number;
+  timestamp: number;
+  fee?: {
+    cost?: number;
+  };
+  external_id: string;
+  exchange: string;
+
+  // Closed position / PnL enrichment (optional)
+  isClosedPosition?: boolean;
+  exitTimestamp?: number;
+  avgExitPrice?: number;
+  closedPnl?: number;
+  avgEntryPrice?: number;
+}
 
 export interface MappedTrade {
   symbol: string;
@@ -71,7 +93,7 @@ export function mapNormalizedTradeToTrade(trade: NormalizedTrade): MappedTrade {
       exit_price: exit_price,
       entry_date,
       exit_date: exit_date,
-      commission: trade.fee.cost || 0,
+      commission: trade.fee?.cost ?? 0,
       pnl: pnl,
       is_closed: true, // Closed positions are always closed
       external_id: trade.external_id,
@@ -90,7 +112,7 @@ export function mapNormalizedTradeToTrade(trade: NormalizedTrade): MappedTrade {
     exit_price: undefined,
     entry_date,
     exit_date: undefined,
-    commission: trade.fee.cost || 0,
+    commission: trade.fee?.cost ?? 0,
     pnl: undefined,
     is_closed: false,
     external_id: trade.external_id,

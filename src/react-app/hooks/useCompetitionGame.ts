@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { buildApiUrl } from './useApi';
 
 export interface TournamentStats {
     totalBalance: number;
@@ -36,6 +35,9 @@ export function useCompetitionGame(
     matchData: any,
     onGameOver?: () => void
 ) {
+    // matchId is currently unused by the game engine, but kept for API compatibility.
+    void matchId;
+
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
     const [isLiquidated, setIsLiquidated] = useState(false);

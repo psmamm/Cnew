@@ -3,12 +3,12 @@ import { createPublicClient, http, formatEther, type Address, type Chain } from 
 import { mainnet, bsc, polygon, arbitrum, optimism, avalanche } from 'viem/chains';
 import { Connection, PublicKey } from '@solana/web3.js';
 
-export type WalletType = 'metamask' | 'trustwallet' | 'phantom' | 'coinbase' | 'walletconnect' | null;
+export type WalletType = 'metamask' | 'trustwallet' | 'phantom' | 'coinbase' | 'walletconnect';
 export type ChainType = 'ethereum' | 'bsc' | 'polygon' | 'arbitrum' | 'optimism' | 'avalanche' | 'solana';
 
 export interface WalletState {
   isConnected: boolean;
-  walletType: WalletType;
+  walletType: WalletType | null;
   address: string | null;
   chain: ChainType | null;
   chainId: number | null;
@@ -331,16 +331,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         throw new Error(`Unsupported chain: ${chain}`);
       }
 
+      const ethereum = window.ethereum;
+      if (!ethereum?.request) {
+        throw new Error('No EVM wallet provider found (window.ethereum)');
+      }
+
       // Try to switch chain
       try {
-        await window.ethereum.request({
+        await ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: `0x${targetChain.id.toString(16)}` }],
         });
       } catch (switchError: any) {
         // If chain doesn't exist, add it
         if (switchError.code === 4902) {
-          await window.ethereum.request({
+          await ethereum.request({
             method: 'wallet_addEthereumChain',
             params: [
               {

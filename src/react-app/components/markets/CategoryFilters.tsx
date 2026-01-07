@@ -1,5 +1,4 @@
 import { Flame } from 'lucide-react';
-import { useState } from 'react';
 
 export type CategoryType = 'favorites' | 'cryptos' | 'spot' | 'futures' | 'alpha' | 'new' | 'zones';
 

@@ -112,7 +112,7 @@ export default function WalletConnect() {
     return names[chain];
   };
 
-  const getWalletName = (walletType: WalletType) => {
+  const getWalletName = (walletType: WalletType | null) => {
     const names: Record<string, string> = {
       metamask: 'MetaMask',
       trustwallet: 'Trust Wallet',
@@ -120,7 +120,7 @@ export default function WalletConnect() {
       coinbase: 'Coinbase Wallet',
       walletconnect: 'WalletConnect',
     };
-    return names[walletType || ''] || 'Wallet';
+    return walletType ? (names[walletType] || 'Wallet') : 'Wallet';
   };
 
   if (wallet.isConnected) {

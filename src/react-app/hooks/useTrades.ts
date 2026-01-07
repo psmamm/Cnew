@@ -26,7 +26,13 @@ export interface Trade {
   session?: string;
   emotion?: string;
   checklist?: string[];
-  source?: 'api' | 'imported';
+  /**
+   * Where this trade originated from.
+   * - api: created/stored in backend
+   * - imported: CSV/manual import
+   * - wallet: derived from on-chain wallet activity
+   */
+  source?: 'api' | 'imported' | 'wallet';
   rating?: number;
 }
 
