@@ -46,3 +46,6 @@ coverage/
 
 .cursor/rules/kluster-code-verify.mdc
 .kluster
+
+# Windows reserved names
+nul
