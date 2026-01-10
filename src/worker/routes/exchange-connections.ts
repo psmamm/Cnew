@@ -38,6 +38,20 @@ interface UserVariable {
   email?: string;
 }
 
+interface ExchangeConnection {
+  id?: number;
+  user_id?: string;
+  exchange_id?: string;
+  api_key_encrypted?: string;
+  api_secret_encrypted?: string;
+  passphrase_encrypted?: string | null;
+  auto_sync_enabled?: number;
+  sync_interval_hours?: number;
+  created_at?: string;
+  updated_at?: string;
+  last_sync_at?: string | null;
+}
+
 export const exchangeConnectionsRouter = new Hono<{ Bindings: Env; Variables: { user: UserVariable } }>();
 
 // Firebase session auth middleware
@@ -85,7 +99,7 @@ exchangeConnectionsRouter.get('/', async (c) => {
   `).bind(userId).all();
 
     // Map database columns to frontend interface
-    const mappedConnections = connections.results.map((conn: any) => ({
+    const mappedConnections = (connections.results as ExchangeConnection[]).map((conn) => ({
         ...conn,
         api_key: conn.api_key_encrypted,
         api_secret: conn.api_secret_encrypted, // Should probably not send back or mask
@@ -153,7 +167,7 @@ exchangeConnectionsRouter.post('/test', zValidator('json', TestConnectionSchema)
                         accountType: balance.accountType,
                     },
                 });
-            } catch (balanceError: any) {
+            } catch {
                 // Connection works but balance failed - might be read-only key
                 return c.json({
                     success: true,
@@ -167,19 +181,21 @@ exchangeConnectionsRouter.post('/test', zValidator('json', TestConnectionSchema)
                 error: 'Connection test failed - please verify your API credentials',
             }, 400);
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Connection test error:', error);
 
         // Provide helpful error messages
         let errorMessage = 'Connection failed';
-        if (error.message?.includes('Invalid API')) {
-            errorMessage = 'Invalid API key or secret';
-        } else if (error.message?.includes('IP')) {
-            errorMessage = 'IP address not whitelisted';
-        } else if (error.message?.includes('permission')) {
-            errorMessage = 'API key lacks required permissions';
-        } else if (error.message) {
-            errorMessage = error.message;
+        if (error instanceof Error) {
+            if (error.message?.includes('Invalid API')) {
+                errorMessage = 'Invalid API key or secret';
+            } else if (error.message?.includes('IP')) {
+                errorMessage = 'IP address not whitelisted';
+            } else if (error.message?.includes('permission')) {
+                errorMessage = 'API key lacks required permissions';
+            } else {
+                errorMessage = error.message;
+            }
         }
 
         return c.json({
@@ -243,13 +259,17 @@ exchangeConnectionsRouter.post('/', zValidator('json', CreateConnectionSchema), 
 
     const newConnection = await c.env.DB.prepare(`
     SELECT * FROM exchange_connections WHERE id = ?
-  `).bind(result.meta.last_row_id).first();
+  `).bind(result.meta.last_row_id).first() as ExchangeConnection | null;
+
+    if (!newConnection) {
+        return c.json({ error: 'Failed to retrieve created connection' }, 500);
+    }
 
     const mappedConnection = {
-        ...newConnection as any,
-        api_key: (newConnection as any).api_key_encrypted,
-        api_secret: (newConnection as any).api_secret_encrypted,
-        passphrase: (newConnection as any).passphrase_encrypted,
+        ...newConnection,
+        api_key: newConnection.api_key_encrypted,
+        api_secret: newConnection.api_secret_encrypted,
+        passphrase: newConnection.passphrase_encrypted,
         exchange_name: data.exchange_id.charAt(0).toUpperCase() + data.exchange_id.slice(1)
     };
 

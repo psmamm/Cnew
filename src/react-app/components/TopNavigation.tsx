@@ -16,7 +16,8 @@ import {
   Activity,
   Settings,
   LogOut,
-  Search
+  Search,
+  CreditCard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotifications } from '@/react-app/hooks/useNotifications';
@@ -117,8 +118,8 @@ export default function TopNavigation() {
     { name: t('Markets'), path: '/markets', hasDropdown: false, key: 'Markets' },
     { name: t('Strategies'), path: '/strategies', hasDropdown: false, key: 'Strategies' },
     { name: t('Reports'), path: '/reports', hasDropdown: false, key: 'Reports' },
+    { name: t('AI Clone'), path: '/ai-clone', hasDropdown: false, key: 'AI Clone' },
     { name: t('Study'), path: '/study', hasDropdown: false, key: 'Study' },
-    { name: t('Alpha Hub'), path: '/alpha-hub', hasDropdown: false, key: 'Alpha Hub' },
   ];
 
   return (
@@ -369,6 +370,17 @@ export default function TopNavigation() {
                           >
                             <User className="w-4 h-4" />
                             <span>Profile</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              navigate('/subscriptions');
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#AAB0C0] hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                          >
+                            <CreditCard className="w-4 h-4" />
+                            <span>Subscription</span>
                           </button>
 
                           <button

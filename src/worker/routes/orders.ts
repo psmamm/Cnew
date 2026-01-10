@@ -4,7 +4,7 @@
  * Handles order placement for Bybit V5 API with risk validation.
  */
 
-import { Hono } from 'hono';
+import { Hono, type Context, type Next } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { placeBybitOrder, validateBybitRisk, type BybitOrderRequest } from '../utils/exchanges/BybitOrderExecution';
@@ -25,15 +25,39 @@ const BybitOrderSchema = z.object({
   category: z.enum(['spot', 'linear', 'inverse', 'option']).default('linear')
 });
 
+interface UserVariable {
+  google_user_data?: {
+    sub: string;
+    email?: string;
+    name?: string;
+  };
+  firebase_user_id?: string;
+  email?: string;
+}
+
 export const ordersRouter = new Hono<{
   Bindings: {
     DB: D1Database;
     ENCRYPTION_MASTER_KEY: string;
   };
+  Variables: {
+    user: UserVariable;
+  };
 }>();
 
+// Exchange connection type
+interface ExchangeConnection {
+  id: string;
+  user_id: string;
+  exchange_id: string;
+  api_key_encrypted: string;
+  api_secret_encrypted: string;
+  passphrase_encrypted?: string;
+  is_active: number;
+}
+
 // Combined auth middleware
-const combinedAuthMiddleware = async (c: any, next: any) => {
+const combinedAuthMiddleware = async (c: Context, next: Next) => {
   const user = c.get('user');
   if (!user) {
     return c.json({ error: 'Unauthorized' }, 401);
@@ -57,7 +81,7 @@ ordersRouter.post(
       if (!user) {
         return c.json({ error: 'Unauthorized' }, 401);
       }
-      const userId = user.google_user_data?.sub || (user as any).firebase_user_id;
+      const userId = user.google_user_data?.sub || user.firebase_user_id;
       
       if (!userId) {
         return c.json({ error: 'Unauthorized' }, 401);
@@ -75,7 +99,7 @@ ordersRouter.post(
         return c.json({ error: 'Exchange connection not found' }, 404);
       }
 
-      const conn = connection as any;
+      const conn = connection as unknown as ExchangeConnection;
 
       // Decrypt API keys for order execution (only in RAM)
       const masterKey = c.env.ENCRYPTION_MASTER_KEY;

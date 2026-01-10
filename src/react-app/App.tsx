@@ -8,7 +8,7 @@ import LoadingSpinner from "@/react-app/components/LoadingSpinner";
 import ErrorBoundary from "@/react-app/components/ErrorBoundary";
 import ProtectedRoute from "@/react-app/components/ProtectedRoute";
 
-const emitDebugLog = (payload: Record<string, any>) => {
+const emitDebugLog = (payload: Record<string, unknown>) => {
   const url = 'http://127.0.0.1:7242/ingest/f3961031-a2d1-4bfa-88fe-0afd58d89888';
   const body = JSON.stringify(payload);
   try {
@@ -128,6 +128,8 @@ const AuthActionPage = lazy(() => import("@/react-app/pages/AuthAction"));
 const TradingPage = lazy(() => import("@/react-app/pages/TradingPage"));
 const TerminalPage = lazy(() => import("@/react-app/pages/Terminal"));
 const ExchangeSettingsPage = lazy(() => import("@/react-app/pages/ExchangeSettings"));
+const AIClonePage = lazy(() => import("@/react-app/pages/AIClone"));
+const SubscriptionsPage = lazy(() => import("@/react-app/pages/Subscriptions"));
 
 
 export default function App() {
@@ -266,6 +268,16 @@ export default function App() {
                       <Route path="/settings/exchanges" element={
                         <ProtectedRoute>
                           <ExchangeSettingsPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/ai-clone" element={
+                        <ProtectedRoute>
+                          <AIClonePage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/subscriptions" element={
+                        <ProtectedRoute>
+                          <SubscriptionsPage />
                         </ProtectedRoute>
                       } />
 

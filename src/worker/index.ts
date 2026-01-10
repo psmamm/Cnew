@@ -13,6 +13,12 @@ import { sbtIssuerRouter } from "./routes/sbt-issuer";
 import { emotionLogsRouter } from "./routes/emotion-logs";
 import { ordersRouter } from "./routes/orders";
 import { apiKeysRouter } from "./routes/api-keys";
+import { reportsRouter } from "./routes/reports";
+import { tradeReplayRouter } from "./routes/trade-replay";
+import { voiceJournalRouter } from "./routes/voice-journal";
+import { aiCloneRouter } from "./routes/ai-clone";
+import { autoTradingRouter } from "./routes/auto-trading";
+import { subscriptionsRouter } from "./routes/subscriptions";
 import { errorHandlerMiddleware } from "./utils/errorHandler";
 import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 
@@ -1038,5 +1044,11 @@ app.route('/api/sbt', sbtIssuerRouter);
 app.route('/api/emotion-logs', emotionLogsRouter);
 app.route('/api/orders', ordersRouter);
 app.route('/api/keys', apiKeysRouter);
+app.route('/api/reports', reportsRouter);
+app.route('/api/trade-replay', tradeReplayRouter);
+app.route('/api/voice-journal', voiceJournalRouter);
+app.route('/api/ai-clone', aiCloneRouter);
+app.route('/api/auto-trading', autoTradingRouter);
+app.route('/api/subscriptions', subscriptionsRouter);
 
 export default app;

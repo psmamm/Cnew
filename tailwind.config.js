@@ -14,48 +14,120 @@ export default {
       },
     },
     extend: {
+      // ===========================================
+      // PREMIUM $1M DESIGN SYSTEM COLORS
+      // ===========================================
       colors: {
+        // Semantic colors (shadcn-ui compatible)
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+
+        // Primary - Soft Purple/Violet
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          50: '#FAF5FF',
+          100: '#F3E8FF',
+          200: '#E9D5FF',
+          300: '#D8B4FE',
+          400: '#C084FC',
+          500: '#A855F7',
+          600: '#9333EA',
+          700: '#7E22CE',
+          800: '#6B21A8',
+          900: '#581C87',
         },
+
+        // Secondary
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+
+        // Destructive
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+
+        // Muted
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
+
+        // Accent
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+
+        // Popover
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+
+        // Card
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+
+        // Premium Dark Backgrounds
+        dark: {
+          base: '#09090B',
+          elevated: '#0F0F12',
+          surface: '#18181B',
+          overlay: '#27272A',
+          subtle: '#3F3F46',
+        },
+
+        // Success - Soft Emerald
+        success: {
+          light: '#34D399',
+          DEFAULT: '#10B981',
+          dark: '#059669',
+        },
+
+        // Danger - Soft Rose
+        danger: {
+          light: '#FB7185',
+          DEFAULT: '#F43F5E',
+          dark: '#E11D48',
+        },
+
+        // Warning - Soft Amber
+        warning: {
+          light: '#FBBF24',
+          DEFAULT: '#F59E0B',
+          dark: '#D97706',
+        },
+
+        // Profit/Loss specific
+        profit: '#10B981',
+        loss: '#F43F5E',
       },
+
+      // ===========================================
+      // BORDER RADIUS - Soft Edges
+      // ===========================================
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        'xl': '16px',
+        '2xl': '24px',
+        '3xl': '32px',
       },
+
+      // ===========================================
+      // TYPOGRAPHY - Premium Font Sizes
+      // ===========================================
       fontSize: {
-        // Reduced text sizes by ~10-15%
         xs: ["0.75rem", { lineHeight: "1rem" }],
         sm: ["0.8125rem", { lineHeight: "1.25rem" }],
         base: ["0.875rem", { lineHeight: "1.375rem" }],
@@ -65,6 +137,189 @@ export default {
         "3xl": ["1.5rem", { lineHeight: "2rem" }],
         "4xl": ["1.875rem", { lineHeight: "2.25rem" }],
         "5xl": ["2.25rem", { lineHeight: "2.5rem" }],
+        "6xl": ["3rem", { lineHeight: "1" }],
+        "7xl": ["3.75rem", { lineHeight: "1" }],
+      },
+
+      // ===========================================
+      // FONT FAMILY - Premium Fonts
+      // ===========================================
+      fontFamily: {
+        sans: ['Inter', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
+        display: ['Cal Sans', 'Inter', 'sans-serif'],
+      },
+
+      // ===========================================
+      // SHADOWS - Soft Premium Shadows
+      // ===========================================
+      boxShadow: {
+        'soft-sm': '0 1px 2px rgba(0, 0, 0, 0.3)',
+        'soft-md': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2)',
+        'soft-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2)',
+        'soft-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3)',
+        'soft-2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.6)',
+        // Glow shadows
+        'glow': '0 0 20px rgba(168, 85, 247, 0.3), 0 0 60px rgba(168, 85, 247, 0.1)',
+        'glow-sm': '0 0 10px rgba(168, 85, 247, 0.2)',
+        'glow-lg': '0 0 40px rgba(168, 85, 247, 0.4)',
+        'glow-success': '0 0 20px rgba(16, 185, 129, 0.3)',
+        'glow-danger': '0 0 20px rgba(244, 63, 94, 0.3)',
+        'glow-warning': '0 0 20px rgba(245, 158, 11, 0.3)',
+        // Card elevation
+        'card': '0 4px 20px rgba(0, 0, 0, 0.25)',
+        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.35)',
+      },
+
+      // ===========================================
+      // BACKDROP BLUR
+      // ===========================================
+      backdropBlur: {
+        xs: '2px',
+        '2xl': '24px',
+        '3xl': '40px',
+      },
+
+      // ===========================================
+      // ANIMATIONS - Butter Smooth
+      // ===========================================
+      animation: {
+        // Fade animations
+        'fade-in': 'fadeIn 0.3s ease-out',
+        'fade-out': 'fadeOut 0.3s ease-out',
+
+        // Slide animations
+        'slide-up': 'slideUp 0.3s ease-out',
+        'slide-down': 'slideDown 0.3s ease-out',
+        'slide-left': 'slideLeft 0.3s ease-out',
+        'slide-right': 'slideRight 0.3s ease-out',
+
+        // Scale animations
+        'scale-in': 'scaleIn 0.2s ease-out',
+        'scale-out': 'scaleOut 0.2s ease-out',
+
+        // Glow pulse
+        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+
+        // Shimmer loading
+        'shimmer': 'shimmer 2s linear infinite',
+
+        // Number count up
+        'count-up': 'countUp 0.4s ease-out',
+
+        // Bounce subtle
+        'bounce-subtle': 'bounceSubtle 0.5s ease-out',
+
+        // Spin slow
+        'spin-slow': 'spin 3s linear infinite',
+
+        // Float
+        'float': 'float 3s ease-in-out infinite',
+
+        // Pulse soft
+        'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+      },
+
+      // ===========================================
+      // KEYFRAMES
+      // ===========================================
+      keyframes: {
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        fadeOut: {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
+        },
+        slideUp: {
+          from: { opacity: '0', transform: 'translateY(10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideDown: {
+          from: { opacity: '0', transform: 'translateY(-10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideLeft: {
+          from: { opacity: '0', transform: 'translateX(10px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideRight: {
+          from: { opacity: '0', transform: 'translateX(-10px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        scaleIn: {
+          from: { opacity: '0', transform: 'scale(0.95)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        scaleOut: {
+          from: { opacity: '1', transform: 'scale(1)' },
+          to: { opacity: '0', transform: 'scale(0.95)' },
+        },
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(168, 85, 247, 0.3)' },
+          '50%': { boxShadow: '0 0 40px rgba(168, 85, 247, 0.5)' },
+        },
+        shimmer: {
+          from: { backgroundPosition: '-200% 0' },
+          to: { backgroundPosition: '200% 0' },
+        },
+        countUp: {
+          from: { opacity: '0', transform: 'translateY(10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        bounceSubtle: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        pulseSoft: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' },
+        },
+      },
+
+      // ===========================================
+      // TRANSITION TIMING FUNCTIONS
+      // ===========================================
+      transitionTimingFunction: {
+        'ease-smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'ease-out-back': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        'ease-in-out-soft': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'ease-spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        'ease-apple': 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+      },
+
+      // ===========================================
+      // TRANSITION DURATION
+      // ===========================================
+      transitionDuration: {
+        '0': '0ms',
+        '50': '50ms',
+        '100': '100ms',
+        '150': '150ms',
+        '200': '200ms',
+        '250': '250ms',
+        '300': '300ms',
+        '400': '400ms',
+        '500': '500ms',
+      },
+
+      // ===========================================
+      // BACKGROUND IMAGE - Gradients
+      // ===========================================
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-premium': 'linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)',
+        'gradient-profit': 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+        'gradient-loss': 'linear-gradient(135deg, #F43F5E 0%, #E11D48 100%)',
+        'gradient-card': 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%)',
+        'gradient-glow': 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.15), transparent)',
+        'shimmer-gradient': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
       },
     },
   },

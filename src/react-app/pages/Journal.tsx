@@ -28,8 +28,12 @@ import {
   CreditCard,
   CheckCircle2,
   FileSpreadsheet,
-  Wallet
+  Wallet,
+  Mic,
+  PlayCircle,
+  BookOpen
 } from "lucide-react";
+import { VoiceRecorder } from "@/react-app/components/journal/VoiceRecorder";
 import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useTrades, useCreateTrade, useUpdateTrade, useDailyStats, type Trade as TradeEntity } from "@/react-app/hooks/useTrades";
 import { useWalletTransactions } from "@/react-app/hooks/useWalletTransactions";
@@ -285,6 +289,7 @@ export default function JournalPage() {
   }, [savedViews]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [activeJournalTab, setActiveJournalTab] = useState<'trades' | 'voice' | 'replay'>('trades');
 
   // Dropdown states
   const [assetTypeOpen, setAssetTypeOpen] = useState(false);
@@ -959,6 +964,96 @@ export default function JournalPage() {
           </div>
         </div>
 
+        {/* Journal Tabs */}
+        <div className="flex items-center gap-2 bg-[#0D0F18] rounded-xl p-1 border border-white/10 w-fit">
+          <button
+            onClick={() => setActiveJournalTab('trades')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeJournalTab === 'trades'
+                ? 'bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white'
+                : 'text-[#7F8C8D] hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            Trades
+          </button>
+          <button
+            onClick={() => setActiveJournalTab('voice')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeJournalTab === 'voice'
+                ? 'bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white'
+                : 'text-[#7F8C8D] hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Mic className="w-4 h-4" />
+            Voice Notes
+          </button>
+          <button
+            onClick={() => setActiveJournalTab('replay')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeJournalTab === 'replay'
+                ? 'bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white'
+                : 'text-[#7F8C8D] hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <PlayCircle className="w-4 h-4" />
+            Trade Replay
+          </button>
+        </div>
+
+        {/* Voice Notes Tab Content */}
+        {activeJournalTab === 'voice' && (
+          <div className="bg-[#0D0F18] rounded-xl p-6 border border-white/10">
+            <VoiceRecorder />
+          </div>
+        )}
+
+        {/* Trade Replay Tab Content */}
+        {activeJournalTab === 'replay' && (
+          <div className="bg-[#0D0F18] rounded-xl p-6 border border-white/10">
+            <div className="text-center py-12">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#667eea]/20 to-[#764ba2]/20 flex items-center justify-center">
+                <PlayCircle className="w-8 h-8 text-[#667eea]" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Trade Replay</h3>
+              <p className="text-[#7F8C8D] max-w-md mx-auto mb-6">
+                Replay your trades with multi-timeframe synchronized playback, AI pattern annotations,
+                and "what-if" scenario analysis. Select a trade from your journal to start.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setActiveJournalTab('trades')}
+                  className="bg-white/5 border-white/10 hover:border-[#667eea]/50"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Browse Trades
+                </Button>
+              </div>
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="text-2xl mb-2">⏱️</div>
+                  <p className="text-sm text-white font-medium">Multi-TF Sync</p>
+                  <p className="text-xs text-[#7F8C8D]">All timeframes play together</p>
+                </div>
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="text-2xl mb-2">🤖</div>
+                  <p className="text-sm text-white font-medium">AI Annotations</p>
+                  <p className="text-xs text-[#7F8C8D]">Pattern detection & insights</p>
+                </div>
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="text-2xl mb-2">🔮</div>
+                  <p className="text-sm text-white font-medium">What-If Analysis</p>
+                  <p className="text-xs text-[#7F8C8D]">Explore alternative exits</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Trades Tab Content */}
+        {activeJournalTab === 'trades' && (
+        <>
         {/* Performance Widgets - 8 Cards - Draggable */}
         <DashboardGrid 
           storageKey="journal-performance-widgets" 
@@ -2245,6 +2340,8 @@ export default function JournalPage() {
             </div>
           )}
         </div>
+        </>
+        )}
 
         {/* Equity Modal */}
         <AnimatePresence>

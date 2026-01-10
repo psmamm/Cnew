@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { D1Database } from "@cloudflare/workers-types";
 
 type Env = {
   ETHERSCAN_API_KEY: string;
@@ -260,7 +261,20 @@ async function loadRecentWhaleTransactions(db: D1Database, hoursBack: number = 2
       LIMIT 100
     `).bind(cutoffTimestamp).all();
 
-    const transactions: WhaleTransaction[] = result.results.map((row: any) => ({
+    interface WhaleTransactionRow {
+      chain: string;
+      transaction_hash: string;
+      coin_symbol: string;
+      amount_tokens: number;
+      usd_value: number;
+      transfer_type: string;
+      from_address?: string;
+      to_address?: string;
+      block_timestamp: number;
+      explorer_url: string;
+    }
+
+    const transactions: WhaleTransaction[] = (result.results as unknown as WhaleTransactionRow[]).map((row) => ({
       id: `${row.chain}-${row.transaction_hash}`,
       timestamp: new Date(row.block_timestamp * 1000),
       coin: row.coin_symbol,
@@ -319,7 +333,17 @@ async function fetchWhaleAddressTransactions(
         continue;
       }
 
-      const data: any = await response.json();
+      const data = await response.json() as {
+        status: string;
+        message?: string;
+        result?: Array<{
+          value: string;
+          timeStamp: string;
+          hash: string;
+          from: string;
+          to: string;
+        }>;
+      };
       console.log(`📊 ${chain}: API response status: ${data.status}, message: ${data.message}, result count: ${Array.isArray(data.result) ? data.result.length : 'N/A'}`);
 
       if (data.status === "0" && data.message && data.message !== "No transactions found") {
@@ -401,7 +425,7 @@ async function getCryptoPrices(): Promise<Record<string, number>> {
     const response = await fetch('https://api.binance.com/api/v3/ticker/price');
     if (!response.ok) throw new Error('Failed to fetch prices');
 
-    const data: any = await response.json();
+    const data = await response.json() as Array<{ symbol: string; price: string }>;
     const prices: Record<string, number> = {};
 
     // Map Binance symbols to our coins
@@ -475,7 +499,24 @@ async function fetchTronTransactions(
           continue;
         }
 
-        const data: any = await response.json();
+        const data = await response.json() as {
+          data?: Array<{
+            txID: string;
+            block_timestamp: number;
+            raw_data?: {
+              contract?: Array<{
+                type: string;
+                parameter?: {
+                  value?: {
+                    amount?: string;
+                    owner_address?: string;
+                    to_address?: string;
+                  };
+                };
+              }>;
+            };
+          }>;
+        };
         console.log(`🟠 TRON: Response data keys: ${Object.keys(data)}`);
 
         // TronGrid API uses different structure
@@ -616,7 +657,18 @@ async function fetchSolanaTransactions(
           continue;
         }
 
-        const data: any = await response.json();
+        const data = await response.json() as {
+          data?: Array<{
+            txHash: string;
+            blockTime: number;
+            meta?: {
+              preBalances?: number[];
+              postBalances?: number[];
+              fee?: number;
+              postTokenBalances?: Array<{ owner?: string }>;
+            };
+          }>;
+        };
         console.log(`🟣 SOLANA: Response data keys: ${Object.keys(data)}`);
         console.log(`🟣 SOLANA: Data array length: ${Array.isArray(data.data) ? data.data.length : 'Not array'}`);
 
@@ -668,9 +720,10 @@ async function fetchSolanaTransactions(
           console.log(`🟣 SOLANA: USD Value: $${usdValue.toLocaleString()}`);
 
           if (usdValue >= 50000) {
+            const toAddress = tx.meta?.postTokenBalances?.[0]?.owner || '';
             const transferType = detectTransferType(
               address, // From whale address
-              tx.meta.postTokenBalances?.[0]?.owner || '',
+              toAddress,
               'solana'
             );
 
@@ -683,7 +736,7 @@ async function fetchSolanaTransactions(
               transferType: transferType,
               hash: tx.txHash,
               fromAddress: address,
-              toAddress: tx.meta.postTokenBalances?.[0]?.owner,
+              toAddress: toAddress,
               blockchainExplorerUrl: `https://solscan.io/tx/${tx.txHash}`,
               chain: 'solana'
             };
@@ -764,7 +817,7 @@ async function fetchChainTransactions(
       return [];
     }
 
-    const latestBlockData: any = await latestBlockResponse.json();
+    const latestBlockData = await latestBlockResponse.json() as { result: string };
     const latestBlock = parseInt(latestBlockData.result, 16);
 
     // Check last 2000 blocks for broader coverage 
@@ -784,7 +837,15 @@ async function fetchChainTransactions(
       return [];
     }
 
-    const txData: any = await txResponse.json();
+    const txData = await txResponse.json() as {
+      result?: Array<{
+        value: string;
+        timeStamp: string;
+        hash: string;
+        from: string;
+        to: string;
+      }>;
+    };
 
     if (!txData.result || !Array.isArray(txData.result)) {
       console.log(`No transaction data for ${chain}`);
@@ -857,8 +918,8 @@ whaleTransactionsRouter.get('/', async (c) => {
       solana: c.env.SOLSCAN_API_KEY
     };
 
-    const missingKeys = Object.entries(apiKeys).filter(([_, key]) => !key);
-    const availableKeys = Object.entries(apiKeys).filter(([_, key]) => !!key);
+    const missingKeys = Object.entries(apiKeys).filter(([, key]) => !key);
+    const availableKeys = Object.entries(apiKeys).filter(([, key]) => !!key);
 
     if (availableKeys.length === 0) {
       return c.json({
@@ -887,7 +948,7 @@ whaleTransactionsRouter.get('/', async (c) => {
     }
 
     // Fetch from all chains sequentially for better debugging
-    let allTransactions: WhaleTransaction[] = [];
+    const allTransactions: WhaleTransaction[] = [];
 
     for (const [chain, apiKey] of Object.entries(apiKeys)) {
       if (!apiKey) continue;
