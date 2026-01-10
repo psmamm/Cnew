@@ -72,7 +72,7 @@ const EXCHANGES: ExchangeInfo[] = [
     logo: '/exchanges/coinbase.svg',
     category: 'crypto_cex',
     features: ['Spot', 'Advanced Trading'],
-    supported: false,
+    supported: true,
     oauthSupported: true,
     apiDocsUrl: 'https://docs.cloud.coinbase.com/'
   },
@@ -82,7 +82,7 @@ const EXCHANGES: ExchangeInfo[] = [
     logo: '/exchanges/kraken.svg',
     category: 'crypto_cex',
     features: ['Spot', 'Futures', 'Margin'],
-    supported: false,
+    supported: true,
     apiDocsUrl: 'https://docs.kraken.com/'
   },
   {
@@ -91,7 +91,7 @@ const EXCHANGES: ExchangeInfo[] = [
     logo: '/exchanges/okx.svg',
     category: 'crypto_cex',
     features: ['Spot', 'Futures', 'Options'],
-    supported: false,
+    supported: true,
     apiDocsUrl: 'https://www.okx.com/docs/'
   },
 
@@ -232,8 +232,9 @@ export default function ExchangeConnectionModal({
         handleClose();
       }, 1500);
 
-    } catch (err: any) {
-      setError(err.message || 'Failed to connect. Please check your credentials.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to connect. Please check your credentials.';
+      setError(message);
     } finally {
       setTesting(false);
     }
