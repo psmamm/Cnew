@@ -40,7 +40,7 @@ function TradingViewAdvancedChartComponent({
     activeEvent,
 }: TradingViewAdvancedChartProps) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const widgetRef = useRef<any>(null);
+    const widgetRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
         if (!containerRef.current) return;

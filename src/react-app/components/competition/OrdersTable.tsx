@@ -1,7 +1,19 @@
 import { Activity } from 'lucide-react';
 
+interface Order {
+    id: string;
+    symbol: string;
+    type: 'buy' | 'sell';
+    side: 'Long' | 'Short';
+    price: number;
+    quantity: number;
+    status: 'pending' | 'filled' | 'cancelled';
+    timestamp: number;
+    [key: string]: unknown;
+}
+
 interface OrdersTableProps {
-    orders: any[];
+    orders: Order[];
 }
 
 export function OrdersTable({ orders }: OrdersTableProps) {

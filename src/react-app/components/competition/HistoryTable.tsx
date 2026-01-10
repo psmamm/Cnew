@@ -1,7 +1,19 @@
 import { Activity } from 'lucide-react';
 
+interface HistoryItem {
+    id: string;
+    symbol: string;
+    type: 'Long' | 'Short';
+    entryPrice: number;
+    exitPrice: number;
+    size: number;
+    pnl: number;
+    timestamp: number;
+    [key: string]: unknown;
+}
+
 interface HistoryTableProps {
-    history: any[];
+    history: HistoryItem[];
 }
 
 export function HistoryTable({ history }: HistoryTableProps) {
