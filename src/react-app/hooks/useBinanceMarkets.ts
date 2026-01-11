@@ -176,8 +176,20 @@ export function useBinanceMarkets() {
         throw new Error(`Failed to fetch klines: ${response.status}`);
       }
       
-      const data = await response.json();
-      const closes = data.map((candle: any[]) => parseFloat(candle[4])); // Close prices
+      interface BinanceKline {
+        0: number;
+        1: string;
+        2: string;
+        3: string;
+        4: string;
+        5: string;
+        6: number;
+        7: string;
+        8: number;
+      }
+
+      const data = await response.json() as BinanceKline[];
+      const closes = data.map((candle) => parseFloat(candle[4])); // Close prices
       
       // Cache the result
       klinesCache.current[cacheKey] = {

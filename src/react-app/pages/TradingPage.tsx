@@ -250,3 +250,14 @@ export default function TradingPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+

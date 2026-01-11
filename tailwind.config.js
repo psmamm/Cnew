@@ -15,7 +15,8 @@ export default {
     },
     extend: {
       // ===========================================
-      // PREMIUM $1M DESIGN SYSTEM COLORS
+      // BITGET-INSPIRED DESIGN SYSTEM (2026)
+      // Minimal Colors: Dark + Teal + White
       // ===========================================
       colors: {
         // Semantic colors (shadcn-ui compatible)
@@ -25,32 +26,25 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
 
-        // Primary - Soft Purple/Violet
+        // Primary - TEAL (Bitget Style)
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-          50: '#FAF5FF',
-          100: '#F3E8FF',
-          200: '#E9D5FF',
-          300: '#D8B4FE',
-          400: '#C084FC',
-          500: '#A855F7',
-          600: '#9333EA',
-          700: '#7E22CE',
-          800: '#6B21A8',
-          900: '#581C87',
+          DEFAULT: '#00D9C8',
+          foreground: '#0D0D0F',
+          hover: '#00F5E1',
+          muted: 'rgba(0, 217, 200, 0.1)',
+          glow: 'rgba(0, 217, 200, 0.3)',
         },
 
-        // Secondary
+        // Secondary - Dark with border
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
 
-        // Destructive
+        // Destructive / Danger
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: '#F43F5E',
+          foreground: '#FFFFFF',
         },
 
         // Muted
@@ -59,10 +53,11 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
 
-        // Accent
+        // Accent - Same as Primary (Teal)
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: '#00D9C8',
+          foreground: '#0D0D0F',
+          hover: '#00F5E1',
         },
 
         // Popover
@@ -77,39 +72,59 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
 
-        // Premium Dark Backgrounds
+        // ===========================================
+        // BITGET DARK BACKGROUNDS (STRICT!)
+        // ===========================================
         dark: {
-          base: '#09090B',
-          elevated: '#0F0F12',
-          surface: '#18181B',
-          overlay: '#27272A',
-          subtle: '#3F3F46',
+          base: '#0D0D0F',        // Main background (almost black)
+          elevated: '#141416',    // Cards, Panels
+          surface: '#1A1A1E',     // Inputs, Dropdowns
+          hover: '#222226',       // Hover states
+          border: '#2A2A2E',      // All borders
+          subtle: '#3A3A3E',      // Hover borders
         },
 
-        // Success - Soft Emerald
+        // Bitget specific colors
+        bitget: {
+          bg: '#0D0D0F',
+          card: '#141416',
+          input: '#1A1A1E',
+          border: '#2A2A2E',
+          'border-hover': '#3A3A3E',
+          accent: '#00D9C8',
+          'accent-hover': '#00F5E1',
+        },
+
+        // Text colors
+        text: {
+          primary: '#FFFFFF',
+          secondary: '#9CA3AF',
+          muted: '#6B7280',
+          disabled: '#4B5563',
+        },
+
+        // Status colors (sparingly used!)
         success: {
           light: '#34D399',
-          DEFAULT: '#10B981',
-          dark: '#059669',
+          DEFAULT: '#00D9C8',     // Same as accent
+          dark: '#00B8A9',
         },
 
-        // Danger - Soft Rose
         danger: {
           light: '#FB7185',
           DEFAULT: '#F43F5E',
           dark: '#E11D48',
         },
 
-        // Warning - Soft Amber
         warning: {
           light: '#FBBF24',
           DEFAULT: '#F59E0B',
           dark: '#D97706',
         },
 
-        // Profit/Loss specific
-        profit: '#10B981',
-        loss: '#F43F5E',
+        // Profit/Loss - ONLY use for trading data
+        profit: '#00D9C8',        // Teal (same as accent)
+        loss: '#F43F5E',          // Red
       },
 
       // ===========================================
@@ -151,7 +166,7 @@ export default {
       },
 
       // ===========================================
-      // SHADOWS - Soft Premium Shadows
+      // SHADOWS - Bitget Style (Subtle)
       // ===========================================
       boxShadow: {
         'soft-sm': '0 1px 2px rgba(0, 0, 0, 0.3)',
@@ -159,16 +174,18 @@ export default {
         'soft-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2)',
         'soft-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3)',
         'soft-2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.6)',
-        // Glow shadows
-        'glow': '0 0 20px rgba(168, 85, 247, 0.3), 0 0 60px rgba(168, 85, 247, 0.1)',
-        'glow-sm': '0 0 10px rgba(168, 85, 247, 0.2)',
-        'glow-lg': '0 0 40px rgba(168, 85, 247, 0.4)',
-        'glow-success': '0 0 20px rgba(16, 185, 129, 0.3)',
+        // Glow shadows - TEAL (Bitget accent)
+        'glow': '0 0 20px rgba(0, 217, 200, 0.3)',
+        'glow-sm': '0 0 10px rgba(0, 217, 200, 0.2)',
+        'glow-lg': '0 0 40px rgba(0, 217, 200, 0.4)',
+        'glow-success': '0 0 20px rgba(0, 217, 200, 0.3)',
         'glow-danger': '0 0 20px rgba(244, 63, 94, 0.3)',
         'glow-warning': '0 0 20px rgba(245, 158, 11, 0.3)',
-        // Card elevation
-        'card': '0 4px 20px rgba(0, 0, 0, 0.25)',
-        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.35)',
+        // Card elevation - Bitget style
+        'card': '0 4px 20px rgba(0, 0, 0, 0.4)',
+        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.5)',
+        // Dropdown shadow
+        'dropdown': '0 10px 40px rgba(0, 0, 0, 0.5)',
       },
 
       // ===========================================
@@ -257,8 +274,8 @@ export default {
           to: { opacity: '0', transform: 'scale(0.95)' },
         },
         glowPulse: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(168, 85, 247, 0.3)' },
-          '50%': { boxShadow: '0 0 40px rgba(168, 85, 247, 0.5)' },
+          '0%, 100%': { boxShadow: '0 0 20px rgba(0, 217, 200, 0.3)' },
+          '50%': { boxShadow: '0 0 40px rgba(0, 217, 200, 0.5)' },
         },
         shimmer: {
           from: { backgroundPosition: '-200% 0' },
@@ -309,17 +326,20 @@ export default {
       },
 
       // ===========================================
-      // BACKGROUND IMAGE - Gradients
+      // BACKGROUND IMAGE - Bitget Gradients
       // ===========================================
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'gradient-premium': 'linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)',
-        'gradient-profit': 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+        // Bitget-style gradients (subtle, not flashy)
+        'gradient-primary': 'linear-gradient(135deg, #00D9C8 0%, #00B8A9 100%)',
+        'gradient-profit': 'linear-gradient(135deg, #00D9C8 0%, #00B8A9 100%)',
         'gradient-loss': 'linear-gradient(135deg, #F43F5E 0%, #E11D48 100%)',
-        'gradient-card': 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%)',
-        'gradient-glow': 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.15), transparent)',
-        'shimmer-gradient': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+        'gradient-card': 'linear-gradient(135deg, #1A1A1E 0%, #141416 100%)',
+        'gradient-glow': 'radial-gradient(circle, rgba(0, 217, 200, 0.1) 0%, transparent 70%)',
+        'shimmer-gradient': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)',
+        // Promo card gradient
+        'gradient-promo': 'linear-gradient(135deg, #1A1A1E 0%, #141416 100%)',
       },
     },
   },

@@ -214,13 +214,7 @@ export default function LeaderboardPage() {
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-10 h-10 bg-[#00D9C8]/20 rounded-full flex items-center justify-center overflow-hidden">
                                                                 {(() => {
-                                                                    interface LeaderboardEntry {
-                                                                        photoURL?: string;
-                                                                        username: string;
-                                                                        pnl?: number;
-                                                                        [key: string]: unknown;
-                                                                    }
-                                                                    const photoURL = isYou ? user?.photoURL : (entry as LeaderboardEntry).photoURL;
+                                                                    const photoURL = isYou ? user?.photoURL : entry.photoURL;
                                                                     const displayName = isYou ? (user?.displayName || entry.username) : entry.username;
 
                                                                     if (photoURL?.startsWith('http') || photoURL?.startsWith('data:')) {

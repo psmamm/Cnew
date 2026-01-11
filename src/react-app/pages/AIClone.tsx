@@ -396,7 +396,7 @@ export default function AIClonePage() {
                     className={`p-4 rounded-xl border transition-all ${
                       isActive
                         ? 'border-primary-500 bg-primary-500/10'
-                        : 'border-white/10 bg-white/5 hover:border-white/20'
+                        : 'border-[#2A2A2E] bg-white/5 hover:border-white/20'
                     }`}
                   >
                     <Icon className={`h-8 w-8 mb-3 ${isActive ? 'text-primary-500' : level.color}`} />
@@ -494,7 +494,7 @@ export default function AIClonePage() {
                     .map((suggestion) => (
                       <div
                         key={suggestion.id}
-                        className="p-4 rounded-lg bg-white/5 border border-white/10"
+                        className="p-4 rounded-lg bg-white/5 border border-[#2A2A2E]"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
@@ -583,3 +583,14 @@ export default function AIClonePage() {
     </DashboardLayout>
   );
 }
+
+
+
+
+
+
+
+
+
+
+

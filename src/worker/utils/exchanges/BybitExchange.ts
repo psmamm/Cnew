@@ -292,8 +292,17 @@ export async function testBybitConnection(
       throw new Error(`Connection test failed: ${response.status} - ${responseText.substring(0, 200)}`);
     }
     
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let data: BybitApiResponse<any>;
+    interface BybitConnectionTestResult {
+      list?: Array<{
+        apiKey?: string;
+        permissions?: string[];
+        ips?: string[];
+        [key: string]: unknown;
+      }>;
+      [key: string]: unknown;
+    }
+
+    let data: BybitApiResponse<BybitConnectionTestResult>;
     try {
       data = JSON.parse(responseText);
     } catch {

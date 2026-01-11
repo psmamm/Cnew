@@ -39,7 +39,7 @@ export function useWhaleTransactions() {
         coin: string;
         amount: number;
         usdValue: number;
-        transferType: string;
+        transferType: 'wallet_to_exchange' | 'exchange_to_wallet' | 'whale_to_whale' | string;
         hash: string;
         fromAddress?: string;
         toAddress?: string;
@@ -50,9 +50,18 @@ export function useWhaleTransactions() {
 
       if (data.transactions && Array.isArray(data.transactions)) {
         // Convert timestamp strings back to Date objects
-        const processedTransactions = (data.transactions as WhaleTransactionRaw[]).map((tx) => ({
-          ...tx,
-          timestamp: new Date(tx.timestamp)
+        const processedTransactions: WhaleTransaction[] = (data.transactions as WhaleTransactionRaw[]).map((tx) => ({
+          id: tx.id,
+          timestamp: new Date(tx.timestamp),
+          coin: tx.coin,
+          amount: tx.amount,
+          usdValue: tx.usdValue,
+          transferType: tx.transferType as 'wallet_to_exchange' | 'exchange_to_wallet' | 'whale_to_whale',
+          hash: tx.hash,
+          fromAddress: tx.fromAddress,
+          toAddress: tx.toAddress,
+          blockchainExplorerUrl: tx.blockchainExplorerUrl,
+          chain: tx.chain
         }));
         
         setTransactions(processedTransactions);

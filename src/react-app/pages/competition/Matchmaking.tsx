@@ -92,7 +92,7 @@ export default function MatchmakingPage() {
 
     return (
         <DashboardLayout>
-            <div className="min-h-screen bg-[#0D0F18] flex items-center justify-center p-8">
+            <div className="min-h-screen bg-[#141416] flex items-center justify-center p-8">
                 <div className="max-w-md w-full">
                     <AnimatePresence mode="wait">
                         {matchFound ? (
@@ -100,24 +100,24 @@ export default function MatchmakingPage() {
                                 key="match-found"
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="bg-[#1E2232] border border-white/10 rounded-2xl p-8 text-center"
+                                className="bg-[#141416] border border-[#2A2A2E] rounded-2xl p-8 text-center"
                             >
                                 <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: 0.2, type: "spring" }}
-                                    className="bg-[#6A3DF4]/20 p-6 rounded-full w-fit mx-auto mb-6"
+                                    className="bg-[#00D9C8]/20 p-6 rounded-full w-fit mx-auto mb-6"
                                 >
-                                    <Gamepad2 className="w-12 h-12 text-[#6A3DF4]" />
+                                    <Gamepad2 className="w-12 h-12 text-[#00D9C8]" />
                                 </motion.div>
-                                <h2 className="text-3xl font-bold mb-2 text-[#6A3DF4]">Match Found!</h2>
+                                <h2 className="text-3xl font-bold mb-2 text-[#00D9C8]">Match Found!</h2>
                                 <p className="text-gray-400 mb-6">Loading match, please wait...</p>
                                 <div className="flex justify-center">
                                     <motion.div
                                         animate={{ rotate: 360 }}
                                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                     >
-                                        <Zap className="w-6 h-6 text-[#6A3DF4]" />
+                                        <Zap className="w-6 h-6 text-[#00D9C8]" />
                                     </motion.div>
                                 </div>
                             </motion.div>
@@ -126,7 +126,7 @@ export default function MatchmakingPage() {
                                 key="matchmaking"
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="bg-[#1E2232] border border-white/10 rounded-2xl p-8"
+                                className="bg-[#141416] border border-[#2A2A2E] rounded-2xl p-8"
                             >
                                 <div className="flex items-center justify-between mb-6">
                                     <h2 className="text-2xl font-bold">Matchmaking</h2>
@@ -138,17 +138,17 @@ export default function MatchmakingPage() {
                                     </button>
                                 </div>
 
-                                <div className="bg-[#E74C3C]/10 border border-[#E74C3C]/20 rounded-xl p-6 mb-6">
+                                <div className="bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-xl p-6 mb-6">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-3">
-                                            <X className="w-5 h-5 text-[#E74C3C]" />
-                                            <span className="text-[#E74C3C] font-semibold">Cancel Matchmaking</span>
+                                            <X className="w-5 h-5 text-[#F43F5E]" />
+                                            <span className="text-[#F43F5E] font-semibold">Cancel Matchmaking</span>
                                         </div>
                                         <motion.div
                                             animate={{ rotate: 360 }}
                                             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                                         >
-                                            <RotateCcw className="w-5 h-5 text-[#E74C3C]" />
+                                            <RotateCcw className="w-5 h-5 text-[#F43F5E]" />
                                         </motion.div>
                                     </div>
                                     <div className="text-sm text-gray-300">
@@ -174,7 +174,7 @@ export default function MatchmakingPage() {
 
                                 <button
                                     onClick={handleCancel}
-                                    className="w-full mt-6 bg-[#E74C3C]/20 hover:bg-[#E74C3C]/30 border border-[#E74C3C]/40 text-[#E74C3C] py-3 rounded-xl font-medium transition-all"
+                                    className="w-full mt-6 bg-[#F43F5E]/20 hover:bg-[#F43F5E]/30 border border-[#F43F5E]/40 text-[#F43F5E] py-3 rounded-xl font-medium transition-all"
                                 >
                                     Cancel
                                 </button>
@@ -186,3 +186,13 @@ export default function MatchmakingPage() {
         </DashboardLayout>
     );
 }
+
+
+
+
+
+
+
+
+
+

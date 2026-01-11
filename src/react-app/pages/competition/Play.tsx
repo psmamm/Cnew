@@ -227,7 +227,19 @@ export default function CompetitionPage() {
                 // At 100ms speed, 5000 candles = 500 seconds > 300 seconds (5 min game)
                 const limit = 1000;
                 const batches = 5;
-                let allFetchedData: any[] = [];
+                interface BinanceKline {
+                    0: number;
+                    1: string;
+                    2: string;
+                    3: string;
+                    4: string;
+                    5: string;
+                    6: number;
+                    7: string;
+                    8: number;
+                }
+
+                let allFetchedData: BinanceKline[] = [];
                 let currentEndTime = Date.now();
 
                 for (let i = 0; i < batches; i++) {

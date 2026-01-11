@@ -139,7 +139,12 @@ strategiesRouter.get('/:id/performance', async (c) => {
     });
   }
 
-  const pnlValues = trades.results.map((t: any) => t.pnl || 0);
+  interface TradeRow {
+    pnl?: number | null;
+    [key: string]: unknown;
+  }
+
+  const pnlValues = (trades.results as unknown as TradeRow[]).map((t) => t.pnl || 0);
   const winningTrades = pnlValues.filter((pnl: number) => pnl > 0).length;
   const totalPnl = pnlValues.reduce((sum: number, pnl: number) => sum + pnl, 0);
 

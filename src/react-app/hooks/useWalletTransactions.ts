@@ -5,8 +5,10 @@ import { mainnet, bsc, polygon, arbitrum, optimism, avalanche } from 'viem/chain
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Trade } from './useTrades';
 
+import type { Chain } from 'viem';
+
 // EVM Chain configurations
-const evmChains: Record<string, any> = {
+const evmChains: Record<string, Chain> = {
   ethereum: mainnet,
   bsc: bsc,
   polygon: polygon,
@@ -141,9 +143,10 @@ export function useWalletTransactions() {
 
       setTransactions(txList);
       return txList;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch EVM transactions:', error);
-      setError(error.message || 'Failed to fetch transactions');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch transactions';
+      setError(errorMessage);
       return [];
     }
   }, []);
@@ -182,9 +185,10 @@ export function useWalletTransactions() {
       const validTxs = txList.filter((tx): tx is BlockchainTransaction => tx !== null);
       setTransactions(validTxs);
       return validTxs;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch Solana transactions:', error);
-      setError(error.message || 'Failed to fetch Solana transactions');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch Solana transactions';
+      setError(errorMessage);
       return [];
     }
   }, []);
@@ -248,9 +252,10 @@ export function useWalletTransactions() {
       // Convert transactions to trades
       const convertedTrades = convertTransactionsToTrades(txs);
       setTrades(convertedTrades);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch wallet transactions:', error);
-      setError(error.message || 'Failed to fetch transactions');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch transactions';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

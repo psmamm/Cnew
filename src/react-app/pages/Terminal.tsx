@@ -226,3 +226,14 @@ export default function Terminal() {
     </SymbolProvider>
   );
 }
+
+
+
+
+
+
+
+
+
+
+

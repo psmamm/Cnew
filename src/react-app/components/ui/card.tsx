@@ -2,37 +2,48 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/react-app/lib/utils"
 
+/**
+ * Card Component - Bitget Style (2026)
+ *
+ * Backgrounds:
+ * - Default: #141416 (elevated)
+ * - Surface: #1A1A1E
+ * - Border: #2A2A2E
+ * - Border radius: 12px
+ */
+
 const cardVariants = cva(
-  "rounded-2xl transition-all duration-200 ease-smooth",
+  "rounded-xl transition-all duration-200",
   {
     variants: {
       variant: {
-        // Default - Elevated surface with subtle border
-        default: "bg-dark-elevated border border-white/6 shadow-card",
+        // Default - Bitget card style
+        default: "bg-[#141416] border border-[#2A2A2E] shadow-card",
 
-        // Premium - Glassmorphism with gradient overlay
-        premium: "card-premium",
-
-        // Glass - Translucent glassmorphism
-        glass: "glass",
+        // Glass - Glassmorphism with blur
+        glass: "bg-[#141416]/80 backdrop-blur-xl border border-[#2A2A2E]",
 
         // Ghost - Minimal, just for grouping
         ghost: "bg-transparent",
 
         // Outline - Border only
-        outline: "bg-transparent border border-white/10",
+        outline: "bg-transparent border border-[#2A2A2E]",
 
-        // Surface - Slightly elevated
-        surface: "bg-dark-surface border border-white/6",
+        // Surface - Slightly elevated (input background)
+        surface: "bg-[#1A1A1E] border border-[#2A2A2E]",
 
         // Interactive - Hover effects
-        interactive: "bg-dark-elevated border border-white/6 shadow-card hover:shadow-card-hover hover:border-white/10 hover:-translate-y-1 cursor-pointer",
+        interactive: "bg-[#141416] border border-[#2A2A2E] shadow-card hover:shadow-card-hover hover:border-[#3A3A3E] hover:-translate-y-0.5 cursor-pointer",
+
+        // Promo - For recommendation/promo cards (Bitget style)
+        promo: "bg-gradient-to-br from-[#1A1A1E] to-[#141416] border border-[#2A2A2E] relative overflow-hidden",
       },
       padding: {
         none: "p-0",
         sm: "p-4",
-        default: "p-6",
-        lg: "p-8",
+        default: "p-5",
+        lg: "p-6",
+        xl: "p-8",
       },
     },
     defaultVariants: {
@@ -76,7 +87,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-lg font-semibold leading-none tracking-tight text-foreground",
+      "text-lg font-semibold leading-none tracking-tight text-white",
       className
     )}
     {...props}
@@ -90,7 +101,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-[#9CA3AF]", className)}
     {...props}
   />
 ))
@@ -117,3 +128,4 @@ const CardFooter = React.forwardRef<
 CardFooter.displayName = "CardFooter"
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, cardVariants }
+

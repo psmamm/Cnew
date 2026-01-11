@@ -17,7 +17,11 @@ interface HumeVoiceJournalProps {
   positionSize: number;
   entryPrice: number;
   currentPrice: number;
-  onAnalysisComplete?: (analysis: any) => void;
+  onAnalysisComplete?: (analysis: {
+    emotions: Array<{ name: string; score: number }>;
+    summary: string;
+    [key: string]: unknown;
+  }) => void;
 }
 
 
@@ -29,11 +33,17 @@ export default function HumeVoiceJournal({
   currentPrice,
   onAnalysisComplete
 }: HumeVoiceJournalProps) {
+  interface EmotionAnalysis {
+    emotions: Array<{ name: string; score: number }>;
+    summary: string;
+    [key: string]: unknown;
+  }
+
   const { theme } = useTheme();
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastAnalysis, setLastAnalysis] = useState<any>(null);
+  const [lastAnalysis, setLastAnalysis] = useState<EmotionAnalysis | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -271,9 +281,9 @@ export default function HumeVoiceJournal({
               <div className={`${getTextColor(theme, 'muted')} text-xs mb-2`}>Top Emotions</div>
               <div className="space-y-1">
                 {lastAnalysis.emotions
-                  .sort((a: any, b: any) => b.score - a.score)
+                  .sort((a, b) => b.score - a.score)
                   .slice(0, 5)
-                  .map((emotion: any, idx: number) => (
+                  .map((emotion, idx: number) => (
                     <div key={idx} className="flex items-center justify-between">
                       <span className={`${getTextColor(theme, 'secondary')} text-xs`}>
                         {emotion.name}
@@ -302,3 +312,10 @@ export default function HumeVoiceJournal({
     </div>
   );
 }
+
+
+
+
+
+
+

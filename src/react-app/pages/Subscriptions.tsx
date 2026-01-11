@@ -411,7 +411,7 @@ export default function SubscriptionsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10">
+                  <tr className="border-b border-[#2A2A2E]">
                     <th className="text-left py-3 text-zinc-400 font-medium">Feature</th>
                     <th className="text-center py-3 text-zinc-400 font-medium">Free</th>
                     <th className="text-center py-3 text-primary-400 font-medium">Pro</th>
@@ -478,3 +478,14 @@ function FeatureRow({
     </tr>
   );
 }
+
+
+
+
+
+
+
+
+
+
+

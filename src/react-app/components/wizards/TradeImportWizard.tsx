@@ -29,8 +29,23 @@ interface TradeData {
     size: number;
 }
 
+interface ImportedTradeData {
+    trades: Array<{
+        symbol: string;
+        direction: 'long' | 'short';
+        entry_price: number;
+        exit_price?: number;
+        quantity: number;
+        entry_date: string;
+        exit_date?: string;
+        pnl?: number;
+        [key: string]: unknown;
+    }>;
+    [key: string]: unknown;
+}
+
 interface TradeImportWizardProps {
-    onComplete?: (data: any) => void;
+    onComplete?: (data: ImportedTradeData) => void;
     onClose?: () => void;
 }
 
@@ -223,11 +238,24 @@ export const TradeImportWizard: React.FC<TradeImportWizardProps> = ({ onComplete
             }
 
             // Tesseract.js v7 - using type assertion due to type definition mismatch
-            const createWorkerWithLogger = createWorker as any;
+            interface TesseractLogger {
+                status?: string;
+                progress?: number;
+                [key: string]: unknown;
+            }
+
+            interface TesseractWorker {
+                loadLanguage: (lang: string) => Promise<void>;
+                initialize: (lang: string) => Promise<void>;
+                recognize: (image: File | Blob) => Promise<{ data: { text: string } }>;
+                terminate: () => Promise<void>;
+            }
+
+            const createWorkerWithLogger = createWorker as (options?: { logger?: (m: TesseractLogger) => void }) => Promise<TesseractWorker>;
             
             setOcrStatus('Loading OCR engine...');
             const worker = await createWorkerWithLogger({
-                logger: (m: any) => {
+                logger: (m: TesseractLogger) => {
                     console.log('📊 OCR Progress:', m);
                     if (m.status === 'recognizing text' && m.progress !== undefined) {
                         const progress = Math.round(m.progress * 100);
@@ -240,11 +268,11 @@ export const TradeImportWizard: React.FC<TradeImportWizardProps> = ({ onComplete
             });
 
             setOcrStatus('Loading language model...');
-            await (worker as any).loadLanguage('eng');
+            await worker.loadLanguage('eng');
             
             console.log('⚙️ Initializing worker...');
             setOcrStatus('Initializing...');
-            await (worker as any).initialize('eng');
+            await worker.initialize('eng');
             
             setOcrStatus('Recognizing text...');
             const { data } = await worker.recognize(file);
@@ -727,3 +755,4 @@ export const TradeImportWizard: React.FC<TradeImportWizardProps> = ({ onComplete
         </div>
     );
 };
+

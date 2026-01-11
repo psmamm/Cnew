@@ -2,34 +2,44 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/react-app/lib/utils"
 
+/**
+ * Button Component - Bitget Style (2026)
+ *
+ * Colors:
+ * - Primary: Teal #00D9C8 (dark text)
+ * - Secondary: Transparent with #2A2A2E border
+ * - Ghost: Transparent, hover #1A1A1E
+ * - Destructive: Red #F43F5E
+ */
+
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 ease-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A855F7]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00D9C8]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0D0F] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        // Primary - Premium gradient with glow
-        default: "bg-gradient-premium text-white shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5 active:translate-y-0",
+        // Primary - Bitget Teal (flat, not gradient)
+        default: "bg-[#00D9C8] text-[#0D0D0F] font-semibold hover:bg-[#00F5E1] hover:shadow-glow active:scale-[0.98]",
 
-        // Destructive - Soft rose
-        destructive: "bg-danger text-white hover:bg-danger-dark shadow-glow-danger/50 hover:shadow-glow-danger",
+        // Destructive - Red
+        destructive: "bg-[#F43F5E] text-white font-semibold hover:bg-[#FB7185] hover:shadow-glow-danger active:scale-[0.98]",
 
-        // Outline - Subtle border
-        outline: "border border-white/10 bg-transparent text-foreground hover:bg-white/5 hover:border-white/15",
+        // Outline - Border only (like Bitget secondary)
+        outline: "border border-[#2A2A2E] bg-transparent text-white hover:bg-[#1A1A1E] hover:border-[#3A3A3E]",
 
-        // Secondary - Surface color
-        secondary: "bg-white/5 text-foreground border border-white/10 hover:bg-white/10 hover:border-white/15",
+        // Secondary - Same as outline for Bitget consistency
+        secondary: "border border-[#2A2A2E] bg-transparent text-white hover:bg-[#1A1A1E] hover:border-[#3A3A3E]",
 
-        // Ghost - No background
-        ghost: "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+        // Ghost - No border, subtle hover
+        ghost: "text-white hover:bg-[#1A1A1E] hover:text-[#00D9C8]",
 
-        // Link style
-        link: "text-primary-500 underline-offset-4 hover:underline hover:text-primary-400",
+        // Link style - Teal text
+        link: "text-[#00D9C8] underline-offset-4 hover:underline hover:text-[#00F5E1]",
 
-        // Success variant
-        success: "bg-success text-white hover:bg-success-dark shadow-glow-success/50 hover:shadow-glow-success",
+        // Success - Same as primary (teal)
+        success: "bg-[#00D9C8] text-[#0D0D0F] font-semibold hover:bg-[#00F5E1] hover:shadow-glow active:scale-[0.98]",
 
-        // Premium - Extra fancy with border gradient
-        premium: "bg-gradient-premium text-white shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5 active:translate-y-0 border border-primary-400/20",
+        // Premium - With glow effect
+        premium: "bg-[#00D9C8] text-[#0D0D0F] font-semibold shadow-glow hover:bg-[#00F5E1] hover:shadow-glow-lg active:scale-[0.98]",
       },
       size: {
         default: "h-10 px-5 py-2",

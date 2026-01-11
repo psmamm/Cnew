@@ -253,10 +253,10 @@ export default function CSVImportModal({
           onClick={e => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center justify-between p-6 border-b border-[#2A2A2E]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#6A3DF4]/10 rounded-xl flex items-center justify-center">
-                <FileUp className="w-5 h-5 text-[#6A3DF4]" />
+              <div className="w-10 h-10 bg-[#00D9C8]/10 rounded-xl flex items-center justify-center">
+                <FileUp className="w-5 h-5 text-[#00D9C8]" />
               </div>
               <div>
                 <h2 className={`text-xl font-semibold ${getTextColor(theme, 'primary')}`}>
@@ -295,7 +295,7 @@ export default function CSVImportModal({
                   onClick={() => fileInputRef.current?.click()}
                   className={`relative border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all ${
                     dragActive
-                      ? 'border-[#6A3DF4] bg-[#6A3DF4]/10'
+                      ? 'border-[#00D9C8] bg-[#00D9C8]/10'
                       : `${getCardBorder(theme)} ${getHoverBg(theme)}`
                   }`}
                 >
@@ -309,7 +309,7 @@ export default function CSVImportModal({
 
                   {loading ? (
                     <div className="flex flex-col items-center gap-4">
-                      <Loader2 className="w-12 h-12 text-[#6A3DF4] animate-spin" />
+                      <Loader2 className="w-12 h-12 text-[#00D9C8] animate-spin" />
                       <p className={getTextColor(theme, 'secondary')}>Processing file...</p>
                     </div>
                   ) : (
@@ -336,7 +336,7 @@ export default function CSVImportModal({
                         key={broker.id}
                         className={`flex items-center gap-2 p-2 ${getCardBg(theme)} rounded-lg border ${getCardBorder(theme)}`}
                       >
-                        <FileText className="w-4 h-4 text-[#6A3DF4]" />
+                        <FileText className="w-4 h-4 text-[#00D9C8]" />
                         <span className={`text-sm ${getTextColor(theme, 'secondary')}`}>
                           {broker.name}
                         </span>
@@ -350,10 +350,10 @@ export default function CSVImportModal({
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 p-4 bg-[#E74C3C]/10 border border-[#E74C3C]/20 rounded-xl"
+                    className="flex items-center gap-2 p-4 bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-xl"
                   >
-                    <AlertCircle className="w-5 h-5 text-[#E74C3C]" />
-                    <span className="text-[#E74C3C] text-sm">{error}</span>
+                    <AlertCircle className="w-5 h-5 text-[#F43F5E]" />
+                    <span className="text-[#F43F5E] text-sm">{error}</span>
                   </motion.div>
                 )}
               </div>
@@ -365,7 +365,7 @@ export default function CSVImportModal({
                 {/* File Info */}
                 <div className={`flex items-center justify-between p-4 ${getCardBg(theme)} rounded-xl border ${getCardBorder(theme)}`}>
                   <div className="flex items-center gap-3">
-                    <FileText className="w-8 h-8 text-[#6A3DF4]" />
+                    <FileText className="w-8 h-8 text-[#00D9C8]" />
                     <div>
                       <p className={`font-medium ${getTextColor(theme, 'primary')}`}>{fileName}</p>
                       <p className={`text-sm ${getTextColor(theme, 'muted')}`}>
@@ -395,7 +395,7 @@ export default function CSVImportModal({
                         onClick={() => setSelectedAssetType(type)}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                           selectedAssetType === type
-                            ? 'bg-[#6A3DF4] text-white'
+                            ? 'bg-[#00D9C8] text-white'
                             : `${getCardBg(theme)} ${getTextColor(theme, 'secondary')} hover:text-white`
                         }`}
                       >
@@ -422,7 +422,7 @@ export default function CSVImportModal({
                       {preview.preview.map((trade, index) => (
                         <tr key={index} className={`border-b ${getCardBorder(theme)}`}>
                           <td className={`py-2 ${getTextColor(theme, 'primary')}`}>{trade.symbol}</td>
-                          <td className={`py-2 ${trade.side === 'buy' || trade.side === 'long' ? 'text-[#2ECC71]' : 'text-[#E74C3C]'}`}>
+                          <td className={`py-2 ${trade.side === 'buy' || trade.side === 'long' ? 'text-[#00D9C8]' : 'text-[#F43F5E]'}`}>
                             {trade.side.toUpperCase()}
                           </td>
                           <td className={`py-2 text-right ${getTextColor(theme, 'secondary')}`}>
@@ -436,7 +436,7 @@ export default function CSVImportModal({
                           </td>
                           <td className={`py-2 text-right ${
                             trade.realizedPnl
-                              ? trade.realizedPnl >= 0 ? 'text-[#2ECC71]' : 'text-[#E74C3C]'
+                              ? trade.realizedPnl >= 0 ? 'text-[#00D9C8]' : 'text-[#F43F5E]'
                               : getTextColor(theme, 'muted')
                           }`}>
                             {trade.realizedPnl ? `$${trade.realizedPnl.toFixed(2)}` : '-'}
@@ -472,10 +472,10 @@ export default function CSVImportModal({
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-2 p-4 bg-[#E74C3C]/10 border border-[#E74C3C]/20 rounded-xl"
+                    className="flex items-center gap-2 p-4 bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-xl"
                   >
-                    <AlertCircle className="w-5 h-5 text-[#E74C3C]" />
-                    <span className="text-[#E74C3C] text-sm">{error}</span>
+                    <AlertCircle className="w-5 h-5 text-[#F43F5E]" />
+                    <span className="text-[#F43F5E] text-sm">{error}</span>
                   </motion.div>
                 )}
               </div>
@@ -484,7 +484,7 @@ export default function CSVImportModal({
             {/* Step 3: Importing */}
             {step === 'importing' && (
               <div className="py-12 text-center">
-                <Loader2 className="w-16 h-16 mx-auto mb-6 text-[#6A3DF4] animate-spin" />
+                <Loader2 className="w-16 h-16 mx-auto mb-6 text-[#00D9C8] animate-spin" />
                 <h3 className={`text-xl font-semibold mb-2 ${getTextColor(theme, 'primary')}`}>
                   Importing Trades...
                 </h3>
@@ -500,9 +500,9 @@ export default function CSVImportModal({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="w-20 h-20 mx-auto mb-6 bg-[#2ECC71]/20 rounded-full flex items-center justify-center"
+                  className="w-20 h-20 mx-auto mb-6 bg-[#00D9C8]/20 rounded-full flex items-center justify-center"
                 >
-                  <Check className="w-10 h-10 text-[#2ECC71]" />
+                  <Check className="w-10 h-10 text-[#00D9C8]" />
                 </motion.div>
                 <h3 className={`text-xl font-semibold mb-2 ${getTextColor(theme, 'primary')}`}>
                   Import Complete!
@@ -532,7 +532,7 @@ export default function CSVImportModal({
 
           {/* Footer */}
           {step !== 'importing' && (
-            <div className="flex items-center justify-between p-6 border-t border-white/10">
+            <div className="flex items-center justify-between p-6 border-t border-[#2A2A2E]">
               {step === 'preview' ? (
                 <>
                   <button
@@ -544,7 +544,7 @@ export default function CSVImportModal({
                   <button
                     onClick={handleImport}
                     disabled={!preview?.totalTrades}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[#6A3DF4] hover:bg-[#5A2DE4] text-white font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-[#00D9C8] hover:bg-[#5A2DE4] text-white font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Import {preview?.totalTrades || 0} Trades
                     <ChevronRight className="w-4 h-4" />
@@ -554,7 +554,7 @@ export default function CSVImportModal({
                 <div className="w-full">
                   <button
                     onClick={handleClose}
-                    className="w-full px-6 py-2.5 bg-[#6A3DF4] hover:bg-[#5A2DE4] text-white font-medium rounded-xl transition-colors"
+                    className="w-full px-6 py-2.5 bg-[#00D9C8] hover:bg-[#5A2DE4] text-white font-medium rounded-xl transition-colors"
                   >
                     Done
                   </button>
@@ -573,3 +573,10 @@ export default function CSVImportModal({
     </AnimatePresence>
   );
 }
+
+
+
+
+
+
+

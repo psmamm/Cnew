@@ -80,7 +80,7 @@ function TrendingCard({ title, icon, items, color, quoteAssetPrices }: TrendingC
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 flex-1 min-w-[280px]"
+      className="bg-[#141416] rounded-xl p-4 border border-white/10 flex-1 min-w-[280px]"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
@@ -100,7 +100,7 @@ function TrendingCard({ title, icon, items, color, quoteAssetPrices }: TrendingC
               className="flex items-center justify-between py-2 hover:bg-white/5 cursor-pointer transition-colors rounded"
             >
               <div className="flex items-center space-x-2.5 flex-1 min-w-0">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#0D0F18]/50">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#141416]/50">
                   <img
                     src={item.logo || getLogoUrlForCoin(item.baseAsset)}
                     alt={item.baseAsset}
@@ -123,7 +123,7 @@ function TrendingCard({ title, icon, items, color, quoteAssetPrices }: TrendingC
                         target.style.display = 'none';
                         const parent = target.parentElement;
                         if (parent && !parent.querySelector('span')) {
-                          parent.innerHTML = `<span class="text-[#BDC3C7] font-bold text-xs">${item.baseAsset.slice(0, 2)}</span>`;
+                          parent.innerHTML = `<span class="text-[#6B7280] font-bold text-xs">${item.baseAsset.slice(0, 2)}</span>`;
                         }
                       }
                     }}
@@ -170,8 +170,13 @@ export default function TrendingCards({ hot, newCoins, topGainer, topVolume }: T
         const data = await response.json();
         const prices: Record<string, number> = { USDT: 1 }; // USDT is always 1
         
+        interface BinancePrice {
+          symbol: string;
+          price: string;
+        }
+
         // Get crypto quote asset prices in USDT
-        data.forEach((ticker: any) => {
+        (data as BinancePrice[]).forEach((ticker) => {
           if (usdtPairs.includes(ticker.symbol)) {
             const asset = ticker.symbol.replace('USDT', '');
             prices[asset] = parseFloat(ticker.price);
@@ -181,7 +186,7 @@ export default function TrendingCards({ hot, newCoins, topGainer, topVolume }: T
         // For fiat currencies (IDR, TRY), we need to get USDT price in that fiat
         // For example: USDT/IDR tells us how many IDR = 1 USDT
         const fiatPairs = ['USDTIDR', 'USDTRY'];
-        data.forEach((ticker: any) => {
+        (data as BinancePrice[]).forEach((ticker) => {
           if (fiatPairs.includes(ticker.symbol)) {
             const fiat = ticker.symbol.replace('USDT', '');
             // Store the USDT price in this fiat currency (e.g., 1 USDT = 16,734 IDR)
@@ -253,3 +258,4 @@ export default function TrendingCards({ hot, newCoins, topGainer, topVolume }: T
     </div>
   );
 }
+

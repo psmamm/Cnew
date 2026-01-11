@@ -158,18 +158,13 @@ export function useSBT(userAddress?: string) {
           args: [address as Address]
         });
 
-        interface BadgeData {
-          id: number;
-          name: string;
-          description: string;
-          imageUrl: string;
-          [key: string]: unknown;
-        }
+        // Badge data from contract matches TraderBadge interface
+        const badgeResult = badgeData as unknown as TraderBadge;
 
         setSbtData({
           hasToken: true,
           tokenId: tokenId.toString(),
-          badges: [badgeData as BadgeData],
+          badges: [badgeResult],
           userAddress: address
         });
       } catch {

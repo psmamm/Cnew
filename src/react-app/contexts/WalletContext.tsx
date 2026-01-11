@@ -159,10 +159,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     try {
       // Request account access
       console.log('Requesting account access...');
-      const accounts = await provider.request({
+      const accountsResponse = await provider.request({
         method: 'eth_requestAccounts',
       });
 
+      const accounts = Array.isArray(accountsResponse) ? accountsResponse as string[] : [];
       console.log('Accounts received:', accounts);
 
       if (!accounts || accounts.length === 0) {
@@ -201,8 +202,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('wallet-connection', JSON.stringify(newState));
 
       // Listen for account changes
-      provider.on('accountsChanged', (accounts: string[]) => {
-        if (accounts.length === 0) {
+      provider.on('accountsChanged', (accounts: unknown) => {
+        const accountsArray = Array.isArray(accounts) ? accounts as string[] : [];
+        if (accountsArray.length === 0) {
           disconnectWallet();
         } else {
           connectEVMWallet(walletType, chain);
@@ -213,11 +215,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       provider.on('chainChanged', () => {
         connectEVMWallet(walletType, chain);
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to connect EVM wallet:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to connect wallet';
       setWallet(prev => ({
         ...prev,
-        error: error.message || 'Failed to connect wallet',
+        error: errorMessage,
       }));
       throw error;
     }

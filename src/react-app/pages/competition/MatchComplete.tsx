@@ -13,7 +13,25 @@ export default function MatchCompletePage() {
     const matchId = searchParams.get('matchId');
     const { user } = useAuth();
     const { eloData, refetch } = useELO();
-    const [matchData, setMatchData] = useState<any>(null);
+    interface MatchData {
+        id: string;
+        player1_id: string;
+        player2_id: string;
+        player1_pnl: number;
+        player2_pnl: number;
+        player1_balance: number;
+        player2_balance: number;
+        player1_trades: number;
+        player2_trades: number;
+        player1_win_rate: number;
+        player2_win_rate: number;
+        player1_elo_change: number;
+        player2_elo_change: number;
+        winner_id: string;
+        [key: string]: unknown;
+    }
+
+    const [matchData, setMatchData] = useState<MatchData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -43,9 +61,9 @@ export default function MatchCompletePage() {
     if (loading) {
         return (
             <DashboardLayout>
-                <div className="min-h-screen bg-[#0D0F18] flex items-center justify-center">
+                <div className="min-h-screen bg-[#141416] flex items-center justify-center">
                     <div className="text-center">
-                        <div className="w-12 h-12 border-4 border-[#6A3DF4]/30 border-t-[#6A3DF4] rounded-full animate-spin mx-auto mb-4" />
+                        <div className="w-12 h-12 border-4 border-[#00D9C8]/30 border-t-[#00D9C8] rounded-full animate-spin mx-auto mb-4" />
                         <p className="text-gray-400">Loading match results...</p>
                     </div>
                 </div>
@@ -56,12 +74,12 @@ export default function MatchCompletePage() {
     if (!matchData) {
         return (
             <DashboardLayout>
-                <div className="min-h-screen bg-[#0D0F18] flex items-center justify-center">
+                <div className="min-h-screen bg-[#141416] flex items-center justify-center">
                     <div className="text-center">
                         <p className="text-gray-400 mb-4">Match not found</p>
                         <button
                             onClick={() => navigate('/competition')}
-                            className="text-[#6A3DF4] hover:text-[#8B5CF6]"
+                            className="text-[#00D9C8] hover:text-[#00D9C8]"
                         >
                             Back to Competition
                         </button>
@@ -71,7 +89,11 @@ export default function MatchCompletePage() {
         );
     }
 
-    const userId = (user as any)?.google_user_data?.sub || (user as any)?.firebase_user_id;
+    interface UserWithId {
+        google_user_data?: { sub?: string };
+        firebase_user_id?: string;
+    }
+    const userId = (user as UserWithId)?.google_user_data?.sub || (user as UserWithId)?.firebase_user_id;
     const isPlayer1 = matchData.player1_id === userId;
     const yourResults = isPlayer1 ? {
         pnl: matchData.player1_pnl,
@@ -102,11 +124,11 @@ export default function MatchCompletePage() {
     };
 
     const youWon = matchData.winner_id === userId;
-    const divisionColor = eloData ? getDivisionColor(eloData.division) : '#6A3DF4';
+    const divisionColor = eloData ? getDivisionColor(eloData.division) : '#00D9C8';
 
     return (
         <DashboardLayout>
-            <div className="min-h-screen bg-[#0D0F18] p-8">
+            <div className="min-h-screen bg-[#141416] p-8">
                 <div className="max-w-4xl mx-auto">
                     <h1 className="text-4xl font-bold mb-8 text-center">Match Complete</h1>
 
@@ -116,12 +138,12 @@ export default function MatchCompletePage() {
                         <motion.div
                             initial={{ opacity: 0, x: -50 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className={`bg-[#1E2232] border-2 rounded-2xl p-6 ${
+                            className={`bg-[#141416] border-2 rounded-2xl p-6 ${
                                 youWon ? 'border-green-500/50' : 'border-red-500/50'
                             }`}
                         >
                             <div className="flex items-center justify-between mb-4">
-                                <div className="w-16 h-16 bg-[#6A3DF4]/20 rounded-full flex items-center justify-center text-2xl">
+                                <div className="w-16 h-16 bg-[#00D9C8]/20 rounded-full flex items-center justify-center text-2xl">
                                     {user?.displayName?.charAt(0) || user?.email?.charAt(0) || '👤'}
                                 </div>
                                 <div className="text-right">
@@ -172,7 +194,7 @@ export default function MatchCompletePage() {
                         <motion.div
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="bg-[#1E2232] border-2 border-white/10 rounded-2xl p-6"
+                            className="bg-[#141416] border-2 border-[#2A2A2E] rounded-2xl p-6"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center text-2xl">
@@ -225,7 +247,7 @@ export default function MatchCompletePage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => navigate('/competition')}
-                            className="bg-gradient-to-r from-[#6A3DF4] to-[#8B5CF6] hover:from-[#5A2DE4] hover:to-[#7B4CE6] text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2"
+                            className="bg- from-[#00D9C8] to-[#00D9C8] hover:from-[#5A2DE4] hover:to-[#7B4CE6] text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2"
                         >
                             <Trophy className="w-5 h-5" />
                             New Ranked Match
@@ -234,7 +256,7 @@ export default function MatchCompletePage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => navigate('/competition/play?type=practice')}
-                            className="bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/50 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2"
+                            className="bg-[#141416] border border-[#2A2A2E] hover:border-[#00D9C8]/50 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2"
                         >
                             <Wrench className="w-5 h-5" />
                             New Practice Match
@@ -246,7 +268,7 @@ export default function MatchCompletePage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-[#1E2232] border border-white/10 rounded-2xl p-6"
+                        className="bg-[#141416] border border-[#2A2A2E] rounded-2xl p-6"
                     >
                         <h3 className="text-xl font-bold mb-4">Trade Analytics</h3>
                         <p className="text-gray-400 text-sm">Detailed trade analysis coming soon...</p>
@@ -256,4 +278,14 @@ export default function MatchCompletePage() {
         </DashboardLayout>
     );
 }
+
+
+
+
+
+
+
+
+
+
 

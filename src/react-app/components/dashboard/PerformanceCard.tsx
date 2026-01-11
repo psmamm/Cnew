@@ -142,7 +142,7 @@ export default function PerformanceCard({ refreshTrigger }: PerformanceCardProps
           </div>
           <button
             onClick={refetch}
-            className="px-4 py-2 bg-[#6A3DF4]/20 hover:bg-[#6A3DF4]/30 border border-[#6A3DF4]/30 rounded-lg text-[#6A3DF4] text-sm font-medium transition-colors"
+            className="px-4 py-2 bg-[#00D9C8]/20 hover:bg-[#00D9C8]/30 border border-[#00D9C8]/30 rounded-lg text-[#00D9C8] text-sm font-medium transition-colors"
           >
             Retry
           </button>
@@ -166,7 +166,7 @@ export default function PerformanceCard({ refreshTrigger }: PerformanceCardProps
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`${getCardBg(theme)} rounded-lg border ${getCardBorder(theme)} border-white/10 p-6 relative overflow-hidden`}
+      className={`${getCardBg(theme)} rounded-lg border ${getCardBorder(theme)} border-[#2A2A2E] p-6 relative overflow-hidden`}
     >
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -227,7 +227,7 @@ export default function PerformanceCard({ refreshTrigger }: PerformanceCardProps
           <div className="mb-6">
             <div className={`w-full ${theme === 'dark' ? 'bg-black/30' : 'bg-gray-800/30'} rounded-full h-2 border border-white/5 overflow-hidden`}>
               <motion.div
-                className="bg-gradient-to-r from-[#6A3DF4] to-[#8A5CFF] h-2 rounded-full"
+                className="bg-gradient-to-r from-[#00D9C8] to-[#00F5E1] h-2 rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressAnimation}%` }}
                 transition={{ 
@@ -252,7 +252,7 @@ export default function PerformanceCard({ refreshTrigger }: PerformanceCardProps
         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
           <div>
             <div className="flex items-center space-x-2 mb-1">
-              <Award className="w-4 h-4 text-[#6A3DF4]" />
+              <Award className="w-4 h-4 text-[#00D9C8]" />
               <span className={`${getTextColor(theme, 'muted')} text-xs uppercase tracking-wider`}>
                 Reputation
               </span>
@@ -264,7 +264,7 @@ export default function PerformanceCard({ refreshTrigger }: PerformanceCardProps
           
           <div>
             <div className="flex items-center space-x-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-[#2ECC71]" />
+              <TrendingUp className="w-4 h-4 text-[#00D9C8]" />
               <span className={`${getTextColor(theme, 'muted')} text-xs uppercase tracking-wider`}>
                 Streak
               </span>
@@ -290,4 +290,12 @@ export default function PerformanceCard({ refreshTrigger }: PerformanceCardProps
     </motion.div>
   );
 }
+
+
+
+
+
+
+
+
 

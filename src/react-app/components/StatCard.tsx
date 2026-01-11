@@ -30,7 +30,7 @@ export default function StatCard({
   
   const getChangeColor = () => {
     if (change === "N/A") return theme === 'dark' ? "text-[#AAB0C0]" : "text-gray-500";
-    return changeType === 'positive' ? 'text-[#2ECC71]' : 'text-[#E74C3C]';
+    return changeType === 'positive' ? 'text-[#00D9C8]' : 'text-[#F43F5E]';
   };
 
   const getChangeIcon = () => {
@@ -43,11 +43,11 @@ export default function StatCard({
   const getProgressColor = () => {
     if (title === "Win Rate") {
       const percentage = parseFloat(value);
-      if (percentage >= 70) return 'from-[#2ECC71] to-[#27AE60]';
-      if (percentage >= 50) return 'from-[#6A3DF4] to-[#8A5CFF]';
-      return 'from-[#E74C3C] to-[#C0392B]';
+      if (percentage >= 70) return 'from-[#00D9C8] to-[#27AE60]';
+      if (percentage >= 50) return 'from-[#00D9C8] to-[#00F5E1]';
+      return 'from-[#F43F5E] to-[#C0392B]';
     }
-    return 'from-[#6A3DF4] to-[#8A5CFF]';
+    return 'from-[#00D9C8] to-[#00F5E1]';
   };
 
   const isClickable = !!onClick;
@@ -65,17 +65,17 @@ export default function StatCard({
     >
       {/* Gradient overlay for clickable cards */}
       {isClickable && (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#6A3DF4]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#00D9C8]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       )}
 
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className={`p-2 sm:p-2.5 rounded-lg border transition-all duration-300 ${
             loading 
-              ? 'bg-[#6A3DF4]/20 border-[#6A3DF4]/30 animate-pulse' 
-              : 'bg-[#6A3DF4]/10 border-[#6A3DF4]/20 group-hover:bg-[#6A3DF4]/20 group-hover:border-[#6A3DF4]/40'
+              ? 'bg-[#00D9C8]/20 border-[#00D9C8]/30 animate-pulse' 
+              : 'bg-[#00D9C8]/10 border-[#00D9C8]/20 group-hover:bg-[#00D9C8]/20 group-hover:border-[#00D9C8]/40'
           }`}>
-            <Icon className={`w-4 h-4 sm:w-5 sm:h-5 text-[#6A3DF4] ${loading ? 'animate-pulse' : ''}`} />
+            <Icon className={`w-4 h-4 sm:w-5 sm:h-5 text-[#00D9C8] ${loading ? 'animate-pulse' : ''}`} />
           </div>
           
           {!loading && change !== "N/A" && (
@@ -111,7 +111,7 @@ export default function StatCard({
         {/* Progress bar for Win Rate */}
         {title === "Win Rate" && value !== "..." && !loading && (
           <div className="mt-3">
-            <div className={`w-full ${theme === 'dark' ? 'bg-[#0D0F18]/50' : 'bg-gray-200'} rounded-full h-1.5`}>
+            <div className={`w-full ${theme === 'dark' ? 'bg-[#141416]/50' : 'bg-gray-200'} rounded-full h-1.5`}>
               <motion.div 
                 className={`bg-gradient-to-r ${getProgressColor()} h-1.5 rounded-full`}
                 initial={{ width: 0 }}
@@ -130,8 +130,8 @@ export default function StatCard({
         {title === "Profit Factor" && value !== "..." && !loading && (
           <div className="mt-2">
             <span className={`text-[10px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
-              parseFloat(value) >= 1.5 ? 'bg-[#2ECC71]/10 text-[#2ECC71]' :
-              parseFloat(value) >= 1.0 ? 'bg-[#6A3DF4]/10 text-[#6A3DF4]' : 'bg-[#E74C3C]/10 text-[#E74C3C]'
+              parseFloat(value) >= 1.5 ? 'bg-[#00D9C8]/10 text-[#00D9C8]' :
+              parseFloat(value) >= 1.0 ? 'bg-[#00D9C8]/10 text-[#00D9C8]' : 'bg-[#F43F5E]/10 text-[#F43F5E]'
             }`}>
               {parseFloat(value) >= 1.5 ? 'Excellent' :
                parseFloat(value) >= 1.0 ? 'Good' : 'Needs Improvement'}
@@ -146,7 +146,7 @@ export default function StatCard({
               {trend.slice(-7).map((point, index) => (
                 <div
                   key={index}
-                  className="bg-[#6A3DF4] rounded-sm flex-1 opacity-70 group-hover:opacity-100 transition-opacity"
+                  className="bg-[#00D9C8] rounded-sm flex-1 opacity-70 group-hover:opacity-100 transition-opacity"
                   style={{ height: `${Math.max(10, (point / Math.max(...trend)) * 100)}%` }}
                 />
               ))}
@@ -158,10 +158,18 @@ export default function StatCard({
         {/* Click indicator */}
         {isClickable && (
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Activity className="w-4 h-4 text-[#6A3DF4]" />
+            <Activity className="w-4 h-4 text-[#00D9C8]" />
           </div>
         )}
       </div>
     </motion.div>
   );
 }
+
+
+
+
+
+
+
+

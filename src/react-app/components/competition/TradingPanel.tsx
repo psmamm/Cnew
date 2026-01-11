@@ -52,7 +52,7 @@ export function TradingPanel({
     const leveragePercentage = ((leverage - 1) / 99) * 100;
 
     return (
-        <div className="w-80 bg-[#1E2232] rounded-xl border border-white/5 flex flex-col shrink-0">
+        <div className="w-80 bg-[#141416] rounded-xl border border-white/5 flex flex-col shrink-0">
             {/* Account Info */}
             <div className="p-4 border-b border-white/5 space-y-3">
                 <div>
@@ -114,7 +114,7 @@ export function TradingPanel({
                             type="number"
                             value={quantity}
                             onChange={(e) => onQuantityChange(parseFloat(e.target.value))}
-                            className="w-full bg-[#0D0F18] border border-white/10 rounded-lg py-3 px-4 pr-16 text-white focus:outline-none focus:border-[#6A3DF4] font-mono"
+                            className="w-full bg-[#141416] border border-white/10 rounded-lg py-3 px-4 pr-16 text-white focus:outline-none focus:border-[#6A3DF4] font-mono"
                             disabled={!gameStarted || gameOver}
                         />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{practiceSettings.symbol.replace('USDT', '')}</span>
@@ -181,7 +181,7 @@ export function TradingPanel({
                                 type="checkbox"
                                 checked={isLimitOrder}
                                 onChange={(e) => onLimitOrderChange(e.target.checked)}
-                                className="peer appearance-none w-3 h-3 rounded border border-white/20 bg-[#0D0F18] checked:bg-[#6A3DF4] checked:border-[#6A3DF4] transition-colors"
+                                className="peer appearance-none w-3 h-3 rounded border border-white/20 bg-[#141416] checked:bg-[#6A3DF4] checked:border-[#6A3DF4] transition-colors"
                             />
                             <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -196,7 +196,7 @@ export function TradingPanel({
                                 placeholder="Limit Price"
                                 value={limitPrice}
                                 onChange={(e) => onLimitPriceChange(e.target.value)}
-                                className="w-full bg-[#0D0F18] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#6A3DF4] font-mono"
+                                className="w-full bg-[#141416] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#6A3DF4] font-mono"
                             />
                         </div>
                     )}
@@ -206,7 +206,7 @@ export function TradingPanel({
                                 type="checkbox"
                                 checked={isTpSlEnabled}
                                 onChange={(e) => onTpSlChange(e.target.checked)}
-                                className="peer appearance-none w-3 h-3 rounded border border-white/20 bg-[#0D0F18] checked:bg-[#6A3DF4] checked:border-[#6A3DF4] transition-colors"
+                                className="peer appearance-none w-3 h-3 rounded border border-white/20 bg-[#141416] checked:bg-[#6A3DF4] checked:border-[#6A3DF4] transition-colors"
                             />
                             <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12"></polyline>
@@ -231,7 +231,7 @@ export function TradingPanel({
                                             placeholder="Price"
                                             value={takeProfit}
                                             onChange={(e) => onTakeProfitChange(e.target.value)}
-                                            className="w-full bg-[#0D0F18] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#2EBD85] font-mono"
+                                            className="w-full bg-[#141416] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#2EBD85] font-mono"
                                         />
                                     </div>
                                     <div className="space-y-1">
@@ -241,7 +241,7 @@ export function TradingPanel({
                                             placeholder="Price"
                                             value={stopLoss}
                                             onChange={(e) => onStopLossChange(e.target.value)}
-                                            className="w-full bg-[#0D0F18] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#F6465D] font-mono"
+                                            className="w-full bg-[#141416] border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-[#F6465D] font-mono"
                                         />
                                     </div>
                                 </div>
@@ -285,4 +285,5 @@ export function TradingPanel({
         </div>
     );
 }
+
 

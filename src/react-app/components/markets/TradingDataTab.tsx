@@ -16,7 +16,7 @@ function DataCard({ title, showFilter = false, children }: DataCardProps) {
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
-    <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 h-full flex flex-col">
+    <div className="bg-[#141416] rounded-xl p-4 border border-white/10 h-full flex flex-col">
       <div className="flex items-center justify-between mb-3 flex-shrink-0">
         <h3 className="text-sm font-semibold text-white">{title}</h3>
         {showFilter && (
@@ -72,7 +72,7 @@ function CoinRow({ rank, item, onNavigate }: CoinRowProps) {
     >
       <div className="flex items-center space-x-2.5 flex-1 min-w-0">
         <div className="text-[#7F8C8D] text-xs font-medium w-6 text-center">{rank}</div>
-        <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#0D0F18]/50">
+        <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 bg-[#141416]/50">
           {item.logo ? (
             <img
               src={item.logo}
@@ -83,12 +83,12 @@ function CoinRow({ rank, item, onNavigate }: CoinRowProps) {
                 target.style.display = 'none';
                 const parent = target.parentElement;
                 if (parent) {
-                  parent.innerHTML = `<span class="text-[#BDC3C7] font-bold text-xs">${item.baseAsset.slice(0, 2)}</span>`;
+                  parent.innerHTML = `<span class="text-[#6B7280] font-bold text-xs">${item.baseAsset.slice(0, 2)}</span>`;
                 }
               }}
             />
           ) : (
-            <span className="text-[#BDC3C7] font-bold text-xs">{item.baseAsset.slice(0, 2)}</span>
+            <span className="text-[#6B7280] font-bold text-xs">{item.baseAsset.slice(0, 2)}</span>
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -562,3 +562,4 @@ export default function TradingDataTab() {
     </motion.div>
   );
 }
+

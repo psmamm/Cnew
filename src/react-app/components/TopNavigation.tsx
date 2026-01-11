@@ -9,15 +9,34 @@ import {
   User,
   Bell,
   ArrowDown,
+  ArrowUp,
+  ArrowLeftRight,
   BarChart3,
   TrendingUp,
   FileText,
   Target,
   Activity,
   Settings,
-  LogOut,
   Search,
-  CreditCard
+  CreditCard,
+  LayoutGrid,
+  Shield,
+  ShieldCheck,
+  Gift,
+  Ticket,
+  Key,
+  SlidersHorizontal,
+  Copy,
+  Check,
+  Wallet,
+  CircleDollarSign,
+  Layers,
+  Coins,
+  Users,
+  LineChart,
+  Eye,
+  EyeOff,
+  Repeat
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotifications } from '@/react-app/hooks/useNotifications';
@@ -38,6 +57,33 @@ export default function TopNavigation() {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [showLanguageCurrency, setShowLanguageCurrency] = useState(false);
   const [languageSearch, setLanguageSearch] = useState('');
+  const [copiedUID, setCopiedUID] = useState(false);
+  const [copiedReferral, setCopiedReferral] = useState(false);
+  const [showWalletDropdown, setShowWalletDropdown] = useState(false);
+  const [showTradingDropdown, setShowTradingDropdown] = useState(false);
+  const [showMoreDropdown, setShowMoreDropdown] = useState(false);
+  const [showBalanceNav, setShowBalanceNav] = useState(true);
+
+  // Generate UID from user email
+  const userUID = user?.email ?
+    Math.abs(user.email.charCodeAt(0) * 12345678).toString().slice(0, 10) :
+    "0000000000";
+
+  // Generate referral code
+  const referralCode = user?.email ?
+    user.email.split('@')[0].slice(0, 4).toUpperCase() + Math.abs(user.email.charCodeAt(0) * 999).toString().slice(0, 4) :
+    "CIRCL0000";
+
+  const copyToClipboard = (text: string, type: 'uid' | 'referral') => {
+    navigator.clipboard.writeText(text);
+    if (type === 'uid') {
+      setCopiedUID(true);
+      setTimeout(() => setCopiedUID(false), 2000);
+    } else {
+      setCopiedReferral(true);
+      setTimeout(() => setCopiedReferral(false), 2000);
+    }
+  };
 
   const toggleDropdown = (name: string) => {
     setOpenDropdowns(prev => ({
@@ -116,30 +162,53 @@ export default function TopNavigation() {
     { name: t('Competition'), path: '/competition', hasDropdown: false, key: 'Competition' },
     { name: t('Journal'), path: '/journal', hasDropdown: false, key: 'Journal' },
     { name: t('Markets'), path: '/markets', hasDropdown: false, key: 'Markets' },
-    { name: t('Strategies'), path: '/strategies', hasDropdown: false, key: 'Strategies' },
-    { name: t('Reports'), path: '/reports', hasDropdown: false, key: 'Reports' },
-    { name: t('AI Clone'), path: '/ai-clone', hasDropdown: false, key: 'AI Clone' },
-    { name: t('Study'), path: '/study', hasDropdown: false, key: 'Study' },
+  ];
+
+  // More dropdown items - Like Bitget's "More" menu
+  const moreMenuItems = [
+    {
+      category: 'Trading Tools',
+      items: [
+        { name: 'Strategies', path: '/strategies', icon: Target, description: 'Manage your playbooks' },
+        { name: 'AI Clone', path: '/ai-clone', icon: Activity, description: 'AI-powered trading assistant' },
+        { name: 'Reports', path: '/reports', icon: BarChart3, description: 'Analytics & insights' },
+      ]
+    },
+    {
+      category: 'Learn',
+      items: [
+        { name: 'Study', path: '/study', icon: FileText, description: 'Educational resources' },
+        { name: 'Alpha Hub', path: '/alpha-hub', icon: TrendingUp, description: 'Market insights' },
+      ]
+    },
+    {
+      category: 'Tools',
+      items: [
+        { name: 'Bitcoin Halving', path: '/bitcoin-halving', icon: Activity, description: 'Halving countdown' },
+        { name: 'US Debt', path: '/us-debt', icon: BarChart3, description: 'US debt tracker' },
+        { name: 'Order Heatmap', path: '/order-heatmap', icon: Target, description: 'Order flow analysis' },
+      ]
+    }
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b transition-colors bg-[#1A1D23] border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b transition-colors bg-[#0D0D0F] border-[#2A2A2E]">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left Section - Logo */}
           <div className="flex items-center space-x-6">
-            {/* Logo */}
+            {/* Logo - Bitget style */}
             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
-              <div className="w-8 h-8 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/20">
-                <BarChart3 className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-[#00D9C8] rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-[#0D0D0F]" />
               </div>
-              <span className="text-xl font-bold text-white">TradeCircle</span>
+              <span className="text-xl font-bold text-white">CIRCL</span>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="lg:hidden p-2 rounded-lg transition-colors text-white hover:bg-white/10"
+              className="lg:hidden p-2 rounded-lg transition-colors text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E]"
             >
               {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -156,7 +225,7 @@ export default function TopNavigation() {
                       onClick={() => hasDropdown ? toggleDropdown(item.name) : navigate(item.path)}
                       className={`
                         flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-lg transition-all
-                        text-white ${isActive ? 'bg-white/5' : 'hover:bg-white/5'}
+                        ${isActive ? 'text-[#00D9C8] bg-[#141416]' : 'text-white hover:text-[#00D9C8] hover:bg-[#1A1A1E]'}
                       `}
                     >
                       <span>{item.name}</span>
@@ -170,7 +239,7 @@ export default function TopNavigation() {
                       <motion.div
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
-                        className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#6A3DF4] rounded-full"
+                        className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#00D9C8] rounded-full"
                         style={{ bottom: '-2px' }}
                       />
                     )}
@@ -181,18 +250,18 @@ export default function TopNavigation() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute top-full left-0 mt-2 w-48 bg-[#1A1D23] border border-white/10 rounded-lg shadow-xl py-2 z-50"
+                        className="absolute top-full left-0 mt-2 w-48 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-dropdown py-2 z-50"
                       >
                         <Link
                           to={item.path}
-                          className="block px-4 py-2 text-sm text-white hover:bg-white/5 transition-colors"
+                          className="block px-4 py-2.5 text-sm text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] transition-colors"
                           onClick={() => toggleDropdown(item.name)}
                         >
                           Overview
                         </Link>
                         <Link
                           to={`${item.path}/advanced`}
-                          className="block px-4 py-2 text-sm text-white hover:bg-white/5 transition-colors"
+                          className="block px-4 py-2.5 text-sm text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] transition-colors"
                           onClick={() => toggleDropdown(item.name)}
                         >
                           Advanced
@@ -202,21 +271,78 @@ export default function TopNavigation() {
                   </div>
                 );
               })}
+
+              {/* More Dropdown - Bitget style */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowMoreDropdown(!showMoreDropdown)}
+                  className={`
+                    flex items-center space-x-1 px-3 py-2 text-sm font-medium rounded-lg transition-all
+                    ${showMoreDropdown ? 'text-[#00D9C8] bg-[#141416]' : 'text-white hover:text-[#00D9C8] hover:bg-[#1A1A1E]'}
+                  `}
+                >
+                  <span>More</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showMoreDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* More Mega Menu - Bitget style */}
+                <AnimatePresence>
+                  {showMoreDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-2 w-[600px] bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-2xl z-50"
+                    >
+                      <div className="p-4 grid grid-cols-3 gap-4">
+                        {moreMenuItems.map((section) => (
+                          <div key={section.category}>
+                            <h4 className="text-xs font-medium text-[#6B7280] uppercase tracking-wider px-2 mb-2">
+                              {section.category}
+                            </h4>
+                            <div className="space-y-1">
+                              {section.items.map((item) => (
+                                <button
+                                  key={item.name}
+                                  onClick={() => {
+                                    navigate(item.path);
+                                    setShowMoreDropdown(false);
+                                  }}
+                                  className="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[#1A1A1E] transition-colors group"
+                                >
+                                  <div className="w-8 h-8 rounded-lg bg-[#1A1A1E] group-hover:bg-[#00D9C8]/10 flex items-center justify-center transition-colors">
+                                    <item.icon className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#00D9C8]" />
+                                  </div>
+                                  <div className="text-left">
+                                    <span className="block text-sm text-white">{item.name}</span>
+                                    <span className="block text-xs text-[#6B7280]">{item.description}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
 
-          {/* Right Section - Darker Background */}
-          <div className="flex items-center rounded-lg px-3 py-2 space-x-2 bg-[#151820]">
+          {/* Right Section - Bitget style */}
+          <div className="flex items-center rounded-lg px-3 py-2 space-x-2 bg-[#141416]">
             {/* Search Icon Button */}
             <div className="relative hidden md:block">
               <button
                 onClick={() => setShowSearchDropdown(!showSearchDropdown)}
-                className="flex items-center justify-center w-8 h-8 text-white hover:bg-white/5 rounded-lg transition-colors"
+                className="flex items-center justify-center w-8 h-8 text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] rounded-lg transition-colors"
               >
                 <Search className="h-4 w-4" />
               </button>
 
-              {/* Search Dropdown */}
+              {/* Search Dropdown - Bitget style */}
               <AnimatePresence>
                 {showSearchDropdown && (
                   <motion.div
@@ -224,14 +350,14 @@ export default function TopNavigation() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full right-0 mt-2 w-80 bg-[#1A1D23] border border-white/10 rounded-lg shadow-xl z-50"
+                    className="absolute top-full right-0 mt-2 w-80 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-dropdown z-50"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {/* Search Input */}
-                    <div className="p-4 border-b border-white/5">
+                    <div className="p-4 border-b border-[#2A2A2E]">
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Search className="h-4 w-4 text-[#7F8C8D]" />
+                          <Search className="h-4 w-4 text-[#6B7280]" />
                         </div>
                         <input
                           type="text"
@@ -243,7 +369,7 @@ export default function TopNavigation() {
                             }
                           }}
                           placeholder={t('Search trades, symbols...')}
-                          className="w-full pl-10 pr-4 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-white text-sm placeholder-[#7F8C8D] focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
+                          className="w-full pl-10 pr-4 py-2 bg-[#1A1A1E] border border-[#2A2A2E] rounded-lg text-white text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#00D9C8] transition-all"
                           autoFocus
                         />
                       </div>
@@ -259,12 +385,12 @@ export default function TopNavigation() {
                               setSearchQuery('');
                               setShowSearchDropdown(false);
                             }}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#AAB0C0] hover:text-white hover:bg-white/5 rounded-lg transition-all text-left"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] rounded-lg transition-all text-left"
                           >
                             <TrendingUp className="w-4 h-4" />
                             <div>
                               <p className="text-sm font-medium">Markets</p>
-                              <p className="text-xs text-[#7F8C8D]">Browse all markets</p>
+                              <p className="text-xs text-[#6B7280]">Browse all markets</p>
                             </div>
                           </button>
                           <button
@@ -273,12 +399,12 @@ export default function TopNavigation() {
                               setSearchQuery('');
                               setShowSearchDropdown(false);
                             }}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#AAB0C0] hover:text-white hover:bg-white/5 rounded-lg transition-all text-left"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] rounded-lg transition-all text-left"
                           >
                             <BarChart3 className="w-4 h-4" />
                             <div>
                               <p className="text-sm font-medium">Dashboard</p>
-                              <p className="text-xs text-[#7F8C8D]">View your dashboard</p>
+                              <p className="text-xs text-[#6B7280]">View your dashboard</p>
                             </div>
                           </button>
                           <button
@@ -287,12 +413,12 @@ export default function TopNavigation() {
                               setSearchQuery('');
                               setShowSearchDropdown(false);
                             }}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#AAB0C0] hover:text-white hover:bg-white/5 rounded-lg transition-all text-left"
+                            className="w-full flex items-center space-x-3 px-3 py-2.5 text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] rounded-lg transition-all text-left"
                           >
                             <FileText className="w-4 h-4" />
                             <div>
                               <p className="text-sm font-medium">Journal</p>
-                              <p className="text-xs text-[#7F8C8D]">View trading journal</p>
+                              <p className="text-xs text-[#6B7280]">View trading journal</p>
                             </div>
                           </button>
                         </div>
@@ -303,30 +429,319 @@ export default function TopNavigation() {
               </AnimatePresence>
             </div>
 
-            {/* Deposit Button - Purple */}
+            {/* Wallet Dropdown - Bitget style */}
+            {user && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowWalletDropdown(!showWalletDropdown)}
+                  className="flex items-center space-x-1.5 p-2 text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] rounded-lg transition-colors"
+                >
+                  <Wallet className="w-5 h-5" />
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showWalletDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Wallet Dropdown Menu - Bitget style */}
+                <AnimatePresence>
+                  {showWalletDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-80 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-2xl z-50"
+                    >
+                      {/* Total Asset Value */}
+                      <div className="p-4 border-b border-[#2A2A2E]">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[#9CA3AF] text-sm">Total asset value (USD)</span>
+                          <button
+                            onClick={() => setShowBalanceNav(!showBalanceNav)}
+                            className="p-1 hover:bg-[#1A1A1E] rounded transition-colors"
+                          >
+                            {showBalanceNav ? (
+                              <Eye className="w-4 h-4 text-[#6B7280]" />
+                            ) : (
+                              <EyeOff className="w-4 h-4 text-[#6B7280]" />
+                            )}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-semibold text-white">
+                            {showBalanceNav ? '0.00' : '****'}
+                          </span>
+                          <span className="text-[#00D9C8] text-sm">≈ 0.000 BTC</span>
+                        </div>
+                      </div>
+
+                      {/* Quick Action Buttons */}
+                      <div className="p-4 border-b border-[#2A2A2E]">
+                        <div className="grid grid-cols-3 gap-2">
+                          <button
+                            onClick={() => {
+                              navigate('/deposit');
+                              setShowWalletDropdown(false);
+                            }}
+                            className="flex flex-col items-center gap-1.5 p-3 bg-[#1A1A1E] rounded-lg hover:bg-[#222226] transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#00D9C8]/10 flex items-center justify-center">
+                              <ArrowDown className="w-4 h-4 text-[#00D9C8]" />
+                            </div>
+                            <span className="text-white text-xs font-medium">Deposit</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/withdraw');
+                              setShowWalletDropdown(false);
+                            }}
+                            className="flex flex-col items-center gap-1.5 p-3 bg-[#1A1A1E] rounded-lg hover:bg-[#222226] transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#00D9C8]/10 flex items-center justify-center">
+                              <ArrowUp className="w-4 h-4 text-[#00D9C8]" />
+                            </div>
+                            <span className="text-white text-xs font-medium">Withdraw</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/transfer');
+                              setShowWalletDropdown(false);
+                            }}
+                            className="flex flex-col items-center gap-1.5 p-3 bg-[#1A1A1E] rounded-lg hover:bg-[#222226] transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#00D9C8]/10 flex items-center justify-center">
+                              <ArrowLeftRight className="w-4 h-4 text-[#00D9C8]" />
+                            </div>
+                            <span className="text-white text-xs font-medium">Transfer</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Wallet Menu Items */}
+                      <div className="py-2">
+                        <button
+                          onClick={() => {
+                            navigate('/assets');
+                            setShowWalletDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <CircleDollarSign className="w-5 h-5 text-[#9CA3AF]" />
+                          <div className="flex-1 text-left">
+                            <span className="block">Assets</span>
+                            <span className="text-xs text-[#6B7280]">View all your assets</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/spot-assets');
+                            setShowWalletDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <Coins className="w-5 h-5 text-[#9CA3AF]" />
+                          <div className="flex-1 text-left">
+                            <span className="block">Spot</span>
+                            <span className="text-xs text-[#6B7280]">Spot trading account</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/margin-assets');
+                            setShowWalletDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <Layers className="w-5 h-5 text-[#9CA3AF]" />
+                          <div className="flex-1 text-left">
+                            <span className="block">Margin</span>
+                            <span className="text-xs text-[#6B7280]">Margin trading account</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/futures-assets');
+                            setShowWalletDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <LineChart className="w-5 h-5 text-[#9CA3AF]" />
+                          <div className="flex-1 text-left">
+                            <span className="block">Futures</span>
+                            <span className="text-xs text-[#6B7280]">Futures trading account</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/copy-trading');
+                            setShowWalletDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <Users className="w-5 h-5 text-[#9CA3AF]" />
+                          <div className="flex-1 text-left">
+                            <span className="block">Copy trading</span>
+                            <span className="text-xs text-[#6B7280]">Follow top traders</span>
+                          </div>
+                        </button>
+                      </div>
+
+                      {/* View All Assets Button */}
+                      <div className="p-3 border-t border-[#2A2A2E]">
+                        <button
+                          onClick={() => {
+                            navigate('/assets');
+                            setShowWalletDropdown(false);
+                          }}
+                          className="w-full py-2.5 bg-[#1A1A1E] hover:bg-[#222226] text-white rounded-lg font-medium transition-colors"
+                        >
+                          View all assets
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Trading Dropdown - Bitget style */}
+            {user && (
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setShowTradingDropdown(!showTradingDropdown)}
+                  className="flex items-center space-x-1.5 px-3 py-2 text-white hover:text-[#00D9C8] hover:bg-[#1A1A1E] rounded-lg transition-colors"
+                >
+                  <span className="text-sm font-medium">Trade</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showTradingDropdown ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Trading Dropdown Menu */}
+                <AnimatePresence>
+                  {showTradingDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-72 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-2xl z-50"
+                    >
+                      <div className="py-2">
+                        <button
+                          onClick={() => {
+                            navigate('/trading?type=spot');
+                            setShowTradingDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                            <Coins className="w-5 h-5 text-[#00D9C8]" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <span className="block font-medium">Spot Trading</span>
+                            <span className="text-xs text-[#6B7280]">Buy and sell crypto</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/trading?type=margin');
+                            setShowTradingDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                            <Layers className="w-5 h-5 text-[#00D9C8]" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <span className="block font-medium">Margin Trading</span>
+                            <span className="text-xs text-[#6B7280]">Trade with leverage</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/trading?type=futures');
+                            setShowTradingDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                            <LineChart className="w-5 h-5 text-[#00D9C8]" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <span className="block font-medium">Futures</span>
+                            <span className="text-xs text-[#6B7280]">USDT-M & Coin-M futures</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/copy-trading');
+                            setShowTradingDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                            <Users className="w-5 h-5 text-[#00D9C8]" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <span className="block font-medium">Copy Trading</span>
+                            <span className="text-xs text-[#6B7280]">Follow expert traders</span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => {
+                            navigate('/bots');
+                            setShowTradingDropdown(false);
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                            <Repeat className="w-5 h-5 text-[#00D9C8]" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <span className="block font-medium">Trading Bots</span>
+                            <span className="text-xs text-[#6B7280]">Automated trading</span>
+                          </div>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Deposit Button - Teal (Bitget style) */}
             {user && (
               <button
                 onClick={() => navigate('/deposit')}
-                className="flex items-center space-x-1.5 px-4 py-2 bg-[#6A3DF4] hover:bg-[#5A2DE4] text-white font-medium rounded-lg transition-colors"
+                className="hidden md:flex items-center space-x-1.5 px-4 py-2 bg-[#00D9C8] hover:bg-[#00F5E1] text-[#0D0D0F] font-semibold rounded-lg transition-colors"
               >
                 <ArrowDown className="w-4 h-4" />
                 <span className="text-sm">Deposit</span>
               </button>
             )}
 
-            {/* User Icons - White */}
+            {/* User Icons - Bitget style */}
             {user ? (
               <>
                 {/* Profile Menu */}
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="p-2 text-white hover:bg-white/5 rounded-lg transition-colors relative"
+                    className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#2A2A2E] hover:border-[#00D9C8] transition-colors"
                   >
-                    <User className="w-5 h-5" />
+                    {user?.photoURL?.startsWith('http') || user?.photoURL?.startsWith('data:') ? (
+                      <img
+                        src={user.photoURL}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#1A1A1E] flex items-center justify-center">
+                        <span className="text-[#9CA3AF] font-semibold text-sm">
+                          {user?.photoURL || user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                        </span>
+                      </div>
+                    )}
                   </button>
 
-                  {/* Profile Dropdown */}
+                  {/* Profile Dropdown - Bitget style */}
                   <AnimatePresence>
                     {showProfileMenu && (
                       <motion.div
@@ -334,53 +749,163 @@ export default function TopNavigation() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-56 bg-[#1A1D23] border border-white/10 rounded-xl shadow-xl z-50"
+                        className="absolute right-0 mt-2 w-72 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-2xl z-50"
                       >
-                        <div className="p-4 border-b border-white/5">
+                        {/* Profile Header */}
+                        <div className="p-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-full flex items-center justify-center overflow-hidden">
+                            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#2A2A2E]">
                               {user?.photoURL?.startsWith('http') || user?.photoURL?.startsWith('data:') ? (
                                 <img
                                   src={user.photoURL}
                                   alt="Profile"
-                                  className="w-10 h-10 rounded-full object-cover"
+                                  className="w-full h-full object-cover"
                                 />
                               ) : (
-                                <span className="text-white font-semibold text-xl">
-                                  {user?.photoURL || user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'P'}
-                                </span>
+                                <div className="w-full h-full bg-[#1A1A1E] flex items-center justify-center">
+                                  <span className="text-[#9CA3AF] font-semibold text-2xl">
+                                    {user?.photoURL || user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                                  </span>
+                                </div>
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-white font-medium text-sm truncate">
+                              <p className="text-white font-semibold text-base truncate">
                                 {user?.displayName || user?.email?.split('@')[0] || 'User'}
                               </p>
-                              <p className="text-[#7F8C8D] text-xs truncate">{user?.email}</p>
+                              <div className="flex items-center space-x-1.5 mt-0.5">
+                                <span className="text-[#6B7280] text-xs">UID</span>
+                                <span className="text-[#9CA3AF] text-xs font-mono">{userUID}</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(userUID, 'uid');
+                                  }}
+                                  className="p-0.5 hover:bg-[#1A1A1E] rounded transition-colors"
+                                >
+                                  {copiedUID ? (
+                                    <Check className="w-3 h-3 text-[#00D9C8]" />
+                                  ) : (
+                                    <Copy className="w-3 h-3 text-[#6B7280]" />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Badges */}
+                          <div className="flex items-center space-x-2 mt-3">
+                            <span className="px-2.5 py-1 bg-[#00D9C8]/10 text-[#00D9C8] text-xs font-medium rounded-full flex items-center gap-1">
+                              <ShieldCheck className="w-3 h-3" />
+                              Verified
+                            </span>
+                            <span className="px-2.5 py-1 bg-[#2A2A2E] text-[#9CA3AF] text-xs font-medium rounded-full flex items-center gap-1">
+                              <Shield className="w-3 h-3" />
+                              VIP
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Menu Items */}
+                        <div className="py-2">
+                          <button
+                            onClick={() => {
+                              navigate('/dashboard');
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <LayoutGrid className="w-5 h-5 text-[#9CA3AF]" />
+                            <span>Dashboard</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              navigate('/settings');
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <CreditCard className="w-5 h-5 text-[#9CA3AF]" />
+                            <span>Identity verification</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              navigate('/settings');
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <ShieldCheck className="w-5 h-5 text-[#9CA3AF]" />
+                            <span>Security settings</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              navigate('/rewards');
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full flex items-center justify-between px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <Gift className="w-5 h-5 text-[#9CA3AF]" />
+                              <span>Rewards Center</span>
+                            </div>
+                            <span className="text-[#00D9C8] text-sm">0 points</span>
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              navigate('/vouchers');
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <Ticket className="w-5 h-5 text-[#9CA3AF]" />
+                            <span>Voucher</span>
+                          </button>
+                        </div>
+
+                        {/* Referral Section */}
+                        <div className="mx-4 mb-3 p-3 bg-[#1A1A1E] rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-[#6B7280] text-xs">Become a Premier Inviter and enjoy...</p>
+                              <p className="text-white font-mono text-sm mt-1">{referralCode}</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copyToClipboard(referralCode, 'referral');
+                                }}
+                                className="p-2 hover:bg-[#2A2A2E] rounded-lg transition-colors"
+                              >
+                                {copiedReferral ? (
+                                  <Check className="w-4 h-4 text-[#00D9C8]" />
+                                ) : (
+                                  <Copy className="w-4 h-4 text-[#6B7280]" />
+                                )}
+                              </button>
+                              <div className="w-8 h-8 bg-[#2A2A2E] rounded-full flex items-center justify-center">
+                                <User className="w-4 h-4 text-[#6B7280]" />
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="p-2">
+                        {/* Bottom Menu Items */}
+                        <div className="py-2 border-t border-[#2A2A2E]">
                           <button
                             onClick={() => {
                               navigate('/settings');
                               setShowProfileMenu(false);
                             }}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#AAB0C0] hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                            className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
                           >
-                            <User className="w-4 h-4" />
-                            <span>Profile</span>
-                          </button>
-
-                          <button
-                            onClick={() => {
-                              navigate('/subscriptions');
-                              setShowProfileMenu(false);
-                            }}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#AAB0C0] hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                          >
-                            <CreditCard className="w-4 h-4" />
-                            <span>Subscription</span>
+                            <Key className="w-5 h-5 text-[#9CA3AF]" />
+                            <span>API management</span>
                           </button>
 
                           <button
@@ -388,23 +913,23 @@ export default function TopNavigation() {
                               navigate('/settings');
                               setShowProfileMenu(false);
                             }}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#AAB0C0] hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                            className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
                           >
-                            <Settings className="w-4 h-4" />
-                            <span>Settings</span>
+                            <SlidersHorizontal className="w-5 h-5 text-[#9CA3AF]" />
+                            <span>Preferences</span>
                           </button>
                         </div>
 
-                        <div className="p-2 border-t border-white/5">
+                        {/* Logout Button */}
+                        <div className="p-3 border-t border-[#2A2A2E]">
                           <button
                             onClick={() => {
                               handleLogout();
                               setShowProfileMenu(false);
                             }}
-                            className="w-full flex items-center space-x-3 px-3 py-2 text-[#E74C3C] hover:bg-[#E74C3C]/10 rounded-lg transition-all"
+                            className="w-full py-2.5 bg-[#1A1A1E] hover:bg-[#222226] text-white rounded-lg font-medium transition-colors"
                           >
-                            <LogOut className="w-4 h-4" />
-                            <span>Sign Out</span>
+                            Log out
                           </button>
                         </div>
                       </motion.div>
@@ -412,19 +937,19 @@ export default function TopNavigation() {
                   </AnimatePresence>
                 </div>
 
-                {/* WalletConnect removed */}
+                {/* Notifications - Bitget style */}
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="p-2 text-white hover:bg-white/5 rounded-lg transition-colors relative"
+                    className="p-2 text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] rounded-lg transition-colors relative"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full"></span>
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-[#00D9C8] rounded-full"></span>
                     )}
                   </button>
 
-                  {/* Notifications Dropdown */}
+                  {/* Notifications Dropdown - Bitget style */}
                   <AnimatePresence>
                     {showNotifications && (
                       <motion.div
@@ -432,11 +957,11 @@ export default function TopNavigation() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-80 bg-[#1A1D23] border border-white/10 rounded-xl shadow-xl z-50"
+                        className="absolute right-0 mt-2 w-80 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-dropdown z-50"
                       >
-                        <div className="p-4 border-b border-white/5">
+                        <div className="p-4 border-b border-[#2A2A2E]">
                           <h3 className="text-white font-semibold">Notifications</h3>
-                          <p className="text-[#7F8C8D] text-sm">{unreadCount} new messages</p>
+                          <p className="text-[#6B7280] text-sm">{unreadCount} new messages</p>
                         </div>
 
                         <div className="max-h-96 overflow-y-auto">
@@ -446,7 +971,7 @@ export default function TopNavigation() {
                               return (
                                 <div
                                   key={notification.id}
-                                  className={`p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer ${!notification.read ? 'bg-[#6A3DF4]/5' : ''
+                                  className={`p-4 border-b border-[#2A2A2E] hover:bg-[#1A1A1E] transition-colors cursor-pointer ${!notification.read ? 'bg-[#00D9C8]/5' : ''
                                     }`}
                                   onClick={() => {
                                     if (!notification.read) {
@@ -459,21 +984,21 @@ export default function TopNavigation() {
                                   }}
                                 >
                                   <div className="flex items-start space-x-3">
-                                    <div className={`p-2 rounded-lg ${notification.type === 'trade' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
-                                        notification.type === 'performance' ? 'bg-[#6A3DF4]/20 text-[#6A3DF4]' :
-                                          notification.type === 'strategy' ? 'bg-[#F39C12]/20 text-[#F39C12]' :
-                                            notification.type === 'market' ? 'bg-[#3498DB]/20 text-[#3498DB]' :
-                                              notification.type === 'goal' ? 'bg-[#9B59B6]/20 text-[#9B59B6]' :
-                                                notification.type === 'whale' ? 'bg-[#E74C3C]/20 text-[#E74C3C]' :
-                                                  'bg-[#7F8C8D]/20 text-[#7F8C8D]'
+                                    <div className={`p-2 rounded-lg ${notification.type === 'trade' ? 'bg-[#00D9C8]/10 text-[#00D9C8]' :
+                                        notification.type === 'performance' ? 'bg-[#00D9C8]/10 text-[#00D9C8]' :
+                                          notification.type === 'strategy' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
+                                            notification.type === 'market' ? 'bg-[#00D9C8]/10 text-[#00D9C8]' :
+                                              notification.type === 'goal' ? 'bg-[#00D9C8]/10 text-[#00D9C8]' :
+                                                notification.type === 'whale' ? 'bg-[#F43F5E]/10 text-[#F43F5E]' :
+                                                  'bg-[#2A2A2E] text-[#9CA3AF]'
                                       }`}>
                                       <IconComponent className="w-4 h-4" />
                                     </div>
                                     <div className="flex-1">
                                       <h4 className="text-white font-medium text-sm">{notification.title}</h4>
-                                      <p className="text-[#7F8C8D] text-sm mt-1">{notification.message}</p>
+                                      <p className="text-[#6B7280] text-sm mt-1">{notification.message}</p>
                                       <div className="flex items-center justify-between mt-2">
-                                        <p className="text-[#AAB0C0] text-xs">{notification.time}</p>
+                                        <p className="text-[#9CA3AF] text-xs">{notification.time}</p>
                                         {notification.action && (
                                           <button
                                             onClick={(e) => {
@@ -482,7 +1007,7 @@ export default function TopNavigation() {
                                               navigate(notification.action!.url);
                                               setShowNotifications(false);
                                             }}
-                                            className="text-[#6A3DF4] hover:text-[#8A5CFF] text-xs font-medium px-2 py-1 rounded-md hover:bg-[#6A3DF4]/10 transition-all"
+                                            className="text-[#00D9C8] hover:text-[#00F5E1] text-xs font-medium px-2 py-1 rounded-md hover:bg-[#00D9C8]/10 transition-all"
                                           >
                                             {notification.action.label}
                                           </button>
@@ -490,7 +1015,7 @@ export default function TopNavigation() {
                                       </div>
                                     </div>
                                     {!notification.read && (
-                                      <div className="w-2 h-2 bg-[#6A3DF4] rounded-full mt-2" />
+                                      <div className="w-2 h-2 bg-[#00D9C8] rounded-full mt-2" />
                                     )}
                                   </div>
                                 </div>
@@ -498,17 +1023,17 @@ export default function TopNavigation() {
                             })
                           ) : (
                             <div className="p-8 text-center">
-                              <Bell className="w-12 h-12 text-[#7F8C8D] mx-auto mb-3 opacity-50" />
-                              <p className="text-[#7F8C8D] text-sm">No notifications</p>
+                              <Bell className="w-12 h-12 text-[#6B7280] mx-auto mb-3 opacity-50" />
+                              <p className="text-[#6B7280] text-sm">No notifications</p>
                             </div>
                           )}
                         </div>
 
                         {notifications.length > 0 && (
-                          <div className="p-4 border-t border-white/5 space-y-2">
+                          <div className="p-4 border-t border-[#2A2A2E] space-y-2">
                             <button
                               onClick={markAllAsRead}
-                              className="w-full text-[#6A3DF4] hover:text-[#8A5CFF] text-sm font-medium transition-colors py-2 px-3 rounded-lg hover:bg-[#6A3DF4]/10"
+                              className="w-full text-[#00D9C8] hover:text-[#00F5E1] text-sm font-medium transition-colors py-2 px-3 rounded-lg hover:bg-[#00D9C8]/10"
                             >
                               Mark all as read
                             </button>
@@ -517,7 +1042,7 @@ export default function TopNavigation() {
                                 navigate('/settings');
                                 setShowNotifications(false);
                               }}
-                              className="w-full text-[#AAB0C0] hover:text-white text-sm transition-colors py-2 px-3 rounded-lg hover:bg-white/5"
+                              className="w-full text-[#9CA3AF] hover:text-white text-sm transition-colors py-2 px-3 rounded-lg hover:bg-[#1A1A1E]"
                             >
                               Notification Settings
                             </button>
@@ -532,31 +1057,31 @@ export default function TopNavigation() {
               <>
                 <button
                   onClick={() => navigate('/login')}
-                  className="px-4 py-2 text-sm font-medium text-white hover:bg-white/5 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white hover:text-[#00D9C8] hover:bg-[#1A1A1E] rounded-lg transition-colors"
                 >
                   Login
                 </button>
                 <button
                   onClick={() => navigate('/signup')}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#6A3DF4] hover:bg-[#5A2DE4] rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-semibold text-[#0D0D0F] bg-[#00D9C8] hover:bg-[#00F5E1] rounded-lg transition-colors"
                 >
                   Sign Up
                 </button>
               </>
             )}
 
-            {/* Utility Icons - White */}
-            <div className="hidden md:flex items-center space-x-1 border-l border-white/10 pl-2 ml-1">
+            {/* Utility Icons - Bitget style */}
+            <div className="hidden md:flex items-center space-x-1 border-l border-[#2A2A2E] pl-2 ml-1">
               {/* Language Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowLanguageCurrency(!showLanguageCurrency)}
-                  className="p-2 text-white hover:bg-white/5 rounded-lg transition-colors"
+                  className="p-2 text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E] rounded-lg transition-colors"
                 >
                   <Globe className="w-5 h-5" />
                 </button>
 
-                {/* Language Dropdown */}
+                {/* Language Dropdown - Bitget style */}
                 <AnimatePresence>
                   {showLanguageCurrency && (
                     <motion.div
@@ -564,7 +1089,7 @@ export default function TopNavigation() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-80 bg-[#1A1D23] border border-white/10 rounded-lg shadow-xl z-[100]"
+                      className="absolute right-0 mt-2 w-80 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-dropdown z-[100]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="p-4">
@@ -575,7 +1100,7 @@ export default function TopNavigation() {
                             value={languageSearch}
                             onChange={(e) => setLanguageSearch(e.target.value)}
                             placeholder={t('Search')}
-                            className="w-full px-3 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-lg text-white text-sm placeholder-[#7F8C8D] focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
+                            className="w-full px-3 py-2 bg-[#1A1A1E] border border-[#2A2A2E] rounded-lg text-white text-sm placeholder-[#6B7280] focus:outline-none focus:border-[#00D9C8] transition-all"
                           />
                         </div>
                         <div className="max-h-80 overflow-y-auto">
@@ -587,8 +1112,8 @@ export default function TopNavigation() {
                                 setShowLanguageCurrency(false);
                               }}
                               className={`w-full text-left px-3 py-2 rounded-lg transition-all ${language === lang
-                                  ? 'text-[#6A3DF4] font-medium'
-                                  : 'text-white hover:bg-white/5'
+                                  ? 'text-[#00D9C8] font-medium bg-[#00D9C8]/10'
+                                  : 'text-[#9CA3AF] hover:text-white hover:bg-[#1A1A1E]'
                                 }`}
                             >
                               {lang}
@@ -607,16 +1132,16 @@ export default function TopNavigation() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Bitget style */}
       <AnimatePresence>
         {showMobileMenu && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-white/10 bg-[#1A1D23]"
+            className="lg:hidden border-t border-[#2A2A2E] bg-[#0D0D0F]"
           >
-            <div className="px-4 py-4 space-y-2">
+            <div className="px-4 py-4 space-y-1">
               {navigation.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
@@ -625,8 +1150,8 @@ export default function TopNavigation() {
                     to={item.path}
                     onClick={() => setShowMobileMenu(false)}
                     className={`
-                      block px-3 py-2 text-sm font-medium rounded-lg transition-colors
-                      ${isActive ? 'bg-white/5 text-white' : 'text-white hover:bg-white/5'}
+                      block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors
+                      ${isActive ? 'bg-[#141416] text-[#00D9C8]' : 'text-white hover:text-[#00D9C8] hover:bg-[#1A1A1E]'}
                     `}
                   >
                     {item.name}
@@ -639,7 +1164,7 @@ export default function TopNavigation() {
       </AnimatePresence>
 
       {/* Click outside to close dropdowns */}
-      {(Object.values(openDropdowns).some(Boolean) || showNotifications || showProfileMenu || showSearchDropdown || showLanguageCurrency) && (
+      {(Object.values(openDropdowns).some(Boolean) || showNotifications || showProfileMenu || showSearchDropdown || showLanguageCurrency || showWalletDropdown || showTradingDropdown || showMoreDropdown) && (
         <div
           className="fixed inset-0 z-40"
           onClick={() => {
@@ -648,9 +1173,19 @@ export default function TopNavigation() {
             setShowProfileMenu(false);
             setShowSearchDropdown(false);
             setShowLanguageCurrency(false);
+            setShowWalletDropdown(false);
+            setShowTradingDropdown(false);
+            setShowMoreDropdown(false);
           }}
         />
       )}
     </nav>
   );
 }
+
+
+
+
+
+
+

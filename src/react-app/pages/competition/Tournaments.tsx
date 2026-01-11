@@ -2,6 +2,25 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import DashboardLayout from '@/react-app/components/DashboardLayout';
 import { useTournaments, useTournament } from '@/react-app/hooks/useTournaments';
+
+interface Tournament {
+    id: number;
+    creator_id: string;
+    name: string;
+    symbol: string;
+    description: string;
+    time_limit: number;
+    max_drawdown: number | null;
+    max_participants: number;
+    status: string;
+    started_at: string | null;
+    ended_at: string | null;
+    created_at: string;
+    participantCount?: number;
+    entry_fee?: number;
+    prize_pool?: number;
+    tournament_tier?: string;
+}
 import { buildApiUrl } from '@/react-app/hooks/useApi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Plus, Play, Clock, CheckCircle, X, Crown, TrendingUp } from 'lucide-react';
@@ -56,8 +75,8 @@ export default function TournamentsPage() {
 
             // Clear message after 8 seconds (longer for error messages)
             setTimeout(() => setSeedMessage(null), 8000);
-        } catch (error: any) {
-            const errorMessage = error.message || 'Failed to seed tournaments';
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to seed tournaments';
             setSeedMessage(`Error: ${errorMessage}. Make sure migration 9.sql has been executed.`);
             setTimeout(() => setSeedMessage(null), 8000);
         } finally {
@@ -79,7 +98,7 @@ export default function TournamentsPage() {
 
 
     // Determine tournament tier badge
-    const getTournamentTier = (tournament: any) => {
+    const getTournamentTier = (tournament: Tournament) => {
         if (tournament.tournament_tier) {
             return tournament.tournament_tier;
         }
@@ -114,15 +133,15 @@ export default function TournamentsPage() {
                 };
             default:
                 return {
-                    bg: 'bg-[#6A3DF4]/20',
-                    border: 'border-[#6A3DF4]/50',
-                    text: 'text-[#6A3DF4]',
+                    bg: 'bg-[#00D9C8]/20',
+                    border: 'border-[#00D9C8]/50',
+                    text: 'text-[#00D9C8]',
                     icon: Trophy
                 };
         }
     };
 
-    const TournamentCard = ({ tournament }: { tournament: any }) => {
+    const TournamentCard = ({ tournament }: { tournament: Tournament }) => {
         const tier = getTournamentTier(tournament);
         const badgeStyle = getTierBadgeStyle(tier);
         const BadgeIcon = badgeStyle.icon;
@@ -152,8 +171,9 @@ export default function TournamentsPage() {
 
                 // After joining, navigate to tournament details
                 navigate(`/competition/tournaments/${tournament.id}`);
-            } catch (error: any) {
-                alert(error.message || 'Failed to join tournament');
+            } catch (error: unknown) {
+                const errorMessage = error instanceof Error ? error.message : 'Failed to join tournament';
+                alert(errorMessage);
             } finally {
                 setJoining(false);
             }
@@ -164,7 +184,7 @@ export default function TournamentsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.03, y: -5 }}
-                className="bg-[#0D0F18] border border-white/10 rounded-xl overflow-hidden hover:bg-white/5 transition-all flex flex-col h-full"
+                className="bg-[#141416] border border-[#2A2A2E] rounded-xl overflow-hidden hover:bg-white/5 transition-all flex flex-col h-full"
             >
                 {/* Badge Header */}
                 <div className={`${badgeStyle.bg} ${badgeStyle.border} border-b px-4 py-3 flex items-center justify-center gap-2`}>
@@ -174,8 +194,8 @@ export default function TournamentsPage() {
 
                 {/* Visual Element / Icon */}
                 <div className="flex items-center justify-center py-8 px-4">
-                    <div className="bg-[#0D0F18] rounded-xl p-6 border border-white/5">
-                        <TrendingUp className="w-12 h-12 text-[#6A3DF4]" />
+                    <div className="bg-[#141416] rounded-xl p-6 border border-white/5">
+                        <TrendingUp className="w-12 h-12 text-[#00D9C8]" />
                     </div>
                 </div>
 
@@ -208,7 +228,7 @@ export default function TournamentsPage() {
                         </div>
                         <div className="flex items-center justify-between">
                             <span>Winner Takes</span>
-                            <span className="text-[#6A3DF4] font-bold">
+                            <span className="text-[#00D9C8] font-bold">
                                 ${prizePool > 0 ? prizePool.toFixed(2) : '0.00'} USDT
                             </span>
                         </div>
@@ -222,7 +242,7 @@ export default function TournamentsPage() {
                         whileTap={{ scale: 0.98 }}
                         onClick={handleEnterTournament}
                         disabled={joining || tournament.status === 'completed'}
-                        className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold text-sm transition-all shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                        className="w-full bg-[#00D9C8] hover:bg-[#00D9C8] disabled:bg-gray-700 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold text-sm transition-all shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
                     >
                         {joining ? 'Joining...' : tournament.status === 'completed' ? 'Completed' : `Enter for $${entryFee > 0 ? entryFee.toFixed(2) : '0.00'} USDT`}
                     </motion.button>
@@ -240,13 +260,13 @@ export default function TournamentsPage() {
 
     return (
         <DashboardLayout>
-            <div className="min-h-screen bg-[#0D0F18] p-8">
+            <div className="min-h-screen bg-[#141416] p-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-4">
-                            <div className="bg-[#6A3DF4]/20 p-3 rounded-xl">
-                                <Trophy className="w-8 h-8 text-[#6A3DF4]" />
+                            <div className="bg-[#00D9C8]/20 p-3 rounded-xl">
+                                <Trophy className="w-8 h-8 text-[#00D9C8]" />
                             </div>
                             <div>
                                 <h1 className="text-4xl font-bold mb-2">Tournaments</h1>
@@ -262,11 +282,11 @@ export default function TournamentsPage() {
                                 whileTap={{ scale: 0.95 }}
                                 onClick={handleSeedTournaments}
                                 disabled={seeding}
-                                className="bg-[#1E2232] border border-white/10 hover:border-[#6A3DF4]/50 text-gray-400 hover:text-white px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-[#141416] border border-[#2A2A2E] hover:border-[#00D9C8]/50 text-gray-400 hover:text-white px-4 py-2 rounded-lg text-sm transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {seeding ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-[#6A3DF4]/30 border-t-[#6A3DF4] rounded-full animate-spin" />
+                                        <div className="w-4 h-4 border-2 border-[#00D9C8]/30 border-t-[#00D9C8] rounded-full animate-spin" />
                                         <span>Creating...</span>
                                     </>
                                 ) : (
@@ -296,7 +316,7 @@ export default function TournamentsPage() {
                     )}
 
                     {/* Tabs */}
-                    <div className="flex gap-4 mb-8 border-b border-white/10">
+                    <div className="flex gap-4 mb-8 border-b border-[#2A2A2E]">
                         {[
                             { id: 'active', label: 'Active Tournaments', icon: Play },
                             { id: 'ready', label: 'Ready to Start', icon: Clock },
@@ -304,10 +324,10 @@ export default function TournamentsPage() {
                         ].map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
+                                onClick={() => setActiveTab(tab.id as 'active' | 'ready' | 'completed')}
                                 className={`px-6 py-3 border-b-2 transition-colors flex items-center gap-2 ${
                                     activeTab === tab.id
-                                        ? 'border-[#6A3DF4] text-white'
+                                        ? 'border-[#00D9C8] text-white'
                                         : 'border-transparent text-gray-400 hover:text-white'
                                 }`}
                             >
@@ -328,11 +348,11 @@ export default function TournamentsPage() {
                             >
                                 {activeLoading ? (
                                     <div className="text-center py-12">
-                                        <div className="w-8 h-8 border-4 border-[#6A3DF4]/30 border-t-[#6A3DF4] rounded-full animate-spin mx-auto mb-3" />
+                                        <div className="w-8 h-8 border-4 border-[#00D9C8]/30 border-t-[#00D9C8] rounded-full animate-spin mx-auto mb-3" />
                                         <p className="text-gray-400">Loading tournaments...</p>
                                     </div>
                                 ) : activeTournaments.length === 0 ? (
-                                    <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-center">
+                                    <div className="bg-[#141416] border border-[#2A2A2E] rounded-xl p-4 text-center">
                                         <p className="text-gray-400">No active tournaments at the moment.</p>
                                     </div>
                                 ) : (
@@ -354,11 +374,11 @@ export default function TournamentsPage() {
                             >
                                 {readyLoading ? (
                                     <div className="text-center py-12">
-                                        <div className="w-8 h-8 border-4 border-[#6A3DF4]/30 border-t-[#6A3DF4] rounded-full animate-spin mx-auto mb-3" />
+                                        <div className="w-8 h-8 border-4 border-[#00D9C8]/30 border-t-[#00D9C8] rounded-full animate-spin mx-auto mb-3" />
                                         <p className="text-gray-400">Loading tournaments...</p>
                                     </div>
                                 ) : readyTournaments.length === 0 ? (
-                                    <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-center">
+                                    <div className="bg-[#141416] border border-[#2A2A2E] rounded-xl p-4 text-center">
                                         <p className="text-gray-400">No tournaments ready to start.</p>
                                     </div>
                                 ) : (
@@ -380,11 +400,11 @@ export default function TournamentsPage() {
                             >
                                 {completedLoading ? (
                                     <div className="text-center py-12">
-                                        <div className="w-8 h-8 border-4 border-[#6A3DF4]/30 border-t-[#6A3DF4] rounded-full animate-spin mx-auto mb-3" />
+                                        <div className="w-8 h-8 border-4 border-[#00D9C8]/30 border-t-[#00D9C8] rounded-full animate-spin mx-auto mb-3" />
                                         <p className="text-gray-400">Loading tournaments...</p>
                                     </div>
                                 ) : completedTournaments.length === 0 ? (
-                                    <div className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 text-center">
+                                    <div className="bg-[#141416] border border-[#2A2A2E] rounded-xl p-4 text-center">
                                         <p className="text-gray-400">No completed tournaments yet.</p>
                                     </div>
                                 ) : (
@@ -413,7 +433,7 @@ export default function TournamentsPage() {
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0.9, opacity: 0 }}
                                     onClick={(e) => e.stopPropagation()}
-                                    className="bg-[#0D0F18] border border-white/10 rounded-xl p-4 max-w-md w-full"
+                                    className="bg-[#141416] border border-[#2A2A2E] rounded-xl p-4 max-w-md w-full"
                                 >
                                     <div className="flex items-center justify-between mb-6">
                                         <h2 className="text-2xl font-bold">Create Tournament</h2>
@@ -434,7 +454,7 @@ export default function TournamentsPage() {
                                                 type="text"
                                                 value={createForm.name}
                                                 onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                                                className="w-full bg-[#0D0F18] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#6A3DF4]"
+                                                className="w-full bg-[#141416] border border-[#2A2A2E] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#00D9C8]"
                                                 placeholder="e.g., BTC Championship"
                                             />
                                         </div>
@@ -447,7 +467,7 @@ export default function TournamentsPage() {
                                                 type="text"
                                                 value={createForm.symbol}
                                                 onChange={(e) => setCreateForm({ ...createForm, symbol: e.target.value.toUpperCase() })}
-                                                className="w-full bg-[#0D0F18] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#6A3DF4]"
+                                                className="w-full bg-[#141416] border border-[#2A2A2E] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#00D9C8]"
                                                 placeholder="BTCUSDT"
                                             />
                                         </div>
@@ -459,7 +479,7 @@ export default function TournamentsPage() {
                                             <textarea
                                                 value={createForm.description}
                                                 onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
-                                                className="w-full bg-[#0D0F18] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#6A3DF4]"
+                                                className="w-full bg-[#141416] border border-[#2A2A2E] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#00D9C8]"
                                                 rows={3}
                                                 placeholder="Tournament description..."
                                             />
@@ -474,7 +494,7 @@ export default function TournamentsPage() {
                                                     type="number"
                                                     value={createForm.timeLimit}
                                                     onChange={(e) => setCreateForm({ ...createForm, timeLimit: parseInt(e.target.value) || 60 })}
-                                                    className="w-full bg-[#0D0F18] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#6A3DF4]"
+                                                    className="w-full bg-[#141416] border border-[#2A2A2E] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#00D9C8]"
                                                 />
                                             </div>
                                             <div>
@@ -485,7 +505,7 @@ export default function TournamentsPage() {
                                                     type="number"
                                                     value={createForm.maxParticipants}
                                                     onChange={(e) => setCreateForm({ ...createForm, maxParticipants: parseInt(e.target.value) || 1000 })}
-                                                    className="w-full bg-[#0D0F18] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#6A3DF4]"
+                                                    className="w-full bg-[#141416] border border-[#2A2A2E] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#00D9C8]"
                                                 />
                                             </div>
                                         </div>
@@ -534,13 +554,13 @@ export default function TournamentsPage() {
                                                     alert('Failed to create tournament. Please try again.');
                                                 }
                                             }}
-                                            className="flex-1 bg-gradient-to-r from-[#6A3DF4] to-[#8B5CF6] hover:from-[#5A2DE4] hover:to-[#7B4CE6] text-white py-3 rounded-lg font-bold transition-all"
+                                            className="flex-1 bg- from-[#00D9C8] to-[#00D9C8] hover:from-[#5A2DE4] hover:to-[#7B4CE6] text-white py-3 rounded-lg font-bold transition-all"
                                         >
                                             Create
                                         </button>
                                         <button
                                             onClick={() => setShowCreateModal(false)}
-                                            className="px-6 py-3 bg-[#0D0F18] border border-white/10 text-white rounded-lg font-medium transition-all"
+                                            className="px-6 py-3 bg-[#141416] border border-[#2A2A2E] text-white rounded-lg font-medium transition-all"
                                         >
                                             Cancel
                                         </button>
@@ -554,4 +574,14 @@ export default function TournamentsPage() {
         </DashboardLayout>
     );
 }
+
+
+
+
+
+
+
+
+
+
 

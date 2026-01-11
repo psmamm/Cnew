@@ -29,10 +29,28 @@ const DEFAULT_STATS: TournamentStats = {
     totalTrades: 0,
 };
 
+export interface MatchData {
+    id?: string;
+    player1_id?: string;
+    player2_id?: string;
+    player1_pnl?: number;
+    player2_pnl?: number;
+    player1_balance?: number;
+    player2_balance?: number;
+    player1_trades?: number;
+    player2_trades?: number;
+    player1_win_rate?: number;
+    player2_win_rate?: number;
+    player1_elo_change?: number;
+    player2_elo_change?: number;
+    winner_id?: string;
+    [key: string]: unknown;
+}
+
 export function useCompetitionGame(
     gameMode: 'speed' | 'survival' | 'tournament',
     _matchId: string | null,
-    matchData: any,
+    matchData: MatchData | null,
     onGameOver?: () => void
 ) {
     const [gameStarted, setGameStarted] = useState(false);
@@ -60,7 +78,8 @@ export function useCompetitionGame(
     }, [gameStarted, gameOver, onGameOver]);
 
     const startGame = useCallback((settings?: PracticeSettings) => {
-        const timeLimit = matchData?.time_limit || (gameMode === 'speed' ? 300 : 900);
+        const defaultTimeLimit = gameMode === 'speed' ? 300 : 900;
+        const timeLimit = (typeof matchData?.time_limit === 'number' ? matchData.time_limit : defaultTimeLimit);
         setTimeLeft(settings?.timeLimit ? settings.timeLimit * 60 : timeLimit);
         
         if (settings) {

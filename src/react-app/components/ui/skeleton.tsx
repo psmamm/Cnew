@@ -1,6 +1,15 @@
 import * as React from "react"
 import { cn } from "@/react-app/lib/utils"
 
+/**
+ * Skeleton & Loading Components - Bitget Style (2026)
+ *
+ * Colors:
+ * - Skeleton bg: #1A1A1E
+ * - Progress bar track: #2A2A2E
+ * - Progress bar fill: #00D9C8 (teal)
+ */
+
 // Basic Skeleton
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "circular" | "text"
@@ -14,7 +23,7 @@ function Skeleton({
   return (
     <div
       className={cn(
-        "skeleton animate-shimmer",
+        "bg-[#1A1A1E] rounded-lg animate-pulse",
         variant === "circular" && "rounded-full",
         variant === "text" && "h-4 rounded",
         className
@@ -24,10 +33,10 @@ function Skeleton({
   )
 }
 
-// Skeleton Card
+// Skeleton Card - Bitget style
 function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-dark-elevated rounded-2xl border border-white/6 p-6", className)}>
+    <div className={cn("bg-[#141416] rounded-xl border border-[#2A2A2E] p-5", className)}>
       <div className="flex items-center gap-4 mb-4">
         <Skeleton variant="circular" className="h-10 w-10" />
         <div className="space-y-2">
@@ -44,10 +53,10 @@ function SkeletonCard({ className }: { className?: string }) {
   )
 }
 
-// Skeleton Table Row
+// Skeleton Table Row - Bitget style
 function SkeletonTableRow({ columns = 5 }: { columns?: number }) {
   return (
-    <div className="flex items-center gap-4 py-4 border-b border-white/6">
+    <div className="flex items-center gap-4 py-4 border-b border-[#2A2A2E]">
       {Array.from({ length: columns }).map((_, i) => (
         <Skeleton
           key={i}
@@ -61,10 +70,10 @@ function SkeletonTableRow({ columns = 5 }: { columns?: number }) {
   )
 }
 
-// Skeleton Stats Card
+// Skeleton Stats Card - Bitget style
 function SkeletonStats({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-dark-elevated rounded-2xl border border-white/6 p-6", className)}>
+    <div className={cn("bg-[#141416] rounded-xl border border-[#2A2A2E] p-5", className)}>
       <Skeleton className="h-3 w-20 mb-2" />
       <Skeleton className="h-8 w-32 mb-2" />
       <Skeleton className="h-3 w-24" />
@@ -72,10 +81,10 @@ function SkeletonStats({ className }: { className?: string }) {
   )
 }
 
-// Skeleton Chart
+// Skeleton Chart - Bitget style
 function SkeletonChart({ className }: { className?: string }) {
   return (
-    <div className={cn("bg-dark-elevated rounded-2xl border border-white/6 p-6", className)}>
+    <div className={cn("bg-[#141416] rounded-xl border border-[#2A2A2E] p-5", className)}>
       <div className="flex items-center justify-between mb-6">
         <Skeleton className="h-5 w-32" />
         <div className="flex gap-2">
@@ -96,7 +105,7 @@ function SkeletonChart({ className }: { className?: string }) {
   )
 }
 
-// Spinner Component
+// Spinner Component - Bitget style
 interface SpinnerProps {
   size?: "sm" | "md" | "lg"
   className?: string
@@ -112,7 +121,7 @@ function Spinner({ size = "md", className }: SpinnerProps) {
   return (
     <div
       className={cn(
-        "spinner-glow",
+        "rounded-full border-[#2A2A2E] border-t-[#00D9C8] animate-spin",
         sizeClasses[size],
         className
       )}
@@ -120,7 +129,7 @@ function Spinner({ size = "md", className }: SpinnerProps) {
   )
 }
 
-// Loading Overlay
+// Loading Overlay - Bitget style
 interface LoadingOverlayProps {
   isLoading: boolean
   children: React.ReactNode
@@ -140,13 +149,13 @@ function LoadingOverlay({
       {isLoading && (
         <div
           className={cn(
-            "absolute inset-0 flex flex-col items-center justify-center bg-dark-base/80 rounded-2xl z-10",
+            "absolute inset-0 flex flex-col items-center justify-center bg-[#0D0D0F]/80 rounded-xl z-10",
             blur && "backdrop-blur-sm"
           )}
         >
           <Spinner size="lg" />
           {text && (
-            <p className="mt-4 text-sm text-muted-foreground">{text}</p>
+            <p className="mt-4 text-sm text-[#9CA3AF]">{text}</p>
           )}
         </div>
       )}
@@ -154,7 +163,7 @@ function LoadingOverlay({
   )
 }
 
-// Progress Bar
+// Progress Bar - Bitget style (Teal)
 interface ProgressBarProps {
   value: number
   max?: number
@@ -173,22 +182,25 @@ function ProgressBar({
   const percentage = Math.min(100, Math.max(0, (value / max) * 100))
 
   const variantClasses = {
-    default: "bg-gradient-premium shadow-glow-sm",
-    success: "bg-gradient-profit shadow-glow-success",
-    danger: "bg-gradient-loss shadow-glow-danger",
-    warning: "bg-warning shadow-glow-warning",
+    default: "bg-[#00D9C8]",
+    success: "bg-[#00D9C8]",
+    danger: "bg-[#F43F5E]",
+    warning: "bg-[#F59E0B]",
   }
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="progress-bar">
+      <div className="h-1.5 bg-[#2A2A2E] rounded-full overflow-hidden">
         <div
-          className={cn("progress-bar-fill", variantClasses[variant])}
+          className={cn(
+            "h-full rounded-full transition-all duration-300",
+            variantClasses[variant]
+          )}
           style={{ width: `${percentage}%` }}
         />
       </div>
       {showLabel && (
-        <p className="text-xs text-muted-foreground mt-1 text-right">
+        <p className="text-xs text-[#6B7280] mt-1 text-right">
           {Math.round(percentage)}%
         </p>
       )}
@@ -196,7 +208,7 @@ function ProgressBar({
   )
 }
 
-// Pulse Dot (for status indicators)
+// Pulse Dot (for status indicators) - Bitget style
 interface PulseDotProps {
   color?: "default" | "success" | "danger" | "warning"
   className?: string
@@ -204,10 +216,10 @@ interface PulseDotProps {
 
 function PulseDot({ color = "default", className }: PulseDotProps) {
   const colorClasses = {
-    default: "bg-primary-500",
-    success: "bg-success",
-    danger: "bg-danger",
-    warning: "bg-warning",
+    default: "bg-[#00D9C8]",
+    success: "bg-[#00D9C8]",
+    danger: "bg-[#F43F5E]",
+    warning: "bg-[#F59E0B]",
   }
 
   return (

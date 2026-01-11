@@ -55,7 +55,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
   };
 
   return (
-    <div className="bg-[#1E2232] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+    <div className="bg-[#141416] rounded-2xl p-6 border border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Dashboard Title & Date */}
         <div>
@@ -82,7 +82,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search trades, symbols..."
-              className="w-full md:w-80 pl-10 pr-4 py-2 bg-[#0D0F18]/50 border border-white/10 rounded-xl text-white placeholder-[#7F8C8D] focus:outline-none focus:ring-2 focus:ring-[#6A3DF4]/50 focus:border-[#6A3DF4]/50 transition-all"
+              className="w-full md:w-80 pl-10 pr-4 py-2 bg-[#141416]/50 border border-[#2A2A2E] rounded-xl text-white placeholder-[#7F8C8D] focus:outline-none focus:ring-2 focus:ring-[#00D9C8]/50 focus:border-[#00D9C8]/50 transition-all"
             />
           </div>
 
@@ -95,7 +95,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#E74C3C] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  <span className="absolute -top-1 -right-1 bg-[#F43F5E] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                     {unreadCount}
                   </span>
                 )}
@@ -109,7 +109,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-80 bg-[#1E2232] border border-white/10 rounded-xl shadow-xl z-50"
+                    className="absolute right-0 mt-2 w-80 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-xl z-50"
                   >
                     <div className="p-4 border-b border-white/5">
                       <h3 className="text-white font-semibold">Notifications</h3>
@@ -122,16 +122,16 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                         return (
                           <div
                             key={notification.id}
-                            className={`p-4 border-b border-white/5 hover:bg-[#2A2F42] transition-colors ${!notification.read ? 'bg-[#6A3DF4]/5' : ''
+                            className={`p-4 border-b border-white/5 hover:bg-[#2A2F42] transition-colors ${!notification.read ? 'bg-[#00D9C8]/5' : ''
                               }`}
                           >
                             <div className="flex items-start space-x-3">
-                              <div className={`p-2 rounded-lg ${notification.type === 'trade' ? 'bg-[#2ECC71]/20 text-[#2ECC71]' :
-                                notification.type === 'performance' ? 'bg-[#6A3DF4]/20 text-[#6A3DF4]' :
+                              <div className={`p-2 rounded-lg ${notification.type === 'trade' ? 'bg-[#00D9C8]/20 text-[#00D9C8]' :
+                                notification.type === 'performance' ? 'bg-[#00D9C8]/20 text-[#00D9C8]' :
                                   notification.type === 'strategy' ? 'bg-[#F39C12]/20 text-[#F39C12]' :
                                     notification.type === 'market' ? 'bg-[#3498DB]/20 text-[#3498DB]' :
                                       notification.type === 'goal' ? 'bg-[#9B59B6]/20 text-[#9B59B6]' :
-                                        notification.type === 'whale' ? 'bg-[#E74C3C]/20 text-[#E74C3C]' :
+                                        notification.type === 'whale' ? 'bg-[#F43F5E]/20 text-[#F43F5E]' :
                                           'bg-[#7F8C8D]/20 text-[#7F8C8D]'
                                 }`}>
                                 <IconComponent className="w-4 h-4" />
@@ -148,7 +148,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                                         navigate(notification.action!.url);
                                         setShowNotifications(false);
                                       }}
-                                      className="text-[#6A3DF4] hover:text-[#8A5CFF] text-xs font-medium px-2 py-1 rounded-md hover:bg-[#6A3DF4]/10 transition-all"
+                                      className="text-[#00D9C8] hover:text-[#00F5E1] text-xs font-medium px-2 py-1 rounded-md hover:bg-[#00D9C8]/10 transition-all"
                                     >
                                       {notification.action.label}
                                     </button>
@@ -156,7 +156,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                                 </div>
                               </div>
                               {!notification.read && (
-                                <div className="w-2 h-2 bg-[#6A3DF4] rounded-full mt-2" />
+                                <div className="w-2 h-2 bg-[#00D9C8] rounded-full mt-2" />
                               )}
                             </div>
                           </div>
@@ -167,7 +167,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                     <div className="p-4 border-t border-white/5 space-y-2">
                       <button
                         onClick={markAllAsRead}
-                        className="w-full text-[#6A3DF4] hover:text-[#8A5CFF] text-sm font-medium transition-colors py-2 px-3 rounded-lg hover:bg-[#6A3DF4]/10"
+                        className="w-full text-[#00D9C8] hover:text-[#00F5E1] text-sm font-medium transition-colors py-2 px-3 rounded-lg hover:bg-[#00D9C8]/10"
                       >
                         Mark all as read
                       </button>
@@ -192,7 +192,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center space-x-3 px-3 py-2 hover:bg-[#2A2F42] rounded-lg transition-all group"
               >
-                <div className="w-8 h-8 bg-[#6A3DF4] rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#00D9C8] rounded-full flex items-center justify-center">
                   {user?.photoURL?.startsWith('http') || user?.photoURL?.startsWith('data:') ? (
                     <img
                       src={user.photoURL}
@@ -222,11 +222,11 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-56 bg-[#1E2232] border border-white/10 rounded-xl shadow-xl z-50"
+                    className="absolute right-0 mt-2 w-56 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-xl z-50"
                   >
                     <div className="p-4 border-b border-white/5">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-[#6A3DF4] rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-[#00D9C8] rounded-full flex items-center justify-center">
                           {user?.photoURL?.startsWith('http') || user?.photoURL?.startsWith('data:') ? (
                             <img
                               src={user.photoURL}
@@ -279,7 +279,7 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
                           handleLogout();
                           setShowProfileMenu(false);
                         }}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-[#E74C3C] hover:bg-[#E74C3C]/10 rounded-lg transition-all"
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-[#F43F5E] hover:bg-[#F43F5E]/10 rounded-lg transition-all"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Sign Out</span>
@@ -308,3 +308,11 @@ export default function DashboardHeader({ onSearchChange }: DashboardHeaderProps
     </div >
   );
 }
+
+
+
+
+
+
+
+

@@ -22,7 +22,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useStrategies, useCreateStrategy, useUpdateStrategy, useStrategyPerformance } from "@/react-app/hooks/useStrategies";
+import { useStrategies, useCreateStrategy, useUpdateStrategy, useStrategyPerformance, type Strategy } from "@/react-app/hooks/useStrategies";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguageCurrency } from "@/react-app/contexts/LanguageCurrencyContext";
 
@@ -63,7 +63,7 @@ export default function StrategiesPage() {
       }
     };
     loadRate();
-  }, [currency, currencyCode]);
+  }, [currency, currencyCode, convertCurrency]);
 
   const formatCurrency = (amount: number): string => {
     const converted = amount * conversionRate;
@@ -1069,25 +1069,45 @@ export default function StrategiesPage() {
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-gray-600/30">
-                                {performance.trades.slice(0, 10).map((trade) => (
-                                  <tr key={trade.id} className="hover:bg-gray-600/20">
-                                    <td className="px-4 py-3 text-white font-medium">{trade.symbol}</td>
-                                    <td className="px-4 py-3">
-                                      <span className={`px-2 py-1 rounded text-xs font-medium ${trade.direction === 'long' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                                        }`}>
-                                        {trade.direction.toUpperCase()}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-300">{formatPrice(trade.entry_price)}</td>
-                                    <td className="px-4 py-3 text-gray-300">{formatPrice(trade.exit_price)}</td>
-                                    <td className={`px-4 py-3 font-medium ${getPerformanceColor(trade.pnl)}`}>
-                                      {formatCurrency(trade.pnl || 0)}
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-400 text-sm">
-                                      {formatDate(trade.entry_date)}
-                                    </td>
-                                  </tr>
-                                ))}
+                                {performance.trades.slice(0, 10).map((trade) => {
+                                  // Type-safe property access for TradePerformance
+                                  const direction = (typeof trade.direction === 'string' ? trade.direction : 'long') as 'long' | 'short';
+                                  const entryPrice = typeof trade.entry_price === 'number' 
+                                    ? trade.entry_price 
+                                    : typeof trade.entry_price === 'string' 
+                                      ? parseFloat(trade.entry_price) 
+                                      : 0;
+                                  const exitPrice = typeof trade.exit_price === 'number' 
+                                    ? trade.exit_price 
+                                    : typeof trade.exit_price === 'string' 
+                                      ? parseFloat(trade.exit_price) 
+                                      : 0;
+                                  const entryDate = typeof trade.entryDate === 'string' 
+                                    ? trade.entryDate 
+                                    : typeof trade.entry_date === 'string'
+                                      ? trade.entry_date
+                                      : null;
+                                  
+                                  return (
+                                    <tr key={trade.id} className="hover:bg-gray-600/20">
+                                      <td className="px-4 py-3 text-white font-medium">{trade.symbol}</td>
+                                      <td className="px-4 py-3">
+                                        <span className={`px-2 py-1 rounded text-xs font-medium ${direction === 'long' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                                          }`}>
+                                          {direction.toUpperCase()}
+                                        </span>
+                                      </td>
+                                      <td className="px-4 py-3 text-gray-300">{formatPrice(entryPrice)}</td>
+                                      <td className="px-4 py-3 text-gray-300">{formatPrice(exitPrice)}</td>
+                                      <td className={`px-4 py-3 font-medium ${getPerformanceColor(trade.pnl)}`}>
+                                        {formatCurrency(trade.pnl || 0)}
+                                      </td>
+                                      <td className="px-4 py-3 text-gray-400 text-sm">
+                                        {entryDate ? formatDate(entryDate) : 'N/A'}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
                               </tbody>
                             </table>
                           </div>
