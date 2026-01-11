@@ -697,7 +697,7 @@ export default function TopNavigation() {
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#2A2A2E] hover:border-[#00D9C8] transition-colors bg-[#1A1A1E]"
+                    className="w-8 h-8 aspect-square flex-shrink-0 rounded-full overflow-hidden border-2 border-[#2A2A2E] hover:border-[#00D9C8] transition-colors bg-[#1A1A1E]"
                   >
                     {user?.photoURL?.startsWith('http') || user?.photoURL?.startsWith('data:') ? (
                       <img
@@ -707,8 +707,8 @@ export default function TopNavigation() {
                       />
                     ) : (
                       <div className="w-full h-full bg-[#1A1A1E] flex items-center justify-center">
-                        <span className="text-[#9CA3AF] font-semibold text-sm">
-                          {user?.photoURL || user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                        <span className="text-[#9CA3AF] font-semibold text-xs">
+                          {user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
                     )}
@@ -727,7 +727,7 @@ export default function TopNavigation() {
                         {/* Profile Header */}
                         <div className="p-4">
                           <div className="flex items-center space-x-3">
-                            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#2A2A2E]">
+                            <div className="w-12 h-12 aspect-square flex-shrink-0 rounded-full overflow-hidden border-2 border-[#2A2A2E]">
                               {user?.photoURL?.startsWith('http') || user?.photoURL?.startsWith('data:') ? (
                                 <img
                                   src={user.photoURL}
@@ -736,8 +736,8 @@ export default function TopNavigation() {
                                 />
                               ) : (
                                 <div className="w-full h-full bg-[#1A1A1E] flex items-center justify-center">
-                                  <span className="text-[#9CA3AF] font-semibold text-2xl">
-                                    {user?.photoURL || user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                                  <span className="text-[#9CA3AF] font-semibold text-xl">
+                                    {user?.displayName?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                                   </span>
                                 </div>
                               )}

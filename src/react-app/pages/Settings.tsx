@@ -14,9 +14,15 @@ import {
   Smartphone,
   Mail,
   Lock,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  RefreshCw,
+  Trash2,
+  Clock,
+  Link2
 } from "lucide-react";
 import DashboardLayout from "@/react-app/components/DashboardLayout";
+import ExchangeConnectionModal from "@/react-app/components/exchanges/ExchangeConnectionModal";
+import { useExchangeConnections } from "@/react-app/hooks/useExchangeConnections";
 
 // Bitget-Style Settings Page with Sidebar Navigation
 type SettingsSection = "profile" | "security" | "api" | "notifications" | "data";
@@ -24,6 +30,66 @@ type SettingsSection = "profile" | "security" | "api" | "notifications" | "data"
 export default function SettingsPage() {
   const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<SettingsSection>("profile");
+  const [showExchangeModal, setShowExchangeModal] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+  // Exchange connections hook
+  const {
+    connections,
+    loading: connectionsLoading,
+    syncing,
+    sync,
+    remove,
+    refetch,
+    create
+  } = useExchangeConnections();
+
+  // Handle successful exchange connection
+  const handleExchangeSuccess = async (exchangeId: string, credentials: { apiKey: string; apiSecret: string; passphrase?: string; testnet?: boolean }) => {
+    try {
+      await create({
+        exchange_id: exchangeId,
+        api_key: credentials.apiKey,
+        api_secret: credentials.apiSecret,
+        passphrase: credentials.passphrase,
+        auto_sync_enabled: true,
+        sync_interval_hours: 24
+      });
+      setShowExchangeModal(false);
+      refetch();
+    } catch (error) {
+      console.error('Failed to create connection:', error);
+    }
+  };
+
+  // Handle sync
+  const handleSync = async (connectionId: number) => {
+    try {
+      await sync(connectionId);
+    } catch (error) {
+      console.error('Sync failed:', error);
+    }
+  };
+
+  // Handle delete
+  const handleDelete = async (connectionId: number) => {
+    try {
+      await remove(connectionId);
+      setDeleteConfirmId(null);
+    } catch (error) {
+      console.error('Delete failed:', error);
+    }
+  };
+
+  // Format time ago
+  const getTimeAgo = (dateString: string | undefined) => {
+    if (!dateString) return 'Never';
+    const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
 
   // Generate a mock UID based on user email
   const uid = user?.email ?
@@ -35,7 +101,7 @@ export default function SettingsPage() {
   const sidebarItems = [
     { id: "profile" as const, label: "Profile", icon: User },
     { id: "security" as const, label: "Security", icon: Shield },
-    { id: "api" as const, label: "API Keys", icon: Key },
+    { id: "api" as const, label: "Exchange Connections", icon: Link2 },
     { id: "notifications" as const, label: "Notifications", icon: Bell },
     { id: "data" as const, label: "Data Export", icon: Download },
   ];
@@ -317,22 +383,110 @@ export default function SettingsPage() {
                         <h3 className="text-lg font-medium text-white">Exchange Connections</h3>
                         <p className="text-sm text-[#9CA3AF] mt-1">Connect your exchanges to import trades automatically</p>
                       </div>
-                      <button className="px-4 py-2 bg-[#00D9C8] text-[#0D0D0F] rounded-lg font-medium hover:bg-[#00F5E1] transition-colors flex items-center gap-2">
+                      <button
+                        onClick={() => setShowExchangeModal(true)}
+                        className="px-4 py-2 bg-[#00D9C8] text-[#0D0D0F] rounded-lg font-medium hover:bg-[#00F5E1] transition-colors flex items-center gap-2"
+                      >
                         <Key className="w-4 h-4" />
                         Add Exchange
                       </button>
                     </div>
 
-                    {/* Empty State */}
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 bg-[#1A1A1E] rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <Key className="w-8 h-8 text-[#6B7280]" />
+                    {/* Loading State */}
+                    {connectionsLoading ? (
+                      <div className="text-center py-12">
+                        <RefreshCw className="w-8 h-8 text-[#6B7280] animate-spin mx-auto mb-4" />
+                        <p className="text-[#9CA3AF]">Loading connections...</p>
                       </div>
-                      <h4 className="text-white font-medium mb-2">No exchanges connected</h4>
-                      <p className="text-[#9CA3AF] text-sm max-w-sm mx-auto">
-                        Connect your first exchange to start importing trades and syncing your portfolio.
-                      </p>
-                    </div>
+                    ) : connections.length === 0 ? (
+                      /* Empty State */
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 bg-[#1A1A1E] rounded-xl flex items-center justify-center mx-auto mb-4">
+                          <Key className="w-8 h-8 text-[#6B7280]" />
+                        </div>
+                        <h4 className="text-white font-medium mb-2">No exchanges connected</h4>
+                        <p className="text-[#9CA3AF] text-sm max-w-sm mx-auto">
+                          Connect your first exchange to start importing trades and syncing your portfolio.
+                        </p>
+                      </div>
+                    ) : (
+                      /* Exchange List */
+                      <div className="space-y-3">
+                        {connections.map((connection) => (
+                          <div
+                            key={connection.id}
+                            className="bg-[#1A1A1E] rounded-xl p-4 flex items-center justify-between"
+                          >
+                            <div className="flex items-center gap-4">
+                              {/* Exchange Logo */}
+                              <div className="w-12 h-12 bg-[#2A2A2E] rounded-xl flex items-center justify-center">
+                                <span className="text-xl font-bold text-[#00D9C8]">
+                                  {(connection.exchange_name || connection.exchange_id).charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-white font-medium">
+                                    {connection.exchange_name || connection.exchange_id.charAt(0).toUpperCase() + connection.exchange_id.slice(1)}
+                                  </h4>
+                                  {connection.is_active !== false && (
+                                    <span className="w-5 h-5 bg-[#00D9C8] rounded-full flex items-center justify-center">
+                                      <Check className="w-3 h-3 text-[#0D0D0F]" />
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-4 text-sm text-[#6B7280] mt-1">
+                                  <span className="flex items-center gap-1">
+                                    <Key className="w-3 h-3" />
+                                    {connection.api_key ? `${connection.api_key.slice(0, 4)}...${connection.api_key.slice(-4)}` : '****'}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    Synced {getTimeAgo(connection.last_sync_at)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {/* Sync Button */}
+                              <button
+                                onClick={() => handleSync(connection.id)}
+                                disabled={syncing[connection.id]}
+                                className="p-2 hover:bg-[#2A2A2E] rounded-lg transition-colors"
+                              >
+                                <RefreshCw className={`w-5 h-5 text-[#9CA3AF] ${syncing[connection.id] ? 'animate-spin' : ''}`} />
+                              </button>
+
+                              {/* Delete Button */}
+                              {deleteConfirmId === connection.id ? (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleDelete(connection.id)}
+                                    className="px-3 py-1.5 bg-[#F43F5E] text-white text-sm rounded-lg hover:bg-[#E11D48] transition-colors"
+                                  >
+                                    Confirm
+                                  </button>
+                                  <button
+                                    onClick={() => setDeleteConfirmId(null)}
+                                    className="px-3 py-1.5 bg-[#2A2A2E] text-white text-sm rounded-lg hover:bg-[#3A3A3E] transition-colors"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setDeleteConfirmId(connection.id)}
+                                  className="p-2 hover:bg-[#2A2A2E] rounded-lg transition-colors"
+                                >
+                                  <Trash2 className="w-5 h-5 text-[#9CA3AF] hover:text-[#F43F5E]" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -423,6 +577,13 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Exchange Connection Modal */}
+      <ExchangeConnectionModal
+        isOpen={showExchangeModal}
+        onClose={() => setShowExchangeModal(false)}
+        onSuccess={handleExchangeSuccess}
+      />
     </DashboardLayout>
   );
 }

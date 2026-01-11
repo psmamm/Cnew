@@ -102,8 +102,8 @@ const EXCHANGES: ExchangeInfo[] = [
     logo: '/brokers/ibkr.svg',
     category: 'stocks',
     features: ['Stocks', 'Options', 'Futures', 'Forex'],
-    supported: false,
-    apiDocsUrl: 'https://interactivebrokers.github.io/tws-api/'
+    supported: true,
+    apiDocsUrl: 'https://interactivebrokers.github.io/cpwebapi/'
   },
   {
     id: 'td_ameritrade',
@@ -111,8 +111,9 @@ const EXCHANGES: ExchangeInfo[] = [
     logo: '/brokers/tda.svg',
     category: 'stocks',
     features: ['Stocks', 'Options', 'ETFs'],
-    supported: false,
-    oauthSupported: true
+    supported: true,
+    oauthSupported: true,
+    apiDocsUrl: 'https://developer.tdameritrade.com/apis'
   },
 
   // Forex
@@ -122,7 +123,7 @@ const EXCHANGES: ExchangeInfo[] = [
     logo: '/brokers/oanda.svg',
     category: 'forex',
     features: ['Forex', 'CFDs'],
-    supported: false,
+    supported: true,
     apiDocsUrl: 'https://developer.oanda.com/'
   },
 

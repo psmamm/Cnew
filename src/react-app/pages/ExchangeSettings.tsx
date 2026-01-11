@@ -4,7 +4,7 @@
  * Manage connected exchanges, API keys, and sync settings.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Link2, Plus, Trash2, RefreshCw, Settings, Shield, Clock, AlertCircle,
@@ -15,6 +15,7 @@ import { useTheme } from '@/react-app/contexts/ThemeContext';
 import { getCardBg, getCardBorder, getTextColor, getHoverBg } from '@/react-app/utils/themeUtils';
 import ExchangeConnectionModal from '@/react-app/components/exchanges/ExchangeConnectionModal';
 import DashboardLayout from '@/react-app/components/DashboardLayout';
+import { useExchangeConnections, ExchangeConnection } from '@/react-app/hooks/useExchangeConnections';
 
 // ============================================================================
 // Types
@@ -34,36 +35,21 @@ interface ConnectedExchange {
   createdAt: string;
 }
 
-// ============================================================================
-// Mock Data
-// ============================================================================
-
-const MOCK_CONNECTED_EXCHANGES: ConnectedExchange[] = [
-  {
-    id: 'conn_1',
-    exchangeId: 'bybit',
-    exchangeName: 'Bybit',
-    apiKeyPreview: 'ABCD...XYZ1',
+// Helper to convert ExchangeConnection to ConnectedExchange
+function mapConnectionToExchange(conn: ExchangeConnection): ConnectedExchange {
+  return {
+    id: String(conn.id),
+    exchangeId: conn.exchange_id,
+    exchangeName: conn.exchange_name || conn.exchange_id.charAt(0).toUpperCase() + conn.exchange_id.slice(1),
+    apiKeyPreview: conn.api_key ? `${conn.api_key.slice(0, 4)}...${conn.api_key.slice(-4)}` : '****',
     isTestnet: false,
-    status: 'connected',
-    lastSync: new Date(Date.now() - 60000).toISOString(),
-    tradesCount: 245,
-    permissions: ['Read', 'Trade'],
-    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-  },
-  {
-    id: 'conn_2',
-    exchangeId: 'binance',
-    exchangeName: 'Binance',
-    apiKeyPreview: 'EFGH...XYZ2',
-    isTestnet: false,
-    status: 'connected',
-    lastSync: new Date(Date.now() - 120000).toISOString(),
-    tradesCount: 189,
+    status: conn.is_active !== false ? 'connected' : 'error',
+    lastSync: conn.last_sync_at || conn.created_at,
+    tradesCount: 0,
     permissions: ['Read'],
-    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
-  }
-];
+    createdAt: conn.created_at
+  };
+}
 
 // ============================================================================
 // Component
@@ -72,52 +58,68 @@ const MOCK_CONNECTED_EXCHANGES: ConnectedExchange[] = [
 export default function ExchangeSettings() {
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const [exchanges, setExchanges] = useState<ConnectedExchange[]>(MOCK_CONNECTED_EXCHANGES);
+
+  // Use the real hook for exchange connections
+  const {
+    connections,
+    loading,
+    syncing: syncingMap,
+    sync,
+    remove,
+    refetch
+  } = useExchangeConnections();
+
+  // Map connections to UI format
+  const [exchanges, setExchanges] = useState<ConnectedExchange[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedExchange, setSelectedExchange] = useState<ConnectedExchange | null>(null);
-  const [syncing, setSyncing] = useState<string | null>(null);
+  const [localSyncing, setLocalSyncing] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const handleSync = async (exchangeId: string) => {
-    setSyncing(exchangeId);
-    // Simulate sync
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setSyncing(null);
+  // Update exchanges when connections change
+  useEffect(() => {
+    setExchanges(connections.map(mapConnectionToExchange));
+  }, [connections]);
 
-    // Update last sync time
-    setExchanges(prev =>
-      prev.map(ex =>
-        ex.id === exchangeId
-          ? { ...ex, lastSync: new Date().toISOString() }
-          : ex
-      )
-    );
+  const handleSync = async (exchangeId: string) => {
+    const numericId = parseInt(exchangeId);
+    if (isNaN(numericId)) {
+      setLocalSyncing(exchangeId);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setLocalSyncing(null);
+      return;
+    }
+
+    try {
+      await sync(numericId);
+    } catch (error) {
+      console.error('Sync failed:', error);
+    }
   };
 
   const handleDelete = async (exchangeId: string) => {
-    // Remove exchange
-    setExchanges(prev => prev.filter(ex => ex.id !== exchangeId));
+    const numericId = parseInt(exchangeId);
+    if (!isNaN(numericId)) {
+      try {
+        await remove(numericId);
+      } catch (error) {
+        console.error('Delete failed:', error);
+      }
+    }
     setDeleteConfirm(null);
     setSelectedExchange(null);
   };
 
-  const handleAddSuccess = (exchangeId: string) => {
-    // Add new exchange (in real app, this would come from API response)
-    const newExchange: ConnectedExchange = {
-      id: `conn_${Date.now()}`,
-      exchangeId,
-      exchangeName: exchangeId.charAt(0).toUpperCase() + exchangeId.slice(1),
-      apiKeyPreview: 'NEW...KEY',
-      isTestnet: false,
-      status: 'connected',
-      lastSync: new Date().toISOString(),
-      tradesCount: 0,
-      permissions: ['Read'],
-      createdAt: new Date().toISOString()
-    };
-
-    setExchanges(prev => [...prev, newExchange]);
+  const handleAddSuccess = () => {
+    // Refetch connections after successful add
+    refetch();
     setShowAddModal(false);
+  };
+
+  // Check if a specific exchange is syncing
+  const isSyncing = (exchangeId: string) => {
+    const numericId = parseInt(exchangeId);
+    return localSyncing === exchangeId || (!isNaN(numericId) && syncingMap[numericId]);
   };
 
   const formatDate = (dateString: string) => {
@@ -183,7 +185,12 @@ export default function ExchangeSettings() {
 
         {/* Connected Exchanges */}
         <div className="space-y-4">
-          {exchanges.length === 0 ? (
+          {loading ? (
+            <div className={`p-12 text-center ${getCardBg(theme)} rounded-2xl border ${getCardBorder(theme)}`}>
+              <RefreshCw className={`w-8 h-8 mx-auto mb-4 ${getTextColor(theme, 'muted')} animate-spin`} />
+              <p className={getTextColor(theme, 'muted')}>Loading connections...</p>
+            </div>
+          ) : exchanges.length === 0 ? (
             <div className={`p-12 text-center ${getCardBg(theme)} rounded-2xl border ${getCardBorder(theme)}`}>
               <div className="w-16 h-16 mx-auto mb-4 bg-[#6A3DF4]/10 rounded-2xl flex items-center justify-center">
                 <Link2 className="w-8 h-8 text-[#6A3DF4]" />
@@ -252,11 +259,11 @@ export default function ExchangeSettings() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleSync(exchange.id)}
-                        disabled={syncing === exchange.id}
+                        disabled={isSyncing(exchange.id)}
                         className={`p-2 rounded-lg ${getHoverBg(theme)} transition-colors`}
                       >
                         <RefreshCw className={`w-5 h-5 ${getTextColor(theme, 'secondary')} ${
-                          syncing === exchange.id ? 'animate-spin' : ''
+                          isSyncing(exchange.id) ? 'animate-spin' : ''
                         }`} />
                       </button>
                       <button
