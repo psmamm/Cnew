@@ -72,6 +72,8 @@
     "cf-typegen": "wrangler types",
     "check": "tsc && vite build && wrangler deploy --dry-run",
     "dev": "vite",
+    "dev:worker": "wrangler dev",
+    "dev:all": "start cmd /c \"npm run dev:worker\" && npm run dev",
     "lint": "eslint .",
     "deploy:sbt:mumbai": "hardhat run scripts/deploy-sbt.js --network polygonMumbai",
     "deploy:sbt:mainnet": "hardhat run scripts/deploy-sbt.js --network polygon"

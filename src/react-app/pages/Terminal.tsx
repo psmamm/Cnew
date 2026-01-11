@@ -20,6 +20,7 @@ import { TradingViewChart } from '../components/terminal/TradingViewChart';
 import { TerminalDealTicket } from '../components/terminal/TerminalDealTicket';
 import { PositionsPanel } from '../components/terminal/PositionsPanel';
 import { WebGLOrderbook } from '../components/terminal/WebGLOrderbook';
+import { AICloneFloatingPanel } from '../components/terminal/AICloneFloatingPanel';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
 // Mock stats for now - will be replaced with real data
@@ -41,6 +42,7 @@ export default function Terminal() {
   const [chartSize, setChartSize] = useState(60); // Percentage
   const [orderbookSize, setOrderbookSize] = useState(50); // Percentage of right side
   const [bottomPanelSize, setBottomPanelSize] = useState(25); // Percentage
+  const [isAIClonePanelOpen, setIsAIClonePanelOpen] = useState(false);
 
   // Resize handlers
   const handleChartResize = (e: React.MouseEvent) => {
@@ -124,6 +126,8 @@ export default function Terminal() {
           priceChange24h={mockStats.priceChange24h}
           priceChangePercent24h={mockStats.priceChangePercent24h}
           stats={mockStats}
+          onAICloneToggle={() => setIsAIClonePanelOpen(!isAIClonePanelOpen)}
+          isAIClonePanelOpen={isAIClonePanelOpen}
         />
 
         {/* Main Content with Resizable Panels */}
@@ -161,7 +165,7 @@ export default function Terminal() {
           {/* Resize Handle */}
           <div
             onMouseDown={handleChartResize}
-            className="w-1 bg-[#2B2F36] hover:bg-[#F0B90B] transition-colors cursor-col-resize shrink-0"
+            className="w-1 bg-[#2B2F36] hover:bg-[#00D9C8] transition-colors cursor-col-resize shrink-0"
           />
 
           {/* Right Side Panels */}
@@ -177,7 +181,7 @@ export default function Terminal() {
             {/* Resize Handle */}
             <div
               onMouseDown={handleOrderbookResize}
-              className="h-1 bg-[#2B2F36] hover:bg-[#F0B90B] transition-colors cursor-row-resize shrink-0"
+              className="h-1 bg-[#2B2F36] hover:bg-[#00D9C8] transition-colors cursor-row-resize shrink-0"
             />
 
             {/* Deal Ticket Panel */}
@@ -195,7 +199,7 @@ export default function Terminal() {
           <>
             <div
               onMouseDown={handleBottomResize}
-              className="h-1 bg-[#2B2F36] hover:bg-[#F0B90B] transition-colors cursor-row-resize relative group shrink-0"
+              className="h-1 bg-[#2B2F36] hover:bg-[#00D9C8] transition-colors cursor-row-resize relative group shrink-0"
             >
               <button
                 onClick={() => setIsBottomPanelCollapsed(true)}
@@ -222,6 +226,12 @@ export default function Terminal() {
             </button>
           </div>
         )}
+
+        {/* AI Clone Floating Panel */}
+        <AICloneFloatingPanel
+          isOpen={isAIClonePanelOpen}
+          onClose={() => setIsAIClonePanelOpen(false)}
+        />
       </div>
     </SymbolProvider>
   );

@@ -6,8 +6,9 @@
  */
 
 import { useState } from 'react';
-import { Star, ChevronDown, Settings } from 'lucide-react';
+import { Star, ChevronDown, Settings, Bot } from 'lucide-react';
 import { useSymbol } from '../../contexts/SymbolContext';
+import { PortfolioHeader } from './PortfolioHeader';
 import type { Symbol, TerminalStats } from '../../types/terminal';
 
 interface TerminalHeaderProps {
@@ -15,6 +16,8 @@ interface TerminalHeaderProps {
   priceChange24h: number;
   priceChangePercent24h: number;
   stats?: TerminalStats;
+  onAICloneToggle?: () => void;
+  isAIClonePanelOpen?: boolean;
 }
 
 const SYMBOLS: Symbol[] = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT'];
@@ -24,6 +27,8 @@ export function TerminalHeader({
   priceChange24h,
   priceChangePercent24h,
   stats,
+  onAICloneToggle,
+  isAIClonePanelOpen = false,
 }: TerminalHeaderProps) {
   const { symbol, setSymbol } = useSymbol();
   const [isSymbolDropdownOpen, setIsSymbolDropdownOpen] = useState(false);
@@ -36,11 +41,11 @@ export function TerminalHeader({
       <div className="flex items-center gap-6 flex-1">
         {/* Symbol Selector */}
         <div className="relative flex items-center gap-2">
-          <Star className="w-4 h-4 text-[#848E9C] hover:text-[#F0B90B] cursor-pointer" />
+          <Star className="w-4 h-4 text-[#848E9C] hover:text-[#00D9C8] cursor-pointer" />
           <div className="relative">
             <button
               onClick={() => setIsSymbolDropdownOpen(!isSymbolDropdownOpen)}
-              className="flex items-center gap-2 text-[#EAECEF] font-semibold text-lg hover:text-[#F0B90B] transition-colors"
+              className="flex items-center gap-2 text-[#EAECEF] font-semibold text-lg hover:text-[#00D9C8] transition-colors"
             >
               <span>{symbol}</span>
               <span className="text-[#848E9C] text-xs bg-[#2B2F36] px-1.5 py-0.5 rounded">Perpetual</span>
@@ -57,7 +62,7 @@ export function TerminalHeader({
                       setIsSymbolDropdownOpen(false);
                     }}
                     className={`w-full text-left px-4 py-2 text-sm hover:bg-[#2B2F36] transition-colors ${
-                      sym === symbol ? 'text-[#F0B90B]' : 'text-[#EAECEF]'
+                      sym === symbol ? 'text-[#00D9C8]' : 'text-[#EAECEF]'
                     }`}
                   >
                     {sym}
@@ -115,6 +120,27 @@ export function TerminalHeader({
             </div>
           </>
         )}
+        {/* Divider */}
+        <div className="w-px h-6 bg-[#2B2F36] mx-2" />
+
+        {/* Portfolio Header */}
+        <PortfolioHeader />
+
+        {/* AI Clone Toggle */}
+        {onAICloneToggle && (
+          <button
+            onClick={onAICloneToggle}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              isAIClonePanelOpen
+                ? 'bg-[#00D9C8]/20 text-[#00D9C8] border border-[#00D9C8]/50'
+                : 'bg-[#2B2F36]/50 text-[#848E9C] hover:text-[#EAECEF] border border-transparent hover:border-[#2B2F36]'
+            }`}
+          >
+            <Bot className="w-4 h-4" />
+            <span className="text-xs font-medium">AI Clone</span>
+          </button>
+        )}
+
         <Settings className="w-4 h-4 text-[#848E9C] hover:text-[#EAECEF] cursor-pointer ml-2" />
       </div>
     </header>

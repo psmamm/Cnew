@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -15,11 +15,12 @@ import {
   Smartphone,
   Mail,
   Lock,
-  Settings as SettingsIcon,
   RefreshCw,
   Trash2,
   Clock,
-  Link2
+  Link2,
+  Camera,
+  Loader2
 } from "lucide-react";
 import DashboardLayout from "@/react-app/components/DashboardLayout";
 import ExchangeConnectionModal from "@/react-app/components/exchanges/ExchangeConnectionModal";
@@ -29,11 +30,26 @@ import { useExchangeConnections } from "@/react-app/hooks/useExchangeConnections
 type SettingsSection = "profile" | "security" | "api" | "notifications" | "data";
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, updateUserProfile, uploadProfilePicture } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState<SettingsSection>("profile");
   const [showExchangeModal, setShowExchangeModal] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+  // Profile editing state
+  const [displayName, setDisplayName] = useState(user?.displayName || "");
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Notification preferences state
+  const [notifications, setNotifications] = useState({
+    tradeAlerts: true,
+    performanceReports: true,
+    productUpdates: false,
+    securityAlerts: true,
+  });
 
   // Read section from URL parameter
   useEffect(() => {
@@ -42,6 +58,94 @@ export default function SettingsPage() {
       setActiveSection(section as SettingsSection);
     }
   }, [searchParams]);
+
+  // Update displayName when user changes
+  useEffect(() => {
+    if (user?.displayName) {
+      setDisplayName(user.displayName);
+    }
+  }, [user?.displayName]);
+
+  // Handle profile save
+  const handleSaveProfile = async () => {
+    if (!displayName.trim()) {
+      setProfileError("Display name cannot be empty");
+      return;
+    }
+
+    setIsSavingProfile(true);
+    setProfileError(null);
+    setProfileSaved(false);
+
+    try {
+      const result = await updateUserProfile({ displayName: displayName.trim() });
+      if (result.error) {
+        setProfileError("Failed to update profile");
+      } else {
+        setProfileSaved(true);
+        setTimeout(() => setProfileSaved(false), 3000);
+      }
+    } catch {
+      setProfileError("Failed to update profile");
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  // Handle profile picture upload
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setProfileError("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setProfileError("Image must be less than 5MB");
+      return;
+    }
+
+    setIsSavingProfile(true);
+    setProfileError(null);
+
+    try {
+      const result = await uploadProfilePicture(file);
+      if (result.error) {
+        setProfileError("Failed to update profile picture. Please check Firebase Storage rules.");
+      } else {
+        setProfileSaved(true);
+        setTimeout(() => setProfileSaved(false), 3000);
+      }
+    } catch {
+      setProfileError("Failed to upload image");
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  // Handle notification toggle
+  const handleNotificationToggle = (key: keyof typeof notifications) => {
+    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+    // In production, save to backend here
+  };
+
+  // Copy UID to clipboard
+  const handleCopyUID = async () => {
+    try {
+      await navigator.clipboard.writeText(uid);
+      // Could show a toast here
+    } catch {
+      console.error("Failed to copy");
+    }
+  };
 
   // Exchange connections hook
   const {
@@ -198,11 +302,34 @@ export default function SettingsPage() {
                     <div className="flex items-start gap-6">
                       {/* Avatar */}
                       <div className="relative">
-                        <div className="w-20 h-20 rounded-xl bg-[#1A1A1E] border border-[#2A2A2E] flex items-center justify-center text-3xl">
-                          {user?.photoURL || user?.displayName?.charAt(0) || user?.email?.charAt(0) || "👤"}
-                        </div>
-                        <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#00D9C8] rounded-lg flex items-center justify-center hover:bg-[#00F5E1] transition-colors">
-                          <SettingsIcon className="w-4 h-4 text-[#0D0D0F]" />
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                        {user?.photoURL ? (
+                          <img
+                            src={user.photoURL}
+                            alt="Profile"
+                            className="w-20 h-20 rounded-xl object-cover border border-[#2A2A2E]"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-xl bg-[#1A1A1E] border border-[#2A2A2E] flex items-center justify-center text-3xl">
+                            {user?.displayName?.charAt(0) || user?.email?.charAt(0) || "👤"}
+                          </div>
+                        )}
+                        <button
+                          onClick={handleAvatarClick}
+                          disabled={isSavingProfile}
+                          className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#00D9C8] rounded-lg flex items-center justify-center hover:bg-[#00F5E1] transition-colors disabled:opacity-50"
+                        >
+                          {isSavingProfile ? (
+                            <Loader2 className="w-4 h-4 text-[#0D0D0F] animate-spin" />
+                          ) : (
+                            <Camera className="w-4 h-4 text-[#0D0D0F]" />
+                          )}
                         </button>
                       </div>
 
@@ -223,7 +350,10 @@ export default function SettingsPage() {
                           <div className="flex items-center gap-2">
                             <span className="text-[#6B7280]">UID:</span>
                             <span className="text-white font-mono">{uid}</span>
-                            <button className="p-1 hover:bg-[#1A1A1E] rounded transition-colors">
+                            <button
+                              onClick={handleCopyUID}
+                              className="p-1 hover:bg-[#1A1A1E] rounded transition-colors"
+                            >
                               <Copy className="w-3.5 h-3.5" />
                             </button>
                           </div>
@@ -235,12 +365,21 @@ export default function SettingsPage() {
                           </div>
                         </div>
                       </div>
-
-                      {/* Edit Profile Button */}
-                      <button className="px-4 py-2 bg-[#1A1A1E] border border-[#2A2A2E] rounded-lg text-white text-sm font-medium hover:bg-[#222226] transition-colors">
-                        Edit Profile
-                      </button>
                     </div>
+
+                    {/* Success/Error Messages */}
+                    {profileSaved && (
+                      <div className="mt-4 p-3 bg-[#00D9C8]/10 border border-[#00D9C8]/20 rounded-lg flex items-center gap-2">
+                        <Check className="w-4 h-4 text-[#00D9C8]" />
+                        <span className="text-[#00D9C8] text-sm">Profile updated successfully!</span>
+                      </div>
+                    )}
+                    {profileError && (
+                      <div className="mt-4 p-3 bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-lg flex items-center gap-2">
+                        <X className="w-4 h-4 text-[#F43F5E]" />
+                        <span className="text-[#F43F5E] text-sm">{profileError}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Profile Form */}
@@ -252,7 +391,8 @@ export default function SettingsPage() {
                         <label className="block text-sm text-[#9CA3AF] mb-2">Display Name</label>
                         <input
                           type="text"
-                          defaultValue={user?.displayName || ""}
+                          value={displayName}
+                          onChange={(e) => setDisplayName(e.target.value)}
                           placeholder="Enter your name"
                           className="w-full px-4 py-3 bg-[#1A1A1E] border border-[#2A2A2E] rounded-lg text-white placeholder-[#6B7280] focus:border-[#00D9C8] focus:outline-none transition-colors"
                         />
@@ -269,8 +409,19 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="mt-6 flex justify-end">
-                      <button className="px-6 py-2.5 bg-[#00D9C8] text-[#0D0D0F] rounded-lg font-medium hover:bg-[#00F5E1] transition-colors">
-                        Save Changes
+                      <button
+                        onClick={handleSaveProfile}
+                        disabled={isSavingProfile || displayName === (user?.displayName || "")}
+                        className="px-6 py-2.5 bg-[#00D9C8] text-[#0D0D0F] rounded-lg font-medium hover:bg-[#00F5E1] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {isSavingProfile ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          "Save Changes"
+                        )}
                       </button>
                     </div>
                   </div>
@@ -510,20 +661,28 @@ export default function SettingsPage() {
                 >
                   <div className="bg-[#141416] rounded-xl border border-[#2A2A2E] divide-y divide-[#2A2A2E]">
                     {[
-                      { title: "Trade Alerts", description: "Get notified when trades are executed" },
-                      { title: "Performance Reports", description: "Weekly and monthly performance summaries" },
-                      { title: "Product Updates", description: "New features and improvements" },
-                      { title: "Security Alerts", description: "Login attempts and security changes" },
-                    ].map((item, i) => (
-                      <div key={i} className="p-5 flex items-center justify-between">
+                      { key: "tradeAlerts" as const, title: "Trade Alerts", description: "Get notified when trades are executed" },
+                      { key: "performanceReports" as const, title: "Performance Reports", description: "Weekly and monthly performance summaries" },
+                      { key: "productUpdates" as const, title: "Product Updates", description: "New features and improvements" },
+                      { key: "securityAlerts" as const, title: "Security Alerts", description: "Login attempts and security changes" },
+                    ].map((item) => (
+                      <div key={item.key} className="p-5 flex items-center justify-between">
                         <div>
                           <h4 className="text-white font-medium">{item.title}</h4>
                           <p className="text-sm text-[#9CA3AF] mt-0.5">{item.description}</p>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" defaultChecked={i < 2} className="sr-only peer" />
-                          <div className="w-11 h-6 bg-[#2A2A2E] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00D9C8]"></div>
-                        </label>
+                        <button
+                          onClick={() => handleNotificationToggle(item.key)}
+                          className={`relative w-11 h-6 rounded-full transition-colors ${
+                            notifications[item.key] ? "bg-[#00D9C8]" : "bg-[#2A2A2E]"
+                          }`}
+                        >
+                          <div
+                            className={`absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transition-transform ${
+                              notifications[item.key] ? "translate-x-5" : "translate-x-0"
+                            }`}
+                          />
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -594,6 +753,7 @@ export default function SettingsPage() {
         onClose={() => setShowExchangeModal(false)}
         onSuccess={handleExchangeSuccess}
       />
+
     </DashboardLayout>
   );
 }

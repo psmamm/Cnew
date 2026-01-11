@@ -9,7 +9,8 @@ import {
   sendPasswordResetEmail,
   updateProfile
 } from 'firebase/auth';
-import { auth, googleProvider } from '../lib/firebase';
+import { auth, googleProvider, storage } from '../lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuthSync } from '../hooks/useAuthSync';
 
 const emitDebugLog = (payload: Record<string, unknown>) => {
@@ -42,6 +43,7 @@ type AuthContextType = {
   resetPassword: (email: string) => Promise<{ error: unknown }>;
   signInWithGoogle: () => Promise<{ error: unknown }>;
   updateUserProfile: (data: { displayName?: string; photoURL?: string }) => Promise<{ error: unknown }>;
+  uploadProfilePicture: (file: File) => Promise<{ error: unknown; url?: string }>;
   refreshUserData: () => Promise<User | null>;
 };
 
@@ -174,6 +176,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const uploadProfilePicture = async (file: File): Promise<{ error: unknown; url?: string }> => {
+    try {
+      if (!auth.currentUser) {
+        return { error: 'No user logged in' };
+      }
+
+      // Create a reference to the profile picture in Firebase Storage
+      const storageRef = ref(storage, `profile-pictures/${auth.currentUser.uid}`);
+
+      // Upload the file
+      await uploadBytes(storageRef, file);
+
+      // Get the download URL
+      const downloadURL = await getDownloadURL(storageRef);
+
+      // Update the user's profile with the new photo URL
+      await updateProfile(auth.currentUser, { photoURL: downloadURL });
+      setUser({ ...auth.currentUser });
+
+      return { error: null, url: downloadURL };
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      return { error };
+    }
+  };
+
   const refreshUserData = async () => {
     try {
       if (auth.currentUser) {
@@ -198,6 +226,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     resetPassword,
     signInWithGoogle,
     updateUserProfile,
+    uploadProfilePicture,
     refreshUserData,
   };
 

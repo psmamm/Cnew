@@ -15,6 +15,13 @@ export default defineConfig({
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
       'Cross-Origin-Embedder-Policy': 'unsafe-none',
     },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   build: {
     chunkSizeWarningLimit: 5000,

@@ -172,7 +172,7 @@ export function TerminalDealTicket({ currentPrice }: TerminalDealTicketProps) {
                     onClick={() => setMarginMode('cross')}
                     className={`flex-1 text-xs py-1 rounded transition-colors ${
                       marginMode === 'cross'
-                        ? 'bg-[#F0B90B] text-black'
+                        ? 'bg-[#00D9C8] text-black'
                         : 'bg-[#161A1E] text-[#848E9C] hover:text-[#EAECEF]'
                     }`}
                   >
@@ -182,7 +182,7 @@ export function TerminalDealTicket({ currentPrice }: TerminalDealTicketProps) {
                     onClick={() => setMarginMode('isolated')}
                     className={`flex-1 text-xs py-1 rounded transition-colors ${
                       marginMode === 'isolated'
-                        ? 'bg-[#F0B90B] text-black'
+                        ? 'bg-[#00D9C8] text-black'
                         : 'bg-[#161A1E] text-[#848E9C] hover:text-[#EAECEF]'
                     }`}
                   >
@@ -199,13 +199,13 @@ export function TerminalDealTicket({ currentPrice }: TerminalDealTicketProps) {
                 />
                 <div className="flex justify-between text-[10px] text-[#848E9C] mt-1">
                   <span>1x</span>
-                  <span className="text-[#F0B90B]">{leverage}x</span>
+                  <span className="text-[#00D9C8]">{leverage}x</span>
                   <span>100x</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowMarginDropdown(false)}
-                className="w-full text-xs py-1.5 text-[#F0B90B] hover:bg-[#161A1E] transition-colors"
+                className="w-full text-xs py-1.5 text-[#00D9C8] hover:bg-[#161A1E] transition-colors"
               >
                 Confirm
               </button>
@@ -221,7 +221,7 @@ export function TerminalDealTicket({ currentPrice }: TerminalDealTicketProps) {
           <div className="flex justify-between text-[#848E9C] mb-1">
             <span>Price</span>
             {orderType === 'Market' && (
-              <span className="text-[#F0B90B] cursor-pointer hover:underline" onClick={() => setPrice(currentPrice)}>
+              <span className="text-[#00D9C8] cursor-pointer hover:underline" onClick={() => setPrice(currentPrice)}>
                 Last
               </span>
             )}
@@ -233,7 +233,7 @@ export function TerminalDealTicket({ currentPrice }: TerminalDealTicketProps) {
               onChange={(e) => setPrice(Number(e.target.value))}
               disabled={orderType === 'Market'}
               placeholder={orderType === 'Market' ? 'Market' : ''}
-              className="w-full bg-[#2B2F36] rounded px-3 py-2 text-[#EAECEF] text-xs focus:outline-none focus:ring-1 focus:ring-[#F0B90B] disabled:text-[#848E9C] disabled:cursor-not-allowed"
+              className="w-full bg-[#2B2F36] rounded px-3 py-2 text-[#EAECEF] text-xs focus:outline-none focus:ring-1 focus:ring-[#00D9C8] disabled:text-[#848E9C] disabled:cursor-not-allowed"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#848E9C]">USDT</span>
           </div>
@@ -243,14 +243,14 @@ export function TerminalDealTicket({ currentPrice }: TerminalDealTicketProps) {
         <div>
           <div className="flex justify-between text-[#848E9C] mb-1">
             <span>Risk Amount</span>
-            <span className="text-[#F0B90B]">$</span>
+            <span className="text-[#00D9C8]">$</span>
           </div>
           <div className="relative">
             <input
               type="number"
               value={riskAmount}
               onChange={(e) => setRiskAmount(Number(e.target.value))}
-              className="w-full bg-[#2B2F36] rounded px-3 py-2 text-[#EAECEF] text-xs focus:outline-none focus:ring-2 focus:ring-[#F0B90B]"
+              className="w-full bg-[#2B2F36] rounded px-3 py-2 text-[#EAECEF] text-xs focus:outline-none focus:ring-2 focus:ring-[#00D9C8]"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#848E9C]">USDT</span>
           </div>

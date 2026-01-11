@@ -1,33 +1,41 @@
 /**
- * AI Clone Page
- *
- * Dashboard for managing the AI Clone that learns from user's trading patterns
- * and can provide suggestions or execute trades autonomously.
+ * AI Clone Page - Modern Bitget Style (No Gradients)
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import DashboardLayout from '../components/DashboardLayout';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import {
-  Brain,
-  Sparkles,
-  Target,
+  Cpu,
+  Gauge,
+  Crosshair,
   TrendingUp,
+  TrendingDown,
   AlertTriangle,
-  Shield,
+  SlidersHorizontal,
   Play,
   Pause,
   Settings,
   Check,
   X,
   Clock,
+  Workflow,
+  ScanEye,
+  Lightbulb,
+  CircuitBoard,
+  RefreshCw,
+  Activity,
+  Lock,
+  LineChart,
+  Rocket,
+  Network,
+  Sparkles,
   Zap,
-  Eye,
-  MessageSquare,
-  Bot,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react';
 
 // Types
@@ -36,9 +44,12 @@ interface AICloneConfig {
   is_active: boolean;
   min_confidence: number;
   max_position_size: number;
+  max_position_percent: number;
   max_daily_trades: number;
   max_daily_loss: number;
+  max_daily_loss_percent: number;
   allowed_symbols: string[];
+  learning_enabled: boolean;
 }
 
 interface Pattern {
@@ -48,6 +59,7 @@ interface Pattern {
   setup_type: string;
   win_rate: number;
   avg_pnl: number;
+  avg_pnl_percent: number;
   sample_size: number;
   confidence: number;
 }
@@ -61,8 +73,10 @@ interface Suggestion {
   entry_price: number;
   stop_loss: number;
   take_profit: number;
+  position_size?: number;
   created_at: string;
-  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  suggested_at?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'expired' | 'executing' | 'executed';
 }
 
 interface Stats {
@@ -71,38 +85,67 @@ interface Stats {
   totalSuggestions: number;
   approvedSuggestions: number;
   successRate: number;
+  executedTrades: number;
+  totalPnl: number;
+  winRate: number;
 }
 
 const PERMISSION_LEVELS = [
   {
     id: 'observe',
     label: 'Observe',
-    description: 'AI watches and learns from your trades silently',
-    icon: Eye,
-    color: 'text-zinc-400',
+    description: 'AI learns silently',
+    icon: ScanEye,
+    bg: 'bg-slate-600',
+    bgLight: 'bg-slate-600/10',
+    text: 'text-slate-400',
+    ring: 'ring-slate-500/30',
   },
   {
     id: 'suggest',
     label: 'Suggest',
-    description: 'AI provides trade suggestions for your approval',
-    icon: MessageSquare,
-    color: 'text-blue-400',
+    description: 'Get AI suggestions',
+    icon: Lightbulb,
+    bg: 'bg-blue-500',
+    bgLight: 'bg-blue-500/10',
+    text: 'text-blue-400',
+    ring: 'ring-blue-500/30',
   },
   {
     id: 'semi_auto',
     label: 'Semi-Auto',
-    description: 'AI executes trades after your confirmation',
-    icon: Zap,
-    color: 'text-yellow-400',
+    description: 'One-click execute',
+    icon: Workflow,
+    bg: 'bg-orange-500',
+    bgLight: 'bg-orange-500/10',
+    text: 'text-orange-400',
+    ring: 'ring-orange-500/30',
   },
   {
     id: 'full_auto',
     label: 'Full Auto',
-    description: 'AI trades autonomously within your limits',
-    icon: Bot,
-    color: 'text-emerald-400',
+    description: 'Autonomous AI',
+    icon: CircuitBoard,
+    bg: 'bg-[#00D9C8]',
+    bgLight: 'bg-[#00D9C8]/10',
+    text: 'text-[#00D9C8]',
+    ring: 'ring-[#00D9C8]/30',
   },
 ];
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
 
 export default function AIClonePage() {
   const { user } = useAuth();
@@ -113,64 +156,69 @@ export default function AIClonePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [isTraining, setIsTraining] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [executingSuggestion, setExecutingSuggestion] = useState<string | null>(null);
 
-  // Helper to get auth token
   const getToken = useCallback(async () => {
     if (!user) return null;
     return await user.getIdToken();
   }, [user]);
 
-  // Fetch AI Clone data
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!user) return;
-      setLoading(true);
+  const fetchData = useCallback(async () => {
+    if (!user) return;
 
-      try {
-        const token = await getToken();
-        const headers = {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        };
+    try {
+      const token = await getToken();
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
 
-        // Fetch config
-        const configRes = await fetch('/api/ai-clone/config', { headers });
-        if (configRes.ok) {
-          const configData = await configRes.json();
-          setConfig(configData);
-        }
+      const [configRes, patternsRes, suggestionsRes, statsRes] = await Promise.all([
+        fetch('/api/ai-clone/config', { headers }),
+        fetch('/api/ai-clone/patterns?limit=10', { headers }),
+        fetch('/api/ai-clone/suggestions?limit=5', { headers }),
+        fetch('/api/ai-clone/stats', { headers }),
+      ]);
 
-        // Fetch patterns
-        const patternsRes = await fetch('/api/ai-clone/patterns?limit=10', { headers });
-        if (patternsRes.ok) {
-          const patternsData = await patternsRes.json();
-          setPatterns(patternsData.patterns || []);
-        }
-
-        // Fetch suggestions
-        const suggestionsRes = await fetch('/api/ai-clone/suggestions?limit=5', { headers });
-        if (suggestionsRes.ok) {
-          const suggestionsData = await suggestionsRes.json();
-          setSuggestions(suggestionsData.suggestions || []);
-        }
-
-        // Fetch stats
-        const statsRes = await fetch('/api/ai-clone/stats', { headers });
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          setStats(statsData);
-        }
-      } catch (error) {
-        console.error('Error fetching AI Clone data:', error);
-      } finally {
-        setLoading(false);
+      if (configRes.ok) {
+        const configData = await configRes.json();
+        setConfig(configData.config || configData);
       }
-    };
 
-    fetchData();
+      if (patternsRes.ok) {
+        const patternsData = await patternsRes.json();
+        setPatterns(patternsData.patterns || []);
+      }
+
+      if (suggestionsRes.ok) {
+        const suggestionsData = await suggestionsRes.json();
+        setSuggestions(suggestionsData.suggestions || []);
+      }
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setStats({
+          totalPatterns: statsData.patterns?.total || 0,
+          avgConfidence: statsData.patterns?.avg_confidence || 0,
+          totalSuggestions: statsData.config?.total_suggestions || 0,
+          approvedSuggestions: statsData.config?.accepted_suggestions || 0,
+          successRate: statsData.decisions?.win_rate || 0,
+          executedTrades: statsData.decisions?.executed || 0,
+          totalPnl: statsData.decisions?.total_pnl || 0,
+          winRate: statsData.decisions?.win_rate || 0,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching AI Clone data:', error);
+    } finally {
+      setLoading(false);
+    }
   }, [user, getToken]);
 
-  // Start training
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const handleStartTraining = async () => {
     if (!user) return;
     setIsTraining(true);
@@ -188,8 +236,7 @@ export default function AIClonePage() {
       if (res.ok) {
         const data = await res.json();
         alert(`Training complete! Found ${data.patterns_found} new patterns, updated ${data.patterns_updated} existing patterns.`);
-        // Refresh patterns
-        window.location.reload();
+        fetchData();
       }
     } catch (error) {
       console.error('Training failed:', error);
@@ -198,7 +245,6 @@ export default function AIClonePage() {
     }
   };
 
-  // Update permission level
   const handlePermissionChange = async (level: string) => {
     if (!user || !config) return;
 
@@ -221,9 +267,56 @@ export default function AIClonePage() {
     }
   };
 
-  // Handle suggestion action
-  const handleSuggestionAction = async (suggestionId: string, action: 'approve' | 'reject') => {
+  const handleExecuteTrade = async (suggestion: Suggestion) => {
+    if (!user || !config) return;
+    if (config.permission_level !== 'semi_auto' && config.permission_level !== 'full_auto') return;
+
+    setExecutingSuggestion(suggestion.id);
+
+    try {
+      const token = await getToken();
+      const res = await fetch('/api/ai-clone/execute', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          suggestion_id: suggestion.id,
+          symbol: suggestion.symbol,
+          side: suggestion.side,
+          entry_price: suggestion.entry_price,
+          stop_loss: suggestion.stop_loss,
+          take_profit: suggestion.take_profit,
+          position_size: suggestion.position_size || config.max_position_size,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSuggestions(suggestions.map(s =>
+          s.id === suggestion.id ? { ...s, status: 'executed' } : s
+        ));
+        alert(`Trade executed! Order ID: ${data.order_id || 'Pending'}`);
+        fetchData();
+      } else {
+        const error = await res.json();
+        alert(`Execution failed: ${error.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Trade execution failed:', error);
+    } finally {
+      setExecutingSuggestion(null);
+    }
+  };
+
+  const handleSuggestionAction = async (suggestionId: string, action: 'approve' | 'reject', suggestion?: Suggestion) => {
     if (!user) return;
+
+    if (action === 'approve' && config?.permission_level === 'semi_auto' && suggestion) {
+      await handleExecuteTrade(suggestion);
+      return;
+    }
 
     try {
       const token = await getToken();
@@ -247,7 +340,6 @@ export default function AIClonePage() {
     }
   };
 
-  // Toggle active state
   const handleToggleActive = async () => {
     if (!user || !config) return;
 
@@ -274,323 +366,518 @@ export default function AIClonePage() {
     return (
       <DashboardLayout>
         <div className="space-y-6 p-6">
-          <Skeleton className="h-10 w-48" />
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Skeleton className="h-40 rounded-3xl" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-32" />
+              <Skeleton key={i} className="h-36 rounded-2xl" />
             ))}
           </div>
-          <Skeleton className="h-64" />
+          <Skeleton className="h-52 rounded-3xl" />
         </div>
       </DashboardLayout>
     );
   }
 
+  const currentLevel = PERMISSION_LEVELS.find(l => l.id === config?.permission_level) || PERMISSION_LEVELS[0];
+
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-gradient-premium">
-              <Brain className="h-6 w-6 text-white" />
+      <motion.div
+        className="space-y-6 p-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Hero Section */}
+        <motion.div
+          variants={itemVariants}
+          className="relative overflow-hidden rounded-3xl bg-[#0d0d0f] border border-zinc-800/50"
+        >
+          {/* Grid Pattern Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+
+          <div className="relative p-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                {/* AI Clone Avatar */}
+                <div className="relative">
+                  <div className={`relative w-20 h-20 rounded-2xl ${currentLevel.bg} flex items-center justify-center shadow-2xl`}>
+                    <Cpu className="h-10 w-10 text-white" />
+                  </div>
+                  {config?.is_active && (
+                    <motion.span
+                      className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#00D9C8] rounded-full flex items-center justify-center border-2 border-[#0a0a0c]"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <Zap className="h-3 w-3 text-black" />
+                    </motion.span>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-4 mb-2">
+                    <h1 className="text-3xl font-bold text-white">
+                      AI Clone
+                    </h1>
+                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${currentLevel.bg} text-white`}>
+                      {currentLevel.label}
+                    </span>
+                    {config?.is_active ? (
+                      <motion.span
+                        className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D9C8]/10 border border-[#00D9C8]/30 text-[#00D9C8] text-xs font-medium"
+                        animate={{ borderColor: ['rgba(0,217,200,0.3)', 'rgba(0,217,200,0.6)', 'rgba(0,217,200,0.3)'] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <motion.span
+                          className="w-2 h-2 rounded-full bg-[#00D9C8]"
+                          animate={{ opacity: [1, 0.5, 1] }}
+                          transition={{ duration: 1, repeat: Infinity }}
+                        />
+                        Online
+                      </motion.span>
+                    ) : (
+                      <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700/50 text-zinc-500 text-xs">
+                        <span className="w-2 h-2 rounded-full bg-zinc-600" />
+                        Offline
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-zinc-500 text-sm">Autonomous trading AI powered by your trading patterns</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="w-12 h-12 rounded-xl border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/50 hover:border-[#00D9C8]/50 transition-all"
+                >
+                  <Settings className="h-5 w-5 text-zinc-400" />
+                </Button>
+                <Button
+                  onClick={handleToggleActive}
+                  className={`h-12 px-6 rounded-xl font-semibold transition-all ${
+                    config?.is_active
+                      ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20'
+                      : 'bg-[#00D9C8] text-black hover:bg-[#00D9C8]/90'
+                  }`}
+                >
+                  {config?.is_active ? (
+                    <>
+                      <Pause className="h-5 w-5 mr-2" /> Stop AI
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-5 w-5 mr-2" /> Start AI
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Stats Grid */}
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Patterns', value: stats?.totalPatterns || 0, icon: Crosshair, color: 'text-[#00D9C8]', bg: 'bg-[#00D9C8]/10', suffix: '' },
+            { label: 'Confidence', value: ((stats?.avgConfidence || 0) * 100).toFixed(0), icon: Gauge, color: 'text-amber-500', bg: 'bg-amber-500/10', suffix: '%' },
+            { label: 'Trades', value: stats?.executedTrades || 0, icon: LineChart, color: 'text-blue-500', bg: 'bg-blue-500/10', suffix: '', extra: `${((stats?.winRate || 0) * 100).toFixed(0)}% WR` },
+            { label: 'P&L', value: (stats?.totalPnl || 0).toFixed(2), icon: (stats?.totalPnl || 0) >= 0 ? TrendingUp : TrendingDown, color: (stats?.totalPnl || 0) >= 0 ? 'text-emerald-500' : 'text-red-500', bg: (stats?.totalPnl || 0) >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10', prefix: (stats?.totalPnl || 0) >= 0 ? '+$' : '$' },
+          ].map((stat, i) => (
+            <motion.div
+              key={i}
+              className="group relative overflow-hidden rounded-2xl bg-zinc-900/50 border border-zinc-800/50 p-5 hover:border-zinc-700/50 transition-all cursor-pointer"
+              whileHover={{ scale: 1.02, y: -2 }}
+              transition={{ type: 'spring', stiffness: 400 }}
+            >
+              <div className="relative">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-11 h-11 rounded-xl ${stat.bg} flex items-center justify-center`}>
+                    <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                  </div>
+                  {stat.extra && <span className="text-xs text-emerald-400 font-medium">{stat.extra}</span>}
+                </div>
+                <p className="text-3xl font-bold text-white tracking-tight">
+                  {stat.prefix}{stat.value}{stat.suffix}
+                </p>
+                <p className="text-sm text-zinc-500 mt-1">{stat.label}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Permission Level */}
+        <motion.div
+          variants={itemVariants}
+          className="relative overflow-hidden rounded-3xl bg-zinc-900/50 border border-zinc-800/50 p-6"
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-[#00D9C8]/15 flex items-center justify-center">
+              <SlidersHorizontal className="h-6 w-6 text-[#00D9C8]" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">AI Clone</h1>
-              <p className="text-zinc-400">Your personal trading AI that learns from you</p>
+              <h2 className="text-xl font-bold text-white">Permission Level</h2>
+              <p className="text-sm text-zinc-500">Control AI autonomy</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant={config?.is_active ? 'destructive' : 'default'}
-              onClick={handleToggleActive}
-            >
-              {config?.is_active ? (
-                <>
-                  <Pause className="h-4 w-4 mr-2" /> Pause Clone
-                </>
-              ) : (
-                <>
-                  <Play className="h-4 w-4 mr-2" /> Activate Clone
-                </>
-              )}
-            </Button>
-            <Button variant="outline" onClick={() => setShowSettings(!showSettings)}>
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card variant="glass">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-zinc-400">Patterns Learned</p>
-                  <p className="text-2xl font-bold text-white">{stats?.totalPatterns || 0}</p>
-                </div>
-                <Target className="h-8 w-8 text-primary-500 opacity-50" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card variant="glass">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-zinc-400">Avg Confidence</p>
-                  <p className="text-2xl font-bold text-white">
-                    {((stats?.avgConfidence || 0) * 100).toFixed(1)}%
-                  </p>
-                </div>
-                <Sparkles className="h-8 w-8 text-yellow-500 opacity-50" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card variant="glass">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-zinc-400">Suggestions Made</p>
-                  <p className="text-2xl font-bold text-white">{stats?.totalSuggestions || 0}</p>
-                </div>
-                <MessageSquare className="h-8 w-8 text-blue-500 opacity-50" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card variant="glass">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-zinc-400">Success Rate</p>
-                  <p className="text-2xl font-bold text-emerald-400">
-                    {((stats?.successRate || 0) * 100).toFixed(1)}%
-                  </p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-emerald-500 opacity-50" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Permission Level Selector */}
-        <Card variant="glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary-500" />
-              Permission Level
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {PERMISSION_LEVELS.map((level) => {
-                const Icon = level.icon;
-                const isActive = config?.permission_level === level.id;
-                return (
-                  <button
-                    key={level.id}
-                    onClick={() => handlePermissionChange(level.id)}
-                    className={`p-4 rounded-xl border transition-all ${
-                      isActive
-                        ? 'border-primary-500 bg-primary-500/10'
-                        : 'border-[#2A2A2E] bg-white/5 hover:border-white/20'
-                    }`}
-                  >
-                    <Icon className={`h-8 w-8 mb-3 ${isActive ? 'text-primary-500' : level.color}`} />
-                    <h3 className={`font-semibold mb-1 ${isActive ? 'text-primary-500' : 'text-white'}`}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {PERMISSION_LEVELS.map((level) => {
+              const Icon = level.icon;
+              const isActive = config?.permission_level === level.id;
+              return (
+                <motion.button
+                  key={level.id}
+                  onClick={() => handlePermissionChange(level.id)}
+                  className={`relative overflow-hidden p-5 rounded-2xl border-2 transition-all duration-300 ${
+                    isActive
+                      ? `border-transparent ring-2 ${level.ring}`
+                      : 'border-zinc-800/50 hover:border-zinc-700'
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {isActive && (
+                    <motion.div
+                      className={`absolute inset-0 ${level.bgLight}`}
+                      layoutId="activePermission"
+                    />
+                  )}
+                  <div className="relative">
+                    <div className={`w-14 h-14 rounded-xl mb-4 flex items-center justify-center ${
+                      isActive ? level.bg : 'bg-zinc-800/50'
+                    }`}>
+                      <Icon className={`h-7 w-7 ${isActive ? 'text-white' : 'text-zinc-500'}`} />
+                    </div>
+                    <h3 className={`font-bold text-lg mb-1 ${isActive ? 'text-white' : 'text-zinc-400'}`}>
                       {level.label}
                     </h3>
-                    <p className="text-xs text-zinc-400">{level.description}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Learned Patterns */}
-          <Card variant="glass">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary-500" />
-                Learned Patterns
-              </CardTitle>
-              <Button
-                size="sm"
-                onClick={handleStartTraining}
-                disabled={isTraining}
-                loading={isTraining}
-              >
-                {isTraining ? 'Training...' : 'Train Now'}
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {patterns.length === 0 ? (
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 text-zinc-600 mx-auto mb-3" />
-                  <p className="text-zinc-400">No patterns learned yet</p>
-                  <p className="text-xs text-zinc-500 mt-1">
-                    Start training to let the AI learn from your trades
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {patterns.map((pattern) => (
-                    <div
-                      key={pattern.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-white/5"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-white">{pattern.symbol}</span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-primary-500/20 text-primary-400">
-                            {pattern.setup_type}
-                          </span>
-                        </div>
-                        <p className="text-xs text-zinc-400 mt-1">
-                          {pattern.sample_size} trades analyzed
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className={`font-medium ${pattern.win_rate >= 0.5 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {(pattern.win_rate * 100).toFixed(1)}% WR
-                        </p>
-                        <p className="text-xs text-zinc-400">
-                          {(pattern.confidence * 100).toFixed(0)}% conf
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Active Suggestions */}
-          <Card variant="glass">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-yellow-500" />
-                Trade Suggestions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {suggestions.filter(s => s.status === 'pending').length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageSquare className="h-12 w-12 text-zinc-600 mx-auto mb-3" />
-                  <p className="text-zinc-400">No pending suggestions</p>
-                  <p className="text-xs text-zinc-500 mt-1">
-                    AI will suggest trades when it detects matching patterns
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {suggestions
-                    .filter(s => s.status === 'pending')
-                    .map((suggestion) => (
-                      <div
-                        key={suggestion.id}
-                        className="p-4 rounded-lg bg-white/5 border border-[#2A2A2E]"
+                    <p className="text-xs text-zinc-600">{level.description}</p>
+                    {isActive && (
+                      <motion.div
+                        className="absolute top-3 right-3"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-white">{suggestion.symbol}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded ${
+                        <Check className="h-5 w-5 text-white" />
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Trade Suggestions */}
+          <motion.div
+            variants={itemVariants}
+            className="rounded-3xl bg-zinc-900/50 border border-zinc-800/50 overflow-hidden"
+          >
+            <div className="flex items-center justify-between p-6 border-b border-zinc-800/50">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center">
+                  <Rocket className="h-6 w-6 text-amber-500" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Signals</h2>
+                  <p className="text-xs text-zinc-500">AI trade opportunities</p>
+                </div>
+              </div>
+              <Button
+                size="icon"
+                variant="outline"
+                className="w-10 h-10 rounded-xl border-zinc-800 hover:border-zinc-700"
+                onClick={() => fetchData()}
+              >
+                <RefreshCw className="h-4 w-4 text-zinc-400" />
+              </Button>
+            </div>
+
+            <div className="p-6">
+              <AnimatePresence mode="wait">
+                {suggestions.filter(s => s.status === 'pending').length === 0 ? (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-16"
+                  >
+                    <div className="w-20 h-20 rounded-2xl bg-zinc-800/50 flex items-center justify-center mx-auto mb-4">
+                      <Lightbulb className="h-10 w-10 text-zinc-600" />
+                    </div>
+                    <p className="text-zinc-400 font-medium text-lg">No active signals</p>
+                    <p className="text-sm text-zinc-600 mt-1">AI is scanning for opportunities</p>
+                  </motion.div>
+                ) : (
+                  <div className="space-y-4">
+                    {suggestions.filter(s => s.status === 'pending').map((suggestion, i) => (
+                      <motion.div
+                        key={suggestion.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="relative rounded-2xl bg-zinc-800/30 border border-zinc-700/50 p-5 hover:border-zinc-600/50 transition-all"
+                      >
+                        {/* Confidence Bar */}
+                        <div
+                          className="absolute top-0 left-0 h-1 rounded-t-2xl bg-[#00D9C8]"
+                          style={{ width: `${suggestion.confidence * 100}%` }}
+                        />
+
+                        <div className="flex items-center justify-between mb-4 pt-1">
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono font-bold text-xl text-white">{suggestion.symbol}</span>
+                            <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
                               suggestion.side === 'long'
                                 ? 'bg-emerald-500/20 text-emerald-400'
-                                : 'bg-rose-500/20 text-rose-400'
+                                : 'bg-red-500/20 text-red-400'
                             }`}>
+                              {suggestion.side === 'long' ? <ArrowUpRight className="w-3 h-3 inline mr-1" /> : <ArrowDownRight className="w-3 h-3 inline mr-1" />}
                               {suggestion.side.toUpperCase()}
                             </span>
                           </div>
-                          <span className="text-xs text-zinc-400 flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {new Date(suggestion.created_at).toLocaleTimeString()}
-                          </span>
+                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                            <Gauge className="h-4 w-4 text-amber-500" />
+                            <span className="text-sm font-bold text-amber-400">{(suggestion.confidence * 100).toFixed(0)}%</span>
+                          </div>
                         </div>
 
-                        <p className="text-sm text-zinc-300 mb-3">{suggestion.reasoning}</p>
-
-                        <div className="grid grid-cols-3 gap-2 text-xs mb-3">
-                          <div>
-                            <p className="text-zinc-500">Entry</p>
-                            <p className="text-white">${suggestion.entry_price.toFixed(2)}</p>
+                        <div className="grid grid-cols-3 gap-3 mb-4">
+                          <div className="bg-zinc-900/50 rounded-xl p-3 text-center">
+                            <p className="text-xs text-zinc-500 mb-1">Entry</p>
+                            <p className="text-sm font-mono font-bold text-white">${suggestion.entry_price?.toFixed(2)}</p>
                           </div>
-                          <div>
-                            <p className="text-zinc-500">Stop Loss</p>
-                            <p className="text-rose-400">${suggestion.stop_loss.toFixed(2)}</p>
+                          <div className="bg-zinc-900/50 rounded-xl p-3 text-center">
+                            <p className="text-xs text-zinc-500 mb-1">Stop</p>
+                            <p className="text-sm font-mono font-bold text-red-400">${suggestion.stop_loss?.toFixed(2)}</p>
                           </div>
-                          <div>
-                            <p className="text-zinc-500">Take Profit</p>
-                            <p className="text-emerald-400">${suggestion.take_profit.toFixed(2)}</p>
+                          <div className="bg-zinc-900/50 rounded-xl p-3 text-center">
+                            <p className="text-xs text-zinc-500 mb-1">Target</p>
+                            <p className="text-sm font-mono font-bold text-emerald-400">${suggestion.take_profit?.toFixed(2)}</p>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            <Sparkles className="h-4 w-4 text-yellow-500" />
-                            <span className="text-sm text-yellow-400">
-                              {(suggestion.confidence * 100).toFixed(0)}% confidence
-                            </span>
-                          </div>
+                          <span className="text-xs text-zinc-600 flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {new Date(suggestion.created_at || suggestion.suggested_at || '').toLocaleTimeString()}
+                          </span>
                           <div className="flex items-center gap-2">
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={() => handleSuggestionAction(suggestion.id, 'reject')}
+                              className="h-9 px-3 text-red-400 hover:bg-red-500/10"
                             >
-                              <X className="h-4 w-4 text-rose-400" />
+                              <X className="h-4 w-4" />
                             </Button>
                             <Button
                               size="sm"
-                              variant="success"
-                              onClick={() => handleSuggestionAction(suggestion.id, 'approve')}
+                              onClick={() => handleSuggestionAction(suggestion.id, 'approve', suggestion)}
+                              disabled={executingSuggestion === suggestion.id}
+                              className="h-9 px-5 bg-[#00D9C8] text-black font-bold hover:bg-[#00D9C8]/90 transition-all"
                             >
-                              <Check className="h-4 w-4 mr-1" /> Approve
+                              {executingSuggestion === suggestion.id ? (
+                                <RefreshCw className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <>
+                                  <Sparkles className="h-4 w-4 mr-1" />
+                                  {config?.permission_level === 'semi_auto' ? 'Execute' : 'Approve'}
+                                </>
+                              )}
                             </Button>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
 
-        {/* Warning Banner */}
-        {config?.permission_level === 'full_auto' && (
-          <Card variant="glass" className="border-yellow-500/30 bg-yellow-500/5">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+          {/* Learned Patterns */}
+          <motion.div
+            variants={itemVariants}
+            className="rounded-3xl bg-zinc-900/50 border border-zinc-800/50 overflow-hidden"
+          >
+            <div className="flex items-center justify-between p-6 border-b border-zinc-800/50">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#00D9C8]/15 flex items-center justify-center">
+                  <Network className="h-6 w-6 text-[#00D9C8]" />
+                </div>
                 <div>
-                  <p className="font-medium text-yellow-400">Full Auto Mode Active</p>
-                  <p className="text-sm text-zinc-400 mt-1">
-                    The AI Clone will execute trades automatically within your configured limits.
-                    Make sure your risk settings are properly configured before enabling this mode.
-                  </p>
+                  <h2 className="text-xl font-bold text-white">Patterns</h2>
+                  <p className="text-xs text-zinc-500">Learned from your trades</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+              <Button
+                size="sm"
+                onClick={handleStartTraining}
+                disabled={isTraining}
+                className="h-10 px-5 bg-[#00D9C8] text-black font-bold hover:bg-[#00D9C8]/90"
+              >
+                {isTraining ? (
+                  <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Training...</>
+                ) : (
+                  <><Cpu className="h-4 w-4 mr-2" /> Train</>
+                )}
+              </Button>
+            </div>
+
+            <div className="p-6">
+              {patterns.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 rounded-2xl bg-zinc-800/50 flex items-center justify-center mx-auto mb-4">
+                    <Network className="h-10 w-10 text-zinc-600" />
+                  </div>
+                  <p className="text-zinc-400 font-medium text-lg">No patterns yet</p>
+                  <p className="text-sm text-zinc-600 mt-1">Train AI to learn from your trades</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {patterns.map((pattern, i) => (
+                    <motion.div
+                      key={pattern.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-center justify-between p-4 rounded-xl bg-zinc-800/30 border border-zinc-700/50 hover:border-zinc-600/50 transition-all"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          pattern.win_rate >= 0.6 ? 'bg-emerald-500/10' :
+                          pattern.win_rate >= 0.5 ? 'bg-amber-500/10' : 'bg-red-500/10'
+                        }`}>
+                          {pattern.win_rate >= 0.5 ? (
+                            <TrendingUp className={`h-5 w-5 ${pattern.win_rate >= 0.6 ? 'text-emerald-500' : 'text-amber-500'}`} />
+                          ) : (
+                            <TrendingDown className="h-5 w-5 text-red-500" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-white">{pattern.symbol}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-md bg-[#00D9C8]/10 text-[#00D9C8] font-medium">
+                              {pattern.setup_type}
+                            </span>
+                          </div>
+                          <p className="text-xs text-zinc-500 mt-0.5">{pattern.sample_size} trades</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`font-mono font-bold text-lg ${
+                          pattern.win_rate >= 0.6 ? 'text-emerald-400' :
+                          pattern.win_rate >= 0.5 ? 'text-amber-400' : 'text-red-400'
+                        }`}>
+                          {(pattern.win_rate * 100).toFixed(0)}%
+                        </p>
+                        <p className="text-xs text-zinc-500">{(pattern.confidence * 100).toFixed(0)}% conf</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Settings Panel */}
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="rounded-3xl bg-zinc-900/50 border border-zinc-800/50 overflow-hidden"
+            >
+              <div className="flex items-center gap-4 p-6 border-b border-zinc-800/50">
+                <div className="w-12 h-12 rounded-xl bg-[#00D9C8]/15 flex items-center justify-center">
+                  <Lock className="h-6 w-6 text-[#00D9C8]" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Risk Settings</h2>
+                  <p className="text-sm text-zinc-500">AI safety limits</p>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: 'Max Position', value: `${config?.max_position_percent || 5}%` },
+                    { label: 'Daily Trades', value: config?.max_daily_trades || 10 },
+                    { label: 'Max Loss', value: `${config?.max_daily_loss_percent || 5}%` },
+                    { label: 'Min Confidence', value: `${((config?.min_confidence || 0.7) * 100).toFixed(0)}%` },
+                  ].map((setting, i) => (
+                    <div key={i} className="bg-zinc-800/30 rounded-xl p-4 border border-zinc-700/50">
+                      <p className="text-xs text-zinc-500 mb-1">{setting.label}</p>
+                      <p className="text-xl font-mono font-bold text-white">{setting.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-amber-400">Safety Enabled</p>
+                      <p className="text-sm text-amber-400/70 mt-1">
+                        AI will never exceed your configured limits. All trades are protected.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Full Auto Banner */}
+        <AnimatePresence>
+          {config?.permission_level === 'full_auto' && config?.is_active && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="relative overflow-hidden rounded-3xl bg-amber-500/10 border border-amber-500/30 p-6"
+            >
+              <div className="relative flex items-start gap-5">
+                <motion.div
+                  className="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center"
+                  animate={{ rotate: [0, 5, 0, -5, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                >
+                  <CircuitBoard className="h-7 w-7 text-white" />
+                </motion.div>
+                <div>
+                  <p className="font-bold text-amber-400 text-xl">Full Auto Mode Active</p>
+                  <p className="text-zinc-400 mt-1">
+                    AI is trading autonomously within your limits. All trades execute automatically.
+                  </p>
+                  <div className="flex items-center gap-6 mt-4">
+                    <span className="flex items-center gap-2 text-sm text-amber-400">
+                      <motion.div animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1, repeat: Infinity }}>
+                        <Activity className="h-4 w-4" />
+                      </motion.div>
+                      Scanning markets
+                    </span>
+                    <span className="flex items-center gap-2 text-sm text-zinc-500">
+                      <Lock className="h-4 w-4" />
+                      Risk protected
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </DashboardLayout>
   );
 }
-
-
-
-
-
-
-
-
-
-
-

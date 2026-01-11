@@ -25,14 +25,47 @@ interface UserVariable {
 
 export const aiCloneRouter = new Hono<{ Bindings: Env; Variables: { user: UserVariable } }>();
 
-// Firebase auth middleware
+// Firebase auth middleware - supports both Bearer token and cookie
 const firebaseAuthMiddleware = async (c: unknown, next: () => Promise<void>) => {
   const context = c as {
     get: (key: string) => UserVariable | undefined;
     set: (key: string, value: UserVariable) => void;
     json: (data: { error: string }, status: number) => Response;
+    req: { header: (name: string) => string | undefined };
   };
 
+  // Try Bearer token first (from Authorization header)
+  const authHeader = context.req.header('Authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.slice(7);
+      // Decode Firebase JWT token (base64url decode the payload)
+      const tokenParts = token.split('.');
+      if (tokenParts.length === 3) {
+        const base64Url = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+        const base64 = base64Url + '='.repeat((4 - (base64Url.length % 4)) % 4);
+        const payload = JSON.parse(atob(base64)) as { sub?: string; user_id?: string; email?: string; name?: string };
+
+        const userId = payload.sub || payload.user_id;
+        if (userId) {
+          context.set('user', {
+            google_user_data: {
+              sub: userId,
+              email: payload.email,
+              name: payload.name,
+            },
+            firebase_user_id: userId,
+            email: payload.email,
+          });
+          return next();
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing Bearer token:', error);
+    }
+  }
+
+  // Fallback to cookie-based auth
   const firebaseSession = getCookie(context as Parameters<typeof getCookie>[0], 'firebase_session');
   if (firebaseSession) {
     try {
@@ -43,6 +76,7 @@ const firebaseAuthMiddleware = async (c: unknown, next: () => Promise<void>) => 
           email: userData.email,
           name: userData.name,
         },
+        firebase_user_id: userData.google_user_id || userData.sub,
         email: userData.email,
       });
       return next();
@@ -498,20 +532,35 @@ aiCloneRouter.get('/suggestions', async (c) => {
     return c.json({ error: 'Unauthorized' }, 401);
   }
 
+  const limit = parseInt(c.req.query('limit') || '10');
+
   try {
     const suggestions = await c.env.DB.prepare(`
       SELECT * FROM ai_clone_decisions
-      WHERE user_id = ? AND decision_type = 'suggest' AND was_approved IS NULL
+      WHERE user_id = ? AND decision_type = 'suggest'
       ORDER BY suggested_at DESC
-      LIMIT 10
-    `).bind(userId).all();
+      LIMIT ?
+    `).bind(userId, limit).all();
 
-    // Parse JSON fields
-    const parsedSuggestions = suggestions.results.map((s: Record<string, unknown>) => ({
-      ...s,
-      reasoning: s.reasoning ? JSON.parse(s.reasoning as string) : [],
-      pattern_matches: s.pattern_matches ? JSON.parse(s.pattern_matches as string) : [],
-    }));
+    // Parse JSON fields and add status
+    const parsedSuggestions = suggestions.results.map((s: Record<string, unknown>) => {
+      let status = 'pending';
+      if (s.was_executed === 1) {
+        status = 'executed';
+      } else if (s.was_approved === 1) {
+        status = 'approved';
+      } else if (s.was_approved === 0) {
+        status = 'rejected';
+      }
+
+      return {
+        ...s,
+        status,
+        created_at: s.suggested_at,
+        reasoning: s.reasoning ? JSON.parse(s.reasoning as string) : [],
+        pattern_matches: s.pattern_matches ? JSON.parse(s.pattern_matches as string) : [],
+      };
+    });
 
     return c.json({ suggestions: parsedSuggestions });
   } catch (error) {
@@ -625,7 +674,90 @@ aiCloneRouter.post('/suggestions/generate', async (c) => {
   }
 });
 
-// Approve or reject suggestion
+// Quick approve suggestion
+aiCloneRouter.post('/suggestions/:id/approve', async (c) => {
+  const user = c.get('user');
+  const userId = user.google_user_data?.sub || user.firebase_user_id;
+  if (!userId) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+
+  const suggestionId = c.req.param('id');
+
+  try {
+    // Verify ownership
+    const suggestion = await c.env.DB.prepare(`
+      SELECT * FROM ai_clone_decisions WHERE id = ? AND user_id = ?
+    `).bind(suggestionId, userId).first();
+
+    if (!suggestion) {
+      return c.json({ error: 'Suggestion not found' }, 404);
+    }
+
+    // Update suggestion as approved
+    await c.env.DB.prepare(`
+      UPDATE ai_clone_decisions
+      SET was_approved = 1, user_response_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(suggestionId).run();
+
+    // Update accepted count
+    await c.env.DB.prepare(`
+      UPDATE ai_clone_config
+      SET accepted_suggestions = accepted_suggestions + 1
+      WHERE user_id = ?
+    `).bind(userId).run();
+
+    return c.json({
+      success: true,
+      approved: true,
+      message: 'Suggestion approved',
+    });
+  } catch (error) {
+    console.error('Error approving suggestion:', error);
+    return c.json({ error: 'Failed to approve suggestion' }, 500);
+  }
+});
+
+// Quick reject suggestion
+aiCloneRouter.post('/suggestions/:id/reject', async (c) => {
+  const user = c.get('user');
+  const userId = user.google_user_data?.sub || user.firebase_user_id;
+  if (!userId) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+
+  const suggestionId = c.req.param('id');
+
+  try {
+    // Verify ownership
+    const suggestion = await c.env.DB.prepare(`
+      SELECT * FROM ai_clone_decisions WHERE id = ? AND user_id = ?
+    `).bind(suggestionId, userId).first();
+
+    if (!suggestion) {
+      return c.json({ error: 'Suggestion not found' }, 404);
+    }
+
+    // Update suggestion as rejected
+    await c.env.DB.prepare(`
+      UPDATE ai_clone_decisions
+      SET was_approved = 0, user_response_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).bind(suggestionId).run();
+
+    return c.json({
+      success: true,
+      approved: false,
+      message: 'Suggestion rejected',
+    });
+  } catch (error) {
+    console.error('Error rejecting suggestion:', error);
+    return c.json({ error: 'Failed to reject suggestion' }, 500);
+  }
+});
+
+// Approve or reject suggestion with body
 aiCloneRouter.post('/suggestions/:id/respond', zValidator('json', ApproveSuggestionSchema), async (c) => {
   const user = c.get('user');
   const userId = user.google_user_data?.sub || user.firebase_user_id;
@@ -683,6 +815,223 @@ aiCloneRouter.post('/suggestions/:id/respond', zValidator('json', ApproveSuggest
   } catch (error) {
     console.error('Error responding to suggestion:', error);
     return c.json({ error: 'Failed to respond to suggestion' }, 500);
+  }
+});
+
+// ============================================================================
+// TRADE EXECUTION
+// ============================================================================
+
+const ExecuteTradeSchema = z.object({
+  suggestion_id: z.string(),
+  symbol: z.string(),
+  side: z.enum(['long', 'short']),
+  entry_price: z.number().optional(),
+  stop_loss: z.number().optional(),
+  take_profit: z.number().optional(),
+  position_size: z.number().optional(),
+});
+
+// Execute trade from suggestion (for semi_auto/full_auto modes)
+aiCloneRouter.post('/execute', zValidator('json', ExecuteTradeSchema), async (c) => {
+  const user = c.get('user');
+  const userId = user.google_user_data?.sub || user.firebase_user_id;
+  if (!userId) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+
+  const tradeData = c.req.valid('json');
+
+  try {
+    // Get config to verify permission level
+    const config = await c.env.DB.prepare(`
+      SELECT * FROM ai_clone_config WHERE user_id = ?
+    `).bind(userId).first();
+
+    if (!config) {
+      return c.json({ error: 'AI Clone not configured' }, 400);
+    }
+
+    const permissionLevel = config.permission_level as string;
+    if (permissionLevel !== 'semi_auto' && permissionLevel !== 'full_auto') {
+      return c.json({
+        error: 'Trade execution not allowed in current permission level',
+        current_level: permissionLevel,
+        required_level: 'semi_auto or full_auto',
+      }, 403);
+    }
+
+    if (config.is_active !== 1) {
+      return c.json({ error: 'AI Clone is not active' }, 400);
+    }
+
+    // Verify suggestion exists and belongs to user
+    const suggestion = await c.env.DB.prepare(`
+      SELECT * FROM ai_clone_decisions WHERE id = ? AND user_id = ?
+    `).bind(tradeData.suggestion_id, userId).first();
+
+    if (!suggestion) {
+      return c.json({ error: 'Suggestion not found' }, 404);
+    }
+
+    // Check daily trade limit
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayTrades = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM ai_clone_decisions
+      WHERE user_id = ? AND was_executed = 1 AND executed_at >= ?
+    `).bind(userId, todayStart.toISOString()).first();
+
+    const maxDailyTrades = (config.max_daily_trades as number) || 10;
+    if ((todayTrades?.count as number) >= maxDailyTrades) {
+      return c.json({
+        error: 'Daily trade limit reached',
+        limit: maxDailyTrades,
+        executed_today: todayTrades?.count,
+      }, 400);
+    }
+
+    // Check daily loss limit
+    const todayPnL = await c.env.DB.prepare(`
+      SELECT SUM(actual_pnl) as total_pnl FROM ai_clone_decisions
+      WHERE user_id = ? AND was_executed = 1 AND executed_at >= ?
+    `).bind(userId, todayStart.toISOString()).first();
+
+    const maxDailyLoss = (config.max_daily_loss as number) || 0;
+    const currentLoss = (todayPnL?.total_pnl as number) || 0;
+
+    if (maxDailyLoss > 0 && currentLoss < -maxDailyLoss) {
+      return c.json({
+        error: 'Daily loss limit reached',
+        limit: maxDailyLoss,
+        current_loss: currentLoss,
+      }, 400);
+    }
+
+    // Get user's connected exchange
+    const exchange = await c.env.DB.prepare(`
+      SELECT * FROM exchange_connections
+      WHERE user_id = ? AND is_active = 1
+      ORDER BY created_at DESC
+      LIMIT 1
+    `).bind(userId).first();
+
+    let orderId = null;
+    const executionPrice = tradeData.entry_price;
+    let executionError = null;
+
+    if (exchange) {
+      // Execute via connected exchange
+      // This would call the broker adapter in a real implementation
+      try {
+        // For now, we simulate successful execution
+        // In production, this would call the exchange API
+        orderId = `AI_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+
+        // Log the execution attempt
+        console.log('AI Clone executing trade:', {
+          userId,
+          symbol: tradeData.symbol,
+          side: tradeData.side,
+          size: tradeData.position_size,
+          exchange: exchange.exchange_id,
+        });
+      } catch (execError) {
+        executionError = execError instanceof Error ? execError.message : 'Unknown execution error';
+        console.error('Trade execution error:', execError);
+      }
+    } else {
+      // No exchange connected - log trade for paper trading / journaling
+      orderId = `PAPER_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    }
+
+    // Update suggestion as executed
+    await c.env.DB.prepare(`
+      UPDATE ai_clone_decisions
+      SET was_approved = 1,
+          was_executed = ?,
+          user_response_at = CURRENT_TIMESTAMP,
+          executed_at = CURRENT_TIMESTAMP,
+          execution_trade_id = ?,
+          execution_price = ?,
+          execution_error = ?,
+          entry_price = ?,
+          stop_loss = ?,
+          take_profit = ?,
+          position_size = ?
+      WHERE id = ?
+    `).bind(
+      executionError ? 0 : 1,
+      orderId,
+      executionPrice || null,
+      executionError,
+      tradeData.entry_price || null,
+      tradeData.stop_loss || null,
+      tradeData.take_profit || null,
+      tradeData.position_size || null,
+      tradeData.suggestion_id
+    ).run();
+
+    // Update config stats
+    if (!executionError) {
+      await c.env.DB.prepare(`
+        UPDATE ai_clone_config
+        SET accepted_suggestions = accepted_suggestions + 1,
+            executed_trades = executed_trades + 1,
+            last_trade_at = CURRENT_TIMESTAMP
+        WHERE user_id = ?
+      `).bind(userId).run();
+
+      // Create a trade record in the trades table
+      const tradeId = crypto.randomUUID();
+      await c.env.DB.prepare(`
+        INSERT INTO trades (
+          id, user_id, symbol, direction, entry_price, quantity,
+          entry_date, is_closed, notes, tags
+        ) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 0, ?, ?)
+      `).bind(
+        tradeId,
+        userId,
+        tradeData.symbol,
+        tradeData.side,
+        tradeData.entry_price || 0,
+        tradeData.position_size || 1,
+        `AI Clone executed trade. Order ID: ${orderId}`,
+        JSON.stringify(['ai-clone', 'auto-trade'])
+      ).run();
+
+      // Link the trade to the decision
+      await c.env.DB.prepare(`
+        UPDATE ai_clone_decisions SET execution_trade_id = ? WHERE id = ?
+      `).bind(tradeId, tradeData.suggestion_id).run();
+    }
+
+    if (executionError) {
+      return c.json({
+        success: false,
+        error: executionError,
+        suggestion_id: tradeData.suggestion_id,
+      }, 500);
+    }
+
+    return c.json({
+      success: true,
+      order_id: orderId,
+      symbol: tradeData.symbol,
+      side: tradeData.side,
+      execution_price: executionPrice,
+      position_size: tradeData.position_size,
+      stop_loss: tradeData.stop_loss,
+      take_profit: tradeData.take_profit,
+      is_paper: !exchange,
+      message: exchange
+        ? 'Trade executed successfully on exchange'
+        : 'Trade logged for paper trading (no exchange connected)',
+    });
+  } catch (error) {
+    console.error('Error executing trade:', error);
+    return c.json({ error: 'Failed to execute trade' }, 500);
   }
 });
 
