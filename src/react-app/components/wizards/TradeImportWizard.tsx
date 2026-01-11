@@ -251,7 +251,7 @@ export const TradeImportWizard: React.FC<TradeImportWizardProps> = ({ onComplete
                 terminate: () => Promise<void>;
             }
 
-            const createWorkerWithLogger = createWorker as (options?: { logger?: (m: TesseractLogger) => void }) => Promise<TesseractWorker>;
+            const createWorkerWithLogger = createWorker as unknown as (options?: { logger?: (m: TesseractLogger) => void }) => Promise<TesseractWorker>;
             
             setOcrStatus('Loading OCR engine...');
             const worker = await createWorkerWithLogger({
@@ -344,7 +344,7 @@ export const TradeImportWizard: React.FC<TradeImportWizardProps> = ({ onComplete
             await createTrade.mutate(tradePayload);
 
             if (onComplete) {
-                onComplete(tradePayload);
+                onComplete({ trades: [tradePayload] });
             }
         } catch (error) {
             console.error('Failed to save trade:', error);

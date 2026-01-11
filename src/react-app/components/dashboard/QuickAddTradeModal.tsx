@@ -117,7 +117,7 @@ export default function QuickAddTradeModal({ isOpen, onClose, onSuccess }: Quick
 
       const tradeData: TradeData = {
         symbol: formData.symbol.toUpperCase(),
-        direction: formData.direction,
+        direction: formData.direction.toLowerCase() as 'long' | 'short',
         entry_price: entryPrice,
         size: size,
         entry_timestamp: Math.floor(Date.now() / 1000), // Current Unix timestamp

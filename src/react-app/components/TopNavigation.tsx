@@ -158,7 +158,7 @@ export default function TopNavigation() {
   // Navigation items - defined after hooks to ensure context is available
   const navigation = [
     { name: t('Dashboard'), path: '/dashboard', hasDropdown: false, key: 'Dashboard' },
-    { name: t('Trading'), path: '/trading', hasDropdown: false, key: 'Trading' },
+    { name: 'Trade', path: '/trading', hasDropdown: true, key: 'Trade' },
     { name: t('Competition'), path: '/competition', hasDropdown: false, key: 'Competition' },
     { name: t('Journal'), path: '/journal', hasDropdown: false, key: 'Journal' },
     { name: t('Markets'), path: '/markets', hasDropdown: false, key: 'Markets' },
@@ -245,7 +245,94 @@ export default function TopNavigation() {
                     )}
 
                     {/* Dropdown Menu */}
-                    {hasDropdown && openDropdowns[item.name] && (
+                    {hasDropdown && openDropdowns[item.name] && item.key === 'Trade' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full left-0 mt-2 w-72 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-2xl z-50"
+                      >
+                        <div className="py-2">
+                          <button
+                            onClick={() => {
+                              navigate('/trading?type=spot');
+                              toggleDropdown(item.name);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                              <Coins className="w-5 h-5 text-[#00D9C8]" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <span className="block font-medium">Spot Trading</span>
+                              <span className="text-xs text-[#6B7280]">Buy and sell crypto</span>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/trading?type=margin');
+                              toggleDropdown(item.name);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                              <Layers className="w-5 h-5 text-[#00D9C8]" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <span className="block font-medium">Margin Trading</span>
+                              <span className="text-xs text-[#6B7280]">Trade with leverage</span>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/trading?type=futures');
+                              toggleDropdown(item.name);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                              <LineChart className="w-5 h-5 text-[#00D9C8]" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <span className="block font-medium">Futures</span>
+                              <span className="text-xs text-[#6B7280]">USDT-M & Coin-M futures</span>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/copy-trading');
+                              toggleDropdown(item.name);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                              <Users className="w-5 h-5 text-[#00D9C8]" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <span className="block font-medium">Copy Trading</span>
+                              <span className="text-xs text-[#6B7280]">Follow expert traders</span>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/bots');
+                              toggleDropdown(item.name);
+                            }}
+                            className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
+                              <Repeat className="w-5 h-5 text-[#00D9C8]" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <span className="block font-medium">Trading Bots</span>
+                              <span className="text-xs text-[#6B7280]">Automated trading</span>
+                            </div>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                    {hasDropdown && openDropdowns[item.name] && item.key !== 'Trade' && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -602,120 +689,6 @@ export default function TopNavigation() {
               </div>
             )}
 
-            {/* Trading Dropdown - Bitget style */}
-            {user && (
-              <div className="relative hidden md:block">
-                <button
-                  onClick={() => setShowTradingDropdown(!showTradingDropdown)}
-                  className="flex items-center space-x-1.5 px-3 py-2 text-white hover:text-[#00D9C8] hover:bg-[#1A1A1E] rounded-lg transition-colors"
-                >
-                  <span className="text-sm font-medium">Trade</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${showTradingDropdown ? 'rotate-180' : ''}`} />
-                </button>
-
-                {/* Trading Dropdown Menu */}
-                <AnimatePresence>
-                  {showTradingDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-72 bg-[#141416] border border-[#2A2A2E] rounded-xl shadow-2xl z-50"
-                    >
-                      <div className="py-2">
-                        <button
-                          onClick={() => {
-                            navigate('/trading?type=spot');
-                            setShowTradingDropdown(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
-                        >
-                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
-                            <Coins className="w-5 h-5 text-[#00D9C8]" />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <span className="block font-medium">Spot Trading</span>
-                            <span className="text-xs text-[#6B7280]">Buy and sell crypto</span>
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            navigate('/trading?type=margin');
-                            setShowTradingDropdown(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
-                        >
-                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
-                            <Layers className="w-5 h-5 text-[#00D9C8]" />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <span className="block font-medium">Margin Trading</span>
-                            <span className="text-xs text-[#6B7280]">Trade with leverage</span>
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            navigate('/trading?type=futures');
-                            setShowTradingDropdown(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
-                        >
-                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
-                            <LineChart className="w-5 h-5 text-[#00D9C8]" />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <span className="block font-medium">Futures</span>
-                            <span className="text-xs text-[#6B7280]">USDT-M & Coin-M futures</span>
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            navigate('/copy-trading');
-                            setShowTradingDropdown(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
-                        >
-                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
-                            <Users className="w-5 h-5 text-[#00D9C8]" />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <span className="block font-medium">Copy Trading</span>
-                            <span className="text-xs text-[#6B7280]">Follow expert traders</span>
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            navigate('/bots');
-                            setShowTradingDropdown(false);
-                          }}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
-                        >
-                          <div className="w-10 h-10 rounded-lg bg-[#00D9C8]/10 flex items-center justify-center">
-                            <Repeat className="w-5 h-5 text-[#00D9C8]" />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <span className="block font-medium">Trading Bots</span>
-                            <span className="text-xs text-[#6B7280]">Automated trading</span>
-                          </div>
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-
-            {/* Deposit Button - Teal (Bitget style) */}
-            {user && (
-              <button
-                onClick={() => navigate('/deposit')}
-                className="hidden md:flex items-center space-x-1.5 px-4 py-2 bg-[#00D9C8] hover:bg-[#00F5E1] text-[#0D0D0F] font-semibold rounded-lg transition-colors"
-              >
-                <ArrowDown className="w-4 h-4" />
-                <span className="text-sm">Deposit</span>
-              </button>
-            )}
 
             {/* User Icons - Bitget style */}
             {user ? (
@@ -724,7 +697,7 @@ export default function TopNavigation() {
                 <div className="relative">
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#2A2A2E] hover:border-[#00D9C8] transition-colors"
+                    className="w-9 h-9 rounded-full overflow-hidden border-2 border-[#2A2A2E] hover:border-[#00D9C8] transition-colors bg-[#1A1A1E]"
                   >
                     {user?.photoURL?.startsWith('http') || user?.photoURL?.startsWith('data:') ? (
                       <img

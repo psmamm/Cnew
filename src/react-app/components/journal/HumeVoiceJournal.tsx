@@ -36,7 +36,12 @@ export default function HumeVoiceJournal({
   interface EmotionAnalysis {
     emotions: Array<{ name: string; score: number }>;
     summary: string;
-    [key: string]: unknown;
+    prosody?: {
+      stress: number;
+      hesitation: number;
+      fear: number;
+      overconfidence: number;
+    };
   }
 
   const { theme } = useTheme();
@@ -244,33 +249,33 @@ export default function HumeVoiceJournal({
             <div className={`${getCardBg(theme)} rounded p-2 border ${getCardBorder(theme)}`}>
               <div className={`${getTextColor(theme, 'muted')} text-xs`}>Stress</div>
               <div className={`text-sm font-medium ${
-                lastAnalysis.prosody?.stress > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
+                (lastAnalysis.prosody?.stress ?? 0) > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
               }`}>
-                {(lastAnalysis.prosody?.stress * 100).toFixed(0)}%
+                {((lastAnalysis.prosody?.stress ?? 0) * 100).toFixed(0)}%
               </div>
             </div>
             <div className={`${getCardBg(theme)} rounded p-2 border ${getCardBorder(theme)}`}>
               <div className={`${getTextColor(theme, 'muted')} text-xs`}>Hesitation</div>
               <div className={`text-sm font-medium ${
-                lastAnalysis.prosody?.hesitation > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
+                (lastAnalysis.prosody?.hesitation ?? 0) > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
               }`}>
-                {(lastAnalysis.prosody?.hesitation * 100).toFixed(0)}%
+                {((lastAnalysis.prosody?.hesitation ?? 0) * 100).toFixed(0)}%
               </div>
             </div>
             <div className={`${getCardBg(theme)} rounded p-2 border ${getCardBorder(theme)}`}>
               <div className={`${getTextColor(theme, 'muted')} text-xs`}>Fear</div>
               <div className={`text-sm font-medium ${
-                lastAnalysis.prosody?.fear > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
+                (lastAnalysis.prosody?.fear ?? 0) > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
               }`}>
-                {(lastAnalysis.prosody?.fear * 100).toFixed(0)}%
+                {((lastAnalysis.prosody?.fear ?? 0) * 100).toFixed(0)}%
               </div>
             </div>
             <div className={`${getCardBg(theme)} rounded p-2 border ${getCardBorder(theme)}`}>
               <div className={`${getTextColor(theme, 'muted')} text-xs`}>Overconfidence</div>
               <div className={`text-sm font-medium ${
-                lastAnalysis.prosody?.overconfidence > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
+                (lastAnalysis.prosody?.overconfidence ?? 0) > 0.5 ? 'text-[#f6465d]' : 'text-[#848e9c]'
               }`}>
-                {(lastAnalysis.prosody?.overconfidence * 100).toFixed(0)}%
+                {((lastAnalysis.prosody?.overconfidence ?? 0) * 100).toFixed(0)}%
               </div>
             </div>
           </div>

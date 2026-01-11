@@ -25,7 +25,11 @@ export interface TradePerformance {
   pnl: number;
   entryDate: string;
   exitDate: string;
-  [key: string]: unknown;
+  direction?: 'long' | 'short';
+  entry_price?: number | string;
+  exit_price?: number | string;
+  entry_date?: string;
+  exit_date?: string;
 }
 
 export interface StrategyPerformance {

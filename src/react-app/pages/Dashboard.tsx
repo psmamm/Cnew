@@ -101,6 +101,53 @@ export default function DashboardPage() {
       .slice(0, 5);
   }, [trades]);
 
+  // Trader motivational quotes
+  const traderQuotes = [
+    "He who lives by the crystal ball will eat shattered glass. — Ray Dalio",
+    "The goal of a successful trader is to make the best trades. Money is secondary. — Alexander Elder",
+    "Risk comes from not knowing what you're doing. — Warren Buffett",
+    "The market can remain irrational longer than you can remain solvent. — John Maynard Keynes",
+    "In trading, as in life, the best opportunities come when others are fearful. — Unknown",
+    "The most important thing is to preserve capital. — Paul Tudor Jones",
+    "Cut your losses short and let your winners run. — Jesse Livermore",
+    "The market is a voting machine in the short run, but a weighing machine in the long run. — Benjamin Graham",
+    "Trading is 90% psychology and 10% methodology. — Unknown",
+    "The best traders have no ego. — Mark Douglas",
+    "Price action is the ultimate indicator. — Unknown",
+    "Patience is not the ability to wait, but the ability to keep a good attitude while waiting. — Unknown",
+    "The trend is your friend until the end when it bends. — Unknown",
+    "Risk management is the most important aspect of trading. — Unknown",
+    "Emotions are the enemy of trading. — Unknown",
+    "The market doesn't care about your opinion. — Unknown",
+    "Success in trading comes from discipline, not from being right. — Unknown",
+    "The best trade is the one you don't take. — Unknown",
+    "Focus on the process, not the outcome. — Unknown",
+    "Trading is a marathon, not a sprint. — Unknown"
+  ];
+
+  // Get random motivational quote
+  const [motivationalQuote] = useState(() => {
+    return traderQuotes[Math.floor(Math.random() * traderQuotes.length)];
+  });
+
+  // Get time-based greeting with modern emojis
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    const userName = user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'Trader';
+    
+    if (hour >= 5 && hour < 12) {
+      return { greeting: 'Good Morning', emoji: '☀️', userName };
+    } else if (hour >= 12 && hour < 17) {
+      return { greeting: 'Good Afternoon', emoji: '☀️', userName };
+    } else if (hour >= 17 && hour < 22) {
+      return { greeting: 'Good Evening', emoji: '🌙', userName };
+    } else {
+      return { greeting: 'Good Night', emoji: '🌙', userName };
+    }
+  };
+
+  const timeGreeting = getTimeBasedGreeting();
+
   return (
     <DashboardLayout>
       <div className="min-h-screen">
@@ -109,10 +156,9 @@ export default function DashboardPage() {
           {/* Bitget Welcome Header */}
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold text-white flex items-center gap-2">
-              Welcome back, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'Trader'}
-              <span className="text-2xl">👋</span>
+              {timeGreeting.greeting}, {timeGreeting.userName}! <span className="text-2xl">{timeGreeting.emoji}</span>
             </h1>
-            <p className="text-[#9CA3AF] text-sm">The best time to HODL is now, always, and forever.</p>
+            <p className="text-[#9CA3AF] text-sm">{motivationalQuote}</p>
           </div>
 
           {/* Bitget Profile Card */}
