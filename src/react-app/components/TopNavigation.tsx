@@ -24,7 +24,7 @@ import {
   ShieldCheck,
   Gift,
   Ticket,
-  Key,
+  Link2,
   SlidersHorizontal,
   Copy,
   Check,
@@ -805,7 +805,7 @@ export default function TopNavigation() {
 
                           <button
                             onClick={() => {
-                              navigate('/settings');
+                              navigate('/settings?section=security');
                               setShowProfileMenu(false);
                             }}
                             className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
@@ -872,13 +872,13 @@ export default function TopNavigation() {
                         <div className="py-2 border-t border-[#2A2A2E]">
                           <button
                             onClick={() => {
-                              navigate('/settings');
+                              navigate('/settings?section=api');
                               setShowProfileMenu(false);
                             }}
                             className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
                           >
-                            <Key className="w-5 h-5 text-[#9CA3AF]" />
-                            <span>API management</span>
+                            <Link2 className="w-5 h-5 text-[#9CA3AF]" />
+                            <span>Exchange Connections</span>
                           </button>
 
                           <button
@@ -889,7 +889,7 @@ export default function TopNavigation() {
                             className="w-full flex items-center space-x-3 px-4 py-2.5 text-[#E5E7EB] hover:bg-[#1A1A1E] transition-all"
                           >
                             <SlidersHorizontal className="w-5 h-5 text-[#9CA3AF]" />
-                            <span>Preferences</span>
+                            <span>Settings</span>
                           </button>
                         </div>
 

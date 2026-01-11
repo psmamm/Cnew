@@ -32,5 +32,6 @@ export * from './types';
 // Adapters (for direct use if needed)
 export { BinanceAdapter } from './adapters/BinanceAdapter';
 export { BybitAdapter } from './adapters/BybitAdapter';
+export { HyperliquidAdapter } from './adapters/HyperliquidAdapter';
 export { InteractiveBrokersAdapter } from './adapters/InteractiveBrokersAdapter';
 export { TDAmeritradeAdapter } from './adapters/TDAmeritradeAdapter';

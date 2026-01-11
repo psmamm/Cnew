@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import { motion } from "framer-motion";
 import {
@@ -29,9 +30,18 @@ type SettingsSection = "profile" | "security" | "api" | "notifications" | "data"
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState<SettingsSection>("profile");
   const [showExchangeModal, setShowExchangeModal] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+  // Read section from URL parameter
+  useEffect(() => {
+    const section = searchParams.get('section');
+    if (section && ['profile', 'security', 'api', 'notifications', 'data'].includes(section)) {
+      setActiveSection(section as SettingsSection);
+    }
+  }, [searchParams]);
 
   // Exchange connections hook
   const {

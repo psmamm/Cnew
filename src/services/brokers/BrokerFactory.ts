@@ -9,6 +9,7 @@ import { IBroker } from './IBroker';
 import { BrokerMetadata, BrokerCredentials } from './types';
 import { BinanceAdapter } from './adapters/BinanceAdapter';
 import { BybitAdapter } from './adapters/BybitAdapter';
+import { HyperliquidAdapter } from './adapters/HyperliquidAdapter';
 import { InteractiveBrokersAdapter } from './adapters/InteractiveBrokersAdapter';
 import { TDAmeritradeAdapter } from './adapters/TDAmeritradeAdapter';
 
@@ -19,9 +20,12 @@ import { TDAmeritradeAdapter } from './adapters/TDAmeritradeAdapter';
 type BrokerConstructor = new () => IBroker;
 
 const brokerRegistry: Map<string, BrokerConstructor> = new Map([
-  // Crypto Exchanges
+  // Crypto Exchanges (CEX)
   ['binance', BinanceAdapter],
   ['bybit', BybitAdapter],
+
+  // Crypto Exchanges (DEX)
+  ['hyperliquid', HyperliquidAdapter],
 
   // Traditional Brokers
   ['interactive_brokers', InteractiveBrokersAdapter],
