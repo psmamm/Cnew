@@ -252,7 +252,12 @@ export function useTournament(tournamentId: number | null) {
     // Check if user has joined
     useEffect(() => {
         if (user && participants.length > 0) {
-            const userParticipant = participants.find(p => p.user_id === ((user as any).google_user_data?.sub || (user as any).firebase_user_id));
+            interface UserWithId {
+              google_user_data?: { sub?: string };
+              firebase_user_id?: string;
+            }
+            const userId = (user as UserWithId)?.google_user_data?.sub || (user as UserWithId)?.firebase_user_id;
+            const userParticipant = participants.find(p => p.user_id === userId);
             setJoined(!!userParticipant);
         }
     }, [user, participants]);

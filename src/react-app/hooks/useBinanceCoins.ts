@@ -28,10 +28,18 @@ export function useBinanceCoins() {
       const response = await fetch(apiConfig.binance.endpoints.ticker24hr);
       if (!response.ok) throw new Error('Failed to fetch Binance data');
 
-      const data = await response.json();
+      interface BinanceTicker {
+        symbol: string;
+        quoteVolume: string;
+        lastPrice: string;
+        priceChangePercent: string;
+        volume: string;
+      }
+
+      const data = await response.json() as BinanceTicker[];
 
       // Filter for USDT pairs only - major coins with high volume
-      const usdtPairs = data.filter((ticker: any) =>
+      const usdtPairs = data.filter((ticker: BinanceTicker) =>
         ticker.symbol.endsWith('USDT') &&
         !ticker.symbol.includes('UP') &&
         !ticker.symbol.includes('DOWN') &&
@@ -93,7 +101,7 @@ export function useBinanceCoins() {
       };
 
       // Convert to our format
-      const processedCoins: BinanceCoin[] = usdtPairs.map((ticker: any) => {
+      const processedCoins: BinanceCoin[] = usdtPairs.map((ticker: BinanceTicker) => {
         const baseAsset = ticker.symbol.replace('USDT', '');
         const coinInfo = coinMapping[baseAsset];
 

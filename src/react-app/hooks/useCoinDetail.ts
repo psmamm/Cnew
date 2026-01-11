@@ -166,9 +166,17 @@ export function useCoinDetail(symbol: string) {
         throw new Error(`Failed to fetch recent trades: ${response.status}`);
       }
       
-      const data = await response.json();
+      interface BinanceTrade {
+        a: number;
+        p: string;
+        q: string;
+        T: number;
+        m: boolean;
+      }
+
+      const data = await response.json() as BinanceTrade[];
       
-      setRecentTrades(data.map((trade: any) => ({
+      setRecentTrades(data.map((trade: BinanceTrade) => ({
         id: trade.a,
         price: trade.p,
         qty: trade.q,
@@ -196,9 +204,21 @@ export function useCoinDetail(symbol: string) {
         throw new Error(`Failed to fetch klines: ${response.status}`);
       }
       
-      const data = await response.json();
+      interface BinanceKline {
+        0: number; // openTime
+        1: string; // open
+        2: string; // high
+        3: string; // low
+        4: string; // close
+        5: string; // volume
+        6: number; // closeTime
+        7: string; // quoteAssetVolume
+        8: number; // numberOfTrades
+      }
+
+      const data = await response.json() as BinanceKline[];
       
-      return data.map((candle: any[]) => ({
+      return data.map((candle: BinanceKline) => ({
         openTime: candle[0],
         open: candle[1],
         high: candle[2],

@@ -66,14 +66,14 @@ export function useApi<T>(url: string, options?: RequestInit) {
   return { data, loading, error, refetch: fetchData };
 }
 
-export function useApiMutation<T = any>(
+export function useApiMutation<T = unknown>(
   url: string,
   options?: Omit<RequestInit, 'body'>
 ) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const mutate = async (data?: any): Promise<T> => {
+  const mutate = async (data?: unknown): Promise<T> => {
     try {
       setLoading(true);
       setError(null);

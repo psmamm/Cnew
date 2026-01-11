@@ -167,7 +167,13 @@ export default function CompetitionPage() {
             });
             if (response.ok) {
                 const data = await response.json();
-                const leaderboardPlayers: Player[] = (data.scores || []).map((score: any, index: number) => ({
+                interface ScoreData {
+                    username?: string;
+                    pnl?: number;
+                    [key: string]: unknown;
+                }
+
+                const leaderboardPlayers: Player[] = (data.scores || []).map((score: ScoreData, index: number) => ({
                     username: score.username || 'Anonymous',
                     elo: 0,
                     rank: index + 1,
@@ -239,7 +245,7 @@ export default function CompetitionPage() {
                     }
                 }
 
-                const candles = allFetchedData.map((d: any) => ({
+                const candles = allFetchedData.map((d: BinanceKline) => ({
                     time: d[0] / 1000,
                     open: parseFloat(d[1]),
                     high: parseFloat(d[2]),
@@ -700,7 +706,7 @@ export default function CompetitionPage() {
 
                                 <button
                                     onClick={resetReplay}
-                                    className="w-full bg-gradient-to-r from-[#6A3DF4] to-[#8B5CF6] hover:from-[#5A2DE4] hover:to-[#7B4CE6] text-white py-3 rounded-lg font-bold transition-all"
+                                    className="w-full bg- from-[#00D9C8] to-[#00D9C8] hover:from-[#5A2DE4] hover:to-[#7B4CE6] text-white py-3 rounded-lg font-bold transition-all"
                                 >
                                     Play Again
                                 </button>
@@ -802,3 +808,12 @@ export default function CompetitionPage() {
         </div>
     );
 }
+
+
+
+
+
+
+
+
+

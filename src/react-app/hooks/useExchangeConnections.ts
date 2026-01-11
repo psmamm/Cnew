@@ -37,7 +37,7 @@ export interface SyncResult {
   imported: number;
   mapped: number;
   errors: string[];
-  debug?: any;
+  debug?: Record<string, unknown>;
 }
 
 export function useExchangeConnections() {

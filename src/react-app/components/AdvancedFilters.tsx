@@ -22,6 +22,12 @@ export interface AdvancedFilterOptions {
   hasNotes: boolean;
 }
 
+interface Strategy {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
 interface AdvancedFiltersProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,7 +36,7 @@ interface AdvancedFiltersProps {
   onApply: () => void;
   onReset: () => void;
   availableSymbols: string[];
-  availableStrategies: any[];
+  availableStrategies: Strategy[];
 }
 
 export default function AdvancedFilters({
@@ -345,3 +351,11 @@ export default function AdvancedFilters({
     </AnimatePresence>
   );
 }
+
+
+
+
+
+
+
+

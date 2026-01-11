@@ -97,10 +97,16 @@ export default function EquityChart() {
     }).format(amount);
   };
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{ value: number }>;
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#0D0F18] border border-white/10 rounded-lg p-3">
+        <div className="bg-[#141416] border border-[#2A2A2E] rounded-lg p-3">
           <p className="text-[#7F8C8D] text-sm mb-1">{label}</p>
           <p className="text-white font-semibold">
             {formatCurrency(payload[0].value)}
@@ -135,13 +141,20 @@ export default function EquityChart() {
           <Line 
             type="monotone" 
             dataKey="value" 
-            stroke="#6A3DF4" 
+            stroke="#00D9C8" 
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 4, stroke: '#6A3DF4', strokeWidth: 2, fill: '#6A3DF4' }}
+            activeDot={{ r: 4, stroke: '#00D9C8', strokeWidth: 2, fill: '#00D9C8' }}
           />
         </LineChart>
       </ResponsiveContainer>
     </div>
   );
 }
+
+
+
+
+
+
+

@@ -104,10 +104,8 @@ const HomePage = lazy(() => import("@/react-app/pages/Home"));
 const DashboardPage = lazy(() => import("@/react-app/pages/Dashboard"));
 const JournalPage = lazy(() => import("@/react-app/pages/Journal"));
 const ReportsPage = lazy(() => import("@/react-app/pages/Reports"));
-// const OrderHeatmapPage = lazy(() => import("@/react-app/pages/OrderHeatmap")); // Temporarily disabled
 const StrategiesPage = lazy(() => import("@/react-app/pages/Strategies"));
 const SettingsPage = lazy(() => import("@/react-app/pages/Settings"));
-// const BitcoinHalvingPage = lazy(() => import("@/react-app/pages/BitcoinHalving")); // Temporarily disabled
 const USDebtPage = lazy(() => import("@/react-app/pages/USDebt"));
 const StudyPage = lazy(() => import("@/react-app/pages/Study"));
 const AlphaHubPage = lazy(() => import("@/react-app/pages/AlphaHub"));
@@ -130,6 +128,13 @@ const TerminalPage = lazy(() => import("@/react-app/pages/Terminal"));
 const ExchangeSettingsPage = lazy(() => import("@/react-app/pages/ExchangeSettings"));
 const AIClonePage = lazy(() => import("@/react-app/pages/AIClone"));
 const SubscriptionsPage = lazy(() => import("@/react-app/pages/Subscriptions"));
+const AssetsPage = lazy(() => import("@/react-app/pages/Assets"));
+const DepositPage = lazy(() => import("@/react-app/pages/Deposit"));
+const WithdrawPage = lazy(() => import("@/react-app/pages/Withdraw"));
+const TransferPage = lazy(() => import("@/react-app/pages/Transfer"));
+const CopyTradingPage = lazy(() => import("@/react-app/pages/CopyTrading"));
+const BitcoinHalvingPage = lazy(() => import("@/react-app/pages/BitcoinHalving"));
+const OrderHeatmapPage = lazy(() => import("@/react-app/pages/OrderHeatmap"));
 
 
 export default function App() {
@@ -187,24 +192,11 @@ export default function App() {
                           <TerminalPage />
                         </ProtectedRoute>
                       } />
-                      {/* Temporarily disabled - Order Heatmap */}
-                      {/* <Route path="/order-heatmap" element={
-                  <ProtectedRoute>
-                    <OrderHeatmapPage />
-                  </ProtectedRoute>
-                } /> */}
-
                       <Route path="/strategies" element={
                         <ProtectedRoute>
                           <StrategiesPage />
                         </ProtectedRoute>
                       } />
-                      {/* Temporarily disabled - Bitcoin Halving */}
-                      {/* <Route path="/bitcoin-halving" element={
-                  <ProtectedRoute>
-                    <BitcoinHalvingPage />
-                  </ProtectedRoute>
-                } /> */}
                       <Route path="/us-debt" element={
                         <ProtectedRoute>
                           <USDebtPage />
@@ -278,6 +270,41 @@ export default function App() {
                       <Route path="/subscriptions" element={
                         <ProtectedRoute>
                           <SubscriptionsPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/assets" element={
+                        <ProtectedRoute>
+                          <AssetsPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/deposit" element={
+                        <ProtectedRoute>
+                          <DepositPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/withdraw" element={
+                        <ProtectedRoute>
+                          <WithdrawPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/transfer" element={
+                        <ProtectedRoute>
+                          <TransferPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/copy-trading" element={
+                        <ProtectedRoute>
+                          <CopyTradingPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/bitcoin-halving" element={
+                        <ProtectedRoute>
+                          <BitcoinHalvingPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/order-heatmap" element={
+                        <ProtectedRoute>
+                          <OrderHeatmapPage />
                         </ProtectedRoute>
                       } />
 

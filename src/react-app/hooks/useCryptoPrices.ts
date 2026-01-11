@@ -206,11 +206,18 @@ export function useCryptoPrices() {
     
     ws.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
+        interface BinanceTickerWS {
+          s: string;
+          c: string;
+          P: string;
+          v: string;
+        }
+
+        const data = JSON.parse(event.data) as BinanceTickerWS[];
         if (Array.isArray(data)) {
           const newPrices: Record<string, CryptoPrice> = {};
           
-          data.forEach((ticker: any) => {
+          data.forEach((ticker: BinanceTickerWS) => {
             if (prices[ticker.s] || TOP_CRYPTO_COINS.some(coin => coin.symbol === ticker.s)) {
               newPrices[ticker.s] = {
                 symbol: ticker.s,

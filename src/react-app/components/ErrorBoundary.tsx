@@ -20,17 +20,17 @@ export default class ErrorBoundary extends Component<Props, State> {
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: any) {
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         console.error('Error caught by boundary:', error, errorInfo);
     }
 
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-[#0D0F18] flex items-center justify-center p-6">
-                    <div className="max-w-md w-full bg-[#1E2232] rounded-2xl p-8 border border-white/5 text-center">
-                        <div className="w-16 h-16 bg-[#E74C3C]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertTriangle className="w-8 h-8 text-[#E74C3C]" />
+                <div className="min-h-screen bg-[#141416] flex items-center justify-center p-6">
+                    <div className="max-w-md w-full bg-[#141416] rounded-2xl p-8 border border-white/5 text-center">
+                        <div className="w-16 h-16 bg-[#F43F5E]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertTriangle className="w-8 h-8 text-[#F43F5E]" />
                         </div>
                         <h2 className="text-2xl font-bold text-white mb-2">Oops! Something went wrong</h2>
                         <p className="text-[#AAB0C0] mb-6">
@@ -38,7 +38,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                         </p>
                         <button
                             onClick={() => window.location.reload()}
-                            className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                            className="w-full bg-[#00D9C8] hover:bg-[#00F5E1] text-white px-6 py-3 rounded-xl font-semibold transition-all"
                         >
                             Reload Page
                         </button>
@@ -47,7 +47,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                                 <summary className="text-[#7F8C8D] text-sm cursor-pointer hover:text-white">
                                     Error details
                                 </summary>
-                                <pre className="mt-2 text-xs text-[#E74C3C] bg-[#0D0F18] p-3 rounded overflow-auto">
+                                <pre className="mt-2 text-xs text-[#F43F5E] bg-[#141416] p-3 rounded overflow-auto">
                                     {this.state.error.toString()}
                                 </pre>
                             </details>
@@ -60,3 +60,11 @@ export default class ErrorBoundary extends Component<Props, State> {
         return this.props.children;
     }
 }
+
+
+
+
+
+
+
+

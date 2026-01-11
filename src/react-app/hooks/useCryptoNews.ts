@@ -30,9 +30,20 @@ export function useCryptoNews() {
 
             const data = await response.json();
 
+            interface NewsItemRaw {
+                id: string;
+                title: string;
+                description: string;
+                url: string;
+                source: string;
+                timestamp: string | number | Date;
+                imageUrl?: string;
+                [key: string]: unknown;
+            }
+
             if (data.news && Array.isArray(data.news)) {
                 // Convert timestamp strings back to Date objects
-                const processedNews = data.news.map((item: any) => ({
+                const processedNews = (data.news as NewsItemRaw[]).map((item) => ({
                     ...item,
                     timestamp: new Date(item.timestamp)
                 }));

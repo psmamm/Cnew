@@ -19,6 +19,15 @@ export interface Strategy {
   updated_at: string;
 }
 
+export interface TradePerformance {
+  id: number;
+  symbol: string;
+  pnl: number;
+  entryDate: string;
+  exitDate: string;
+  [key: string]: unknown;
+}
+
 export interface StrategyPerformance {
   totalTrades: number;
   winRate: number;
@@ -26,7 +35,7 @@ export interface StrategyPerformance {
   avgPnl: number;
   bestTrade: number;
   worstTrade: number;
-  trades: any[];
+  trades: TradePerformance[];
 }
 
 export function useStrategies() {

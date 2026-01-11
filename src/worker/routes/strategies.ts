@@ -85,7 +85,27 @@ strategiesRouter.get('/', async (c) => {
     ORDER BY s.created_at DESC
   `).bind(userId).all();
 
-  const formattedStrategies = strategies.results.map((strategy: any) => ({
+  interface StrategyRow {
+    id: number;
+    name: string;
+    description?: string;
+    category?: string;
+    rules?: string;
+    risk_per_trade?: number;
+    target_rr?: number;
+    timeframe?: string;
+    is_active: number;
+    trade_count: number;
+    win_rate?: number;
+    avg_return?: number;
+    total_pnl?: number;
+    last_used?: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+  }
+
+  const formattedStrategies = (strategies.results as unknown as StrategyRow[]).map((strategy) => ({
     ...strategy,
     win_rate: strategy.win_rate ? Math.round(strategy.win_rate * 10) / 10 : 0,
     avg_return: strategy.avg_return ? Math.round(strategy.avg_return * 100) / 100 : 0,
@@ -204,9 +224,13 @@ strategiesRouter.delete('/:id', async (c) => {
   const strategyId = c.req.param('id');
 
   // Check if strategy has trades
-  const tradesCount: any = await c.env.DB.prepare(`
+  interface CountResult {
+    count: number;
+  }
+
+  const tradesCount = await c.env.DB.prepare(`
     SELECT COUNT(*) as count FROM trades WHERE strategy_id = ?
-  `).bind(strategyId).first();
+  `).bind(strategyId).first<CountResult>();
 
   if (tradesCount && (tradesCount.count as number) > 0) {
     return c.json({ error: 'Cannot delete strategy with existing trades' }, 400);

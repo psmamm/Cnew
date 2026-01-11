@@ -33,9 +33,24 @@ export function useWhaleTransactions() {
       
       const data = await response.json();
       
+      interface WhaleTransactionRaw {
+        id: string;
+        timestamp: string | number | Date;
+        coin: string;
+        amount: number;
+        usdValue: number;
+        transferType: string;
+        hash: string;
+        fromAddress?: string;
+        toAddress?: string;
+        blockchainExplorerUrl: string;
+        chain: string;
+        [key: string]: unknown;
+      }
+
       if (data.transactions && Array.isArray(data.transactions)) {
         // Convert timestamp strings back to Date objects
-        const processedTransactions = data.transactions.map((tx: any) => ({
+        const processedTransactions = (data.transactions as WhaleTransactionRaw[]).map((tx) => ({
           ...tx,
           timestamp: new Date(tx.timestamp)
         }));

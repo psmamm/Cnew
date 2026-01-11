@@ -43,8 +43,9 @@ export default function AuthAction() {
                     await applyActionCode(auth, oobCodeParam);
                     setMessage('Email verified successfully! You can now sign in.');
                 }
-            } catch (err: any) {
-                setError(err.message || 'Invalid or expired action code.');
+            } catch (err: unknown) {
+                const errorMessage = err instanceof Error ? err.message : 'Invalid or expired action code.';
+                setError(errorMessage);
             } finally {
                 setIsCheckingCode(false);
             }
@@ -69,8 +70,9 @@ export default function AuthAction() {
             await confirmPasswordReset(auth, oobCode, newPassword);
             setMessage('Password has been reset successfully. Redirecting to login...');
             setTimeout(() => navigate('/login'), 3000);
-        } catch (err: any) {
-            setError(err.message || 'Failed to reset password');
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to reset password';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -187,3 +189,7 @@ export default function AuthAction() {
         </AuthLayout>
     );
 }
+
+
+
+

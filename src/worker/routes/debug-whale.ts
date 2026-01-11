@@ -46,8 +46,16 @@ debugWhaleRouter.get('/debug', async (c) => {
       dbStatus = `Error: ${error}`;
     }
     
+    interface ApiTestResult {
+      chain: string;
+      status: string;
+      latestBlock?: number | string;
+      response?: unknown;
+      error?: string;
+    }
+
     // Test API connectivity
-    let apiTestResults: any[] = [];
+    let apiTestResults: ApiTestResult[] = [];
     
     // Test Ethereum API
     if (c.env.ETHERSCAN_API_KEY) {
@@ -56,7 +64,11 @@ debugWhaleRouter.get('/debug', async (c) => {
           `https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=${c.env.ETHERSCAN_API_KEY}`,
           { signal: AbortSignal.timeout(5000) }
         );
-        const data: any = await response.json();
+        interface EtherscanResponse {
+          result?: string;
+          [key: string]: unknown;
+        }
+        const data = await response.json() as EtherscanResponse;
         apiTestResults.push({
           chain: 'ethereum',
           status: response.ok ? 'Success' : 'Failed',
@@ -79,7 +91,11 @@ debugWhaleRouter.get('/debug', async (c) => {
           `https://api.bscscan.com/api?module=proxy&action=eth_blockNumber&apikey=${c.env.BSCSCAN_API_KEY}`,
           { signal: AbortSignal.timeout(5000) }
         );
-        const data: any = await response.json();
+        interface BscscanResponse {
+          result?: string;
+          [key: string]: unknown;
+        }
+        const data = await response.json() as BscscanResponse;
         apiTestResults.push({
           chain: 'bsc',
           status: response.ok ? 'Success' : 'Failed',
@@ -95,8 +111,25 @@ debugWhaleRouter.get('/debug', async (c) => {
       }
     }
     
+    interface WhaleTransactionRow {
+      transaction_hash: string;
+      chain: string;
+      coin_symbol: string;
+      usd_value: number;
+      block_timestamp: number;
+      transfer_type: string;
+      [key: string]: unknown;
+    }
+
     // Get recent transactions from database
-    let recentDbTransactions: any[] = [];
+    let recentDbTransactions: Array<{
+      hash: string;
+      chain: string;
+      coin: string;
+      usdValue: number;
+      timestamp: string;
+      transferType: string;
+    } | { error: string }> = [];
     try {
       const result = await c.env.DB.prepare(`
         SELECT * FROM whale_transactions 
@@ -104,7 +137,7 @@ debugWhaleRouter.get('/debug', async (c) => {
         LIMIT 10
       `).all();
       
-      recentDbTransactions = result.results.map((row: any) => ({
+      recentDbTransactions = (result.results as unknown as WhaleTransactionRow[]).map((row) => ({
         hash: row.transaction_hash.substring(0, 10) + '...',
         chain: row.chain,
         coin: row.coin_symbol,
@@ -188,7 +221,20 @@ debugWhaleRouter.get('/test-detection', async (c) => {
       }, 400);
     }
     
-    const data: any = await response.json();
+    interface EtherscanTxListResponse {
+      status: string;
+      message?: string;
+      result?: Array<{
+        hash: string;
+        timeStamp: string;
+        from: string;
+        to: string;
+        value: string;
+        [key: string]: unknown;
+      }>;
+    }
+
+    const data = await response.json() as EtherscanTxListResponse;
     
     if (data.status !== '1') {
       return c.json({
@@ -200,7 +246,7 @@ debugWhaleRouter.get('/test-detection', async (c) => {
     
     // Analyze transactions
     const transactions = data.result || [];
-    const processedTxs = transactions.map((tx: any) => {
+    const processedTxs = transactions.map((tx) => {
       const amount = parseFloat(tx.value) / Math.pow(10, 18); // ETH decimals
       const ethPrice = 2500; // Estimate
       const usdValue = amount * ethPrice;
@@ -216,7 +262,7 @@ debugWhaleRouter.get('/test-detection', async (c) => {
       };
     });
     
-    const whaleTransactions = processedTxs.filter((tx: any) => tx.isWhaleSize);
+    const whaleTransactions = processedTxs.filter((tx) => tx.isWhaleSize);
     
     return c.json({
       testAddress: testAddress.substring(0, 10) + '...',

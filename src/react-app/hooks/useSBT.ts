@@ -158,10 +158,18 @@ export function useSBT(userAddress?: string) {
           args: [address as Address]
         });
 
+        interface BadgeData {
+          id: number;
+          name: string;
+          description: string;
+          imageUrl: string;
+          [key: string]: unknown;
+        }
+
         setSbtData({
           hasToken: true,
           tokenId: tokenId.toString(),
-          badges: [badgeData as any], // Type assertion for tuple
+          badges: [badgeData as BadgeData],
           userAddress: address
         });
       } catch {

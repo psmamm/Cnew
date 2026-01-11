@@ -56,10 +56,16 @@ export function useLivePnL(openPositions: OpenPosition[]) {
       const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr`);
       if (!response.ok) throw new Error('Failed to fetch crypto prices');
       
-      const data = await response.json();
+      interface BinanceTicker {
+        symbol: string;
+        lastPrice: string;
+        priceChangePercent: string;
+      }
+
+      const data = await response.json() as BinanceTicker[];
       const priceMap: Record<string, { price: number; change24h: number }> = {};
       
-      data.forEach((ticker: any) => {
+      data.forEach((ticker: BinanceTicker) => {
         if (cryptoSymbols.includes(ticker.symbol)) {
           priceMap[ticker.symbol] = {
             price: parseFloat(ticker.lastPrice),

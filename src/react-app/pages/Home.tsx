@@ -22,7 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SignInForm from '../components/auth/SignInForm';
 import { Button } from '../components/ui/button';
 
-const emitDebugLog = (payload: Record<string, any>) => {
+const emitDebugLog = (payload: Record<string, unknown>) => {
   const url = 'http://127.0.0.1:7242/ingest/f3961031-a2d1-4bfa-88fe-0afd58d89888';
   const body = JSON.stringify(payload);
   try {
@@ -154,13 +154,13 @@ export default function Home() {
 
   if (!isLoaded) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#0D0F18] to-[#1C1F2E]">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#0D0D0F]">
         <motion.div
           className="animate-pulse"
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
         >
-          <TrendingUp className="w-12 h-12 text-[#6A3DF4]" />
+          <TrendingUp className="w-12 h-12 text-[#00D9C8]" />
         </motion.div>
       </div>
     );
@@ -169,12 +169,12 @@ export default function Home() {
   return (
     <div
       ref={pageRef}
-      className="min-h-screen bg-gradient-to-br from-[#0D0F18] to-[#1C1F2E] overflow-hidden"
+      className="min-h-screen bg-[#0D0D0F] overflow-hidden"
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
       {/* Header */}
       <motion.header
-        className="bg-[#1E2232]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50"
+        className="bg-[#141416]/90 backdrop-blur-xl border-b border-[#2A2A2E] sticky top-0 z-50"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -186,7 +186,7 @@ export default function Home() {
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              <div className="bg-[#6A3DF4] p-2.5 rounded-xl shadow-lg">
+              <div className="bg-[#00D9C8] p-2.5 rounded-xl shadow-lg">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <span className="text-xl font-bold text-white">Tradecircle</span>
@@ -195,13 +195,13 @@ export default function Home() {
             <nav className="hidden md:flex items-center gap-4 ml-auto">
               <a
                 href="#pricing"
-                className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
+                className="text-[#9CA3AF] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
               >
                 Pricing
               </a>
               <a
                 href="#features"
-                className="text-[#AAB0C0] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
+                className="text-[#9CA3AF] hover:text-white font-medium transition-all duration-300 whitespace-nowrap"
               >
                 Features
               </a>
@@ -209,7 +209,7 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   onClick={() => navigate('/dashboard')}
-                  className="text-[#AAB0C0] hover:text-white"
+                  className="text-[#9CA3AF] hover:text-white"
                 >
                   Dashboard
                 </Button>
@@ -218,14 +218,14 @@ export default function Home() {
                   <Button
                     variant="outline"
                     onClick={() => setShowLoginModal(true)}
-                    className="bg-[#1E2232] hover:bg-[#2A2F42] border-white/10"
+                    className="bg-[#141416] hover:bg-[#2A2F42] border-[#2A2A2E]"
                   >
                     Log In
                   </Button>
                   <Button
                     variant="default"
                     onClick={() => navigate('/signup')}
-                    className="bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                    className="bg-[#00D9C8] hover:bg-[#00F5E1] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
                   >
                     Sign Up
                   </Button>
@@ -254,24 +254,24 @@ export default function Home() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-[#1E2232] border-b border-white/5 overflow-hidden"
+              className="md:hidden bg-[#141416] border-b border-[#2A2A2E] overflow-hidden"
             >
               <div className="px-4 pt-2 pb-6 space-y-4">
                 <a
                   href="#pricing"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-[#AAB0C0] hover:text-white font-medium py-2 transition-colors"
+                  className="block text-[#9CA3AF] hover:text-white font-medium py-2 transition-colors"
                 >
                   Pricing
                 </a>
                 <a
                   href="#features"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-[#AAB0C0] hover:text-white font-medium py-2 transition-colors"
+                  className="block text-[#9CA3AF] hover:text-white font-medium py-2 transition-colors"
                 >
                   Features
                 </a>
-                <div className="pt-4 border-t border-white/5 flex flex-col space-y-3">
+                <div className="pt-4 border-t border-[#2A2A2E] flex flex-col space-y-3">
                   {user ? (
                     <Button
                       variant="default"
@@ -279,7 +279,7 @@ export default function Home() {
                         navigate('/dashboard');
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg"
+                      className="w-full bg-[#00D9C8] hover:bg-[#00F5E1] shadow-lg"
                     >
                       Dashboard
                     </Button>
@@ -291,7 +291,7 @@ export default function Home() {
                           setShowLoginModal(true);
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-full bg-[#1E2232] hover:bg-[#2A2F42] border-white/10"
+                        className="w-full bg-[#141416] hover:bg-[#2A2F42] border-[#2A2A2E]"
                       >
                         Log In
                       </Button>
@@ -301,7 +301,7 @@ export default function Home() {
                           navigate('/signup');
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                        className="w-full bg-[#00D9C8] hover:bg-[#00F5E1] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
                       >
                         Sign Up
                       </Button>
@@ -319,17 +319,17 @@ export default function Home() {
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
           <motion.div
-            className="absolute top-20 left-10 w-72 h-72 bg-[#6A3DF4]/10 rounded-full blur-3xl"
+            className="absolute top-20 left-10 w-72 h-72 bg-[#00D9C8]/10 rounded-full blur-3xl"
             animate={floatingAnimation}
             transition={floatingTransition}
           />
           <motion.div
-            className="absolute top-40 right-20 w-96 h-96 bg-[#6A3DF4]/8 rounded-full blur-3xl"
+            className="absolute top-40 right-20 w-96 h-96 bg-[#00D9C8]/8 rounded-full blur-3xl"
             animate={floatingAnimation}
             transition={{ delay: 1, duration: 4, repeat: Infinity, ease: "easeInOut" as const }}
           />
           <motion.div
-            className="absolute bottom-20 left-1/3 w-64 h-64 bg-[#6A3DF4]/5 rounded-full blur-3xl"
+            className="absolute bottom-20 left-1/3 w-64 h-64 bg-[#00D9C8]/5 rounded-full blur-3xl"
             animate={floatingAnimation}
             transition={{ delay: 2, duration: 5, repeat: Infinity, ease: "easeInOut" as const }}
           />
@@ -349,31 +349,31 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <motion.div
-              className="bg-[#1E2232] backdrop-blur-xl p-6 rounded-xl border border-white/5"
+              className="bg-[#141416] backdrop-blur-xl p-6 rounded-xl border border-[#2A2A2E]"
               animate={floatingAnimation}
               transition={floatingTransition}
               whileHover={{ scale: 1.1, rotateY: 15 }}
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <BarChart3 className="w-12 h-12 text-[#BDC3C7]" />
+              <BarChart3 className="w-12 h-12 text-[#6B7280]" />
             </motion.div>
             <motion.div
-              className="bg-[#1E2232] backdrop-blur-xl p-6 rounded-xl border border-white/5"
+              className="bg-[#141416] backdrop-blur-xl p-6 rounded-xl border border-[#2A2A2E]"
               animate={floatingAnimation}
               transition={{ delay: 0.5, duration: 3, repeat: Infinity, ease: "easeInOut" as const }}
               whileHover={{ scale: 1.1, rotateY: -15 }}
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <Target className="w-12 h-12 text-[#BDC3C7]" />
+              <Target className="w-12 h-12 text-[#6B7280]" />
             </motion.div>
             <motion.div
-              className="bg-[#1E2232] backdrop-blur-xl p-6 rounded-xl border border-white/5"
+              className="bg-[#141416] backdrop-blur-xl p-6 rounded-xl border border-[#2A2A2E]"
               animate={floatingAnimation}
               transition={{ delay: 1, duration: 3, repeat: Infinity, ease: "easeInOut" as const }}
               whileHover={{ scale: 1.1, rotateY: 15 }}
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <Shield className="w-12 h-12 text-[#BDC3C7]" />
+              <Shield className="w-12 h-12 text-[#6B7280]" />
             </motion.div>
           </motion.div>
 
@@ -385,7 +385,7 @@ export default function Home() {
           >
             Master Your
             <motion.span
-              className="bg-gradient-to-r from-[#6A3DF4] to-[#8A5CFF] bg-clip-text text-transparent block"
+              className="bg-[#00D9C8] bg-clip-text text-transparent block"
               animate={{
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
               }}
@@ -403,7 +403,7 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            className="text-base sm:text-lg md:text-xl text-[#AAB0C0] mb-6 max-w-3xl mx-auto leading-relaxed font-light"
+            className="text-base sm:text-lg md:text-xl text-[#9CA3AF] mb-6 max-w-3xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -425,7 +425,7 @@ export default function Home() {
                 variant="default"
                 size="lg"
                 onClick={() => navigate('/signup')}
-                className="bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] px-8 sm:px-12"
+                className="bg-[#00D9C8] hover:bg-[#00F5E1] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] px-8 sm:px-12"
               >
                 Start your Journey Now
               </Button>
@@ -445,13 +445,13 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Simple Pricing</h2>
-            <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] font-light">Choose what works for you</p>
+            <p className="text-lg sm:text-xl md:text-2xl text-[#9CA3AF] font-light">Choose what works for you</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6 lg:gap-8 xl:gap-12 w-full">
             {/* Free Plan */}
             <motion.div
-              className="bg-[#1E2232] rounded-xl border border-white/5 p-6 sm:p-8 lg:p-10 relative group hover:border-white/10 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
+              className="bg-[#141416] rounded-xl border border-[#2A2A2E] p-6 sm:p-8 lg:p-10 relative group hover:border-[#2A2A2E] transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -462,9 +462,9 @@ export default function Home() {
                 <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">Free</h3>
                 <div className="mb-4">
                   <span className="text-4xl sm:text-5xl md:text-6xl font-black text-white">$0</span>
-                  <span className="text-[#AAB0C0] ml-2 text-base sm:text-lg md:text-xl">/forever</span>
+                  <span className="text-[#9CA3AF] ml-2 text-base sm:text-lg md:text-xl">/forever</span>
                 </div>
-                <p className="text-[#AAB0C0] text-sm sm:text-base md:text-lg">Perfect for getting started</p>
+                <p className="text-[#9CA3AF] text-sm sm:text-base md:text-lg">Perfect for getting started</p>
               </div>
 
               <div className="space-y-4 mb-10">
@@ -482,10 +482,10 @@ export default function Home() {
                     transition={{ delay: index * 0.1, duration: 0.5 }}
                     viewport={{ once: true }}
                   >
-                    <div className="bg-[#2ECC71]/20 rounded-full p-1">
-                      <Check className="w-4 h-4 text-[#2ECC71]" />
+                    <div className="bg-[#00D9C8]/20 rounded-full p-1">
+                      <Check className="w-4 h-4 text-[#00D9C8]" />
                     </div>
-                    <span className="text-[#AAB0C0]">{feature}</span>
+                    <span className="text-[#9CA3AF]">{feature}</span>
                   </motion.div>
                 ))}
               </div>
@@ -497,7 +497,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   onClick={handleGetStarted}
-                  className="w-full bg-[#1E2232] hover:bg-[#2A2F42] border-white/20"
+                  className="w-full bg-[#141416] hover:bg-[#2A2F42] border-white/20"
                 >
                   Get Started Free
                 </Button>
@@ -506,7 +506,7 @@ export default function Home() {
 
             {/* Pro Plan */}
             <motion.div
-              className="bg-[#1E2232] rounded-xl border-2 border-[#6A3DF4]/50 p-6 sm:p-8 lg:p-10 relative group hover:border-[#6A3DF4]/70 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
+              className="bg-[#141416] rounded-xl border-2 border-[#00D9C8]/50 p-6 sm:p-8 lg:p-10 relative group hover:border-[#00D9C8]/70 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -514,7 +514,7 @@ export default function Home() {
               whileHover={{ scale: 1.02, y: -5 }}
             >
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-[#6A3DF4] text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                <span className="bg-[#00D9C8] text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                   Most Popular
                 </span>
               </div>
@@ -523,9 +523,9 @@ export default function Home() {
                 <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">Pro</h3>
                 <div className="mb-4">
                   <span className="text-4xl sm:text-5xl md:text-6xl font-black text-white">$19.99</span>
-                  <span className="text-[#AAB0C0] ml-2 text-base sm:text-lg md:text-xl">/month</span>
+                  <span className="text-[#9CA3AF] ml-2 text-base sm:text-lg md:text-xl">/month</span>
                 </div>
-                <p className="text-[#AAB0C0] text-sm sm:text-base md:text-lg">For serious traders</p>
+                <p className="text-[#9CA3AF] text-sm sm:text-base md:text-lg">For serious traders</p>
               </div>
 
               <div className="space-y-4 mb-10">
@@ -552,10 +552,10 @@ export default function Home() {
                     transition={{ delay: index * 0.1, duration: 0.5 }}
                     viewport={{ once: true }}
                   >
-                    <div className="bg-[#6A3DF4]/20 rounded-full p-1">
-                      <Check className="w-4 h-4 text-[#6A3DF4]" />
+                    <div className="bg-[#00D9C8]/20 rounded-full p-1">
+                      <Check className="w-4 h-4 text-[#00D9C8]" />
                     </div>
-                    <span className="text-[#AAB0C0]">{feature}</span>
+                    <span className="text-[#9CA3AF]">{feature}</span>
                   </motion.div>
                 ))}
               </div>
@@ -567,7 +567,7 @@ export default function Home() {
                 <Button
                   variant="default"
                   onClick={handleGetStarted}
-                  className="w-full bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
+                  className="w-full bg-[#00D9C8] hover:bg-[#00F5E1] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)]"
                 >
                   Start Free Trial
                 </Button>
@@ -588,7 +588,7 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Powerful Features</h2>
-            <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] font-light">Everything you need to succeed</p>
+            <p className="text-lg sm:text-xl md:text-2xl text-[#9CA3AF] font-light">Everything you need to succeed</p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full">
@@ -641,18 +641,18 @@ export default function Home() {
             ].map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-[#1E2232] rounded-xl border border-white/5 p-6 sm:p-8 group hover:border-white/10 transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
+                className="bg-[#141416] rounded-xl border border-[#2A2A2E] p-6 sm:p-8 group hover:border-[#2A2A2E] transition-all duration-500 shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2, duration: 0.8 }}
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.05, y: -10 }}
               >
-                <div className="bg-[#6A3DF4]/10 rounded-xl p-4 w-16 h-16 flex items-center justify-center mb-6">
-                  <feature.icon className="w-8 h-8 text-[#BDC3C7]" />
+                <div className="bg-[#00D9C8]/10 rounded-xl p-4 w-16 h-16 flex items-center justify-center mb-6">
+                  <feature.icon className="w-8 h-8 text-[#6B7280]" />
                 </div>
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-sm sm:text-base text-[#AAB0C0] leading-relaxed">{feature.description}</p>
+                <p className="text-sm sm:text-base text-[#9CA3AF] leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -670,7 +670,7 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-            <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] font-light">Everything you need to know about Tradecircle</p>
+            <p className="text-lg sm:text-xl md:text-2xl text-[#9CA3AF] font-light">Everything you need to know about Tradecircle</p>
           </motion.div>
 
           <div className="space-y-4">
@@ -718,7 +718,7 @@ export default function Home() {
             ].map((faq, index) => (
               <motion.div
                 key={index}
-                className="bg-[#1E2232] rounded-xl border border-white/5 overflow-hidden hover:border-white/10 transition-all duration-300"
+                className="bg-[#141416] rounded-xl border border-[#2A2A2E] overflow-hidden hover:border-[#2A2A2E] transition-all duration-300"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
@@ -729,7 +729,7 @@ export default function Home() {
                   onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
                   className="w-full px-6 sm:px-8 py-4 sm:py-6 flex items-center justify-between text-left group h-auto"
                 >
-                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white group-hover:text-[#6A3DF4] transition-colors pr-8">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-white group-hover:text-[#00D9C8] transition-colors pr-8">
                     {faq.question}
                   </h3>
                   <motion.div
@@ -737,7 +737,7 @@ export default function Home() {
                     transition={{ duration: 0.3 }}
                     className="flex-shrink-0"
                   >
-                    <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-[#AAB0C0] group-hover:text-[#6A3DF4] transition-colors" />
+                    <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-[#9CA3AF] group-hover:text-[#00D9C8] transition-colors" />
                   </motion.div>
                 </Button>
                 <AnimatePresence>
@@ -750,7 +750,7 @@ export default function Home() {
                       className="overflow-hidden"
                     >
                       <div className="px-8 pb-6">
-                        <p className="text-[#AAB0C0] leading-relaxed">{faq.answer}</p>
+                        <p className="text-[#9CA3AF] leading-relaxed">{faq.answer}</p>
                       </div>
                     </motion.div>
                   )}
@@ -765,13 +765,13 @@ export default function Home() {
       <section className="py-32 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <motion.div
-            className="bg-[#1E2232] rounded-xl border border-white/10 p-8 sm:p-12 lg:p-16 text-center relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
+            className="bg-[#141416] rounded-xl border border-[#2A2A2E] p-8 sm:p-12 lg:p-16 text-center relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.2)] w-full"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#6A3DF4]/5 to-[#6A3DF4]/10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#00D9C8]/5 to-[#00D9C8]/10" />
             <div className="relative z-10">
               <motion.h2
                 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4"
@@ -786,7 +786,7 @@ export default function Home() {
               >
                 Ready to Transform Your Trading?
               </motion.h2>
-              <p className="text-lg sm:text-xl md:text-2xl text-[#AAB0C0] mb-6 font-light">
+              <p className="text-lg sm:text-xl md:text-2xl text-[#9CA3AF] mb-6 font-light">
                 Join traders who are making a difference
               </p>
               <motion.div
@@ -797,7 +797,7 @@ export default function Home() {
                   variant="default"
                   size="lg"
                   onClick={handleGetStarted}
-                  className="bg-[#6A3DF4] hover:bg-[#8A5CFF] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] px-8 sm:px-12"
+                  className="bg-[#00D9C8] hover:bg-[#00F5E1] shadow-lg hover:shadow-[0_4px_20px_rgba(106,61,244,0.4)] px-8 sm:px-12"
                 >
                   Start Your Journey
                 </Button>
@@ -808,11 +808,11 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1E2232]/50 backdrop-blur-xl border-t border-white/5 py-12 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
+      <footer className="bg-[#141416]/50 backdrop-blur-xl border-t border-[#2A2A2E] py-12 sm:py-16 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 w-full">
         <div className="w-full max-w-[1920px] mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-6 md:mb-0">
-              <div className="bg-[#6A3DF4] p-2.5 rounded-xl">
+              <div className="bg-[#00D9C8] p-2.5 rounded-xl">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-bold text-white">Tradecircle</span>
@@ -844,14 +844,14 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="relative bg-[#1E2232] rounded-2xl shadow-2xl max-w-md w-full border border-white/10"
+              className="relative bg-[#141416] rounded-2xl shadow-2xl max-w-md w-full border border-[#2A2A2E]"
             >
               {/* Close Button */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowLoginModal(false)}
-                className="absolute top-4 right-4 text-[#AAB0C0] hover:text-white"
+                className="absolute top-4 right-4 text-[#9CA3AF] hover:text-white"
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -867,3 +867,17 @@ export default function Home() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

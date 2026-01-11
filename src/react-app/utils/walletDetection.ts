@@ -17,13 +17,22 @@ export function detectInstalledWallets(): DetectedWallet[] {
     return wallets;
   }
 
+  interface EthereumProvider {
+    isMetaMask?: boolean;
+    isTrust?: boolean;
+    isCoinbaseWallet?: boolean;
+    request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+    on: (event: string, callback: (args: unknown) => void) => void;
+    removeListener: (event: string, callback: (args: unknown) => void) => void;
+  }
+
   // Check for multiple ethereum providers (some users have multiple wallets)
-  let ethereumProviders: any[] = [];
+  let ethereumProviders: EthereumProvider[] = [];
   
   if (window.ethereum) {
     // Check if providers array exists (EIP-6963 or multiple wallets)
-    if (Array.isArray((window as any).ethereum.providers)) {
-      ethereumProviders = (window as any).ethereum.providers;
+    if (Array.isArray(window.ethereum.providers)) {
+      ethereumProviders = window.ethereum.providers;
     } else {
       // Single provider
       ethereumProviders = [window.ethereum];
@@ -72,7 +81,7 @@ export function detectInstalledWallets(): DetectedWallet[] {
   }
 
   // Also check global wallet objects
-  if ((window as any).trustwallet && !detectedTypes.has('trustwallet')) {
+  if (window.trustwallet && !detectedTypes.has('trustwallet')) {
     wallets.push({
       type: 'trustwallet',
       name: 'Trust Wallet',
@@ -82,7 +91,7 @@ export function detectInstalledWallets(): DetectedWallet[] {
     detectedTypes.add('trustwallet');
   }
 
-  if ((window as any).coinbaseWalletExtension && !detectedTypes.has('coinbase')) {
+  if (window.coinbaseWalletExtension && !detectedTypes.has('coinbase')) {
     wallets.push({
       type: 'coinbase',
       name: 'Coinbase Wallet',
@@ -158,10 +167,10 @@ export function getWalletType(): WalletType | null {
     if (window.ethereum.isMetaMask && !window.ethereum.isCoinbaseWallet) {
       return 'metamask';
     }
-    if (window.ethereum.isTrust || (window as any).trustwallet) {
+    if (window.ethereum.isTrust || window.trustwallet) {
       return 'trustwallet';
     }
-    if (window.ethereum.isCoinbaseWallet || (window as any).coinbaseWalletExtension) {
+    if (window.ethereum.isCoinbaseWallet || window.coinbaseWalletExtension) {
       return 'coinbase';
     }
     // Generic EVM wallet

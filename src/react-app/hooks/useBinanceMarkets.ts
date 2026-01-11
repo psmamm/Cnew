@@ -14,7 +14,10 @@ export interface BinanceSymbol {
   ocoAllowed: boolean;
   isSpotTradingAllowed: boolean;
   isMarginTradingAllowed: boolean;
-  filters: any[];
+  filters: Array<{
+    filterType: string;
+    [key: string]: unknown;
+  }>;
   permissions: string[];
 }
 
@@ -322,14 +325,23 @@ export function useBinanceMarkets() {
       
       ws.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data);
+          interface BinanceTickerWS {
+            s: string;
+            c: string;
+            P: string;
+            v: string;
+            q: string;
+            C: number;
+          }
+
+          const data = JSON.parse(event.data) as BinanceTickerWS[];
           
           if (Array.isArray(data)) {
             // Update tickers with live data
             setTickers(prev => {
               const updated = { ...prev };
               
-              data.forEach((ticker: any) => {
+              data.forEach((ticker: BinanceTickerWS) => {
                 if (updated[ticker.s]) {
                   updated[ticker.s] = {
                     ...updated[ticker.s],
@@ -349,7 +361,7 @@ export function useBinanceMarkets() {
             setEnhancedData(prev => {
               const updated = { ...prev };
               
-              data.forEach((ticker: any) => {
+              data.forEach((ticker: BinanceTickerWS) => {
                 if (updated[ticker.s]) {
                   updated[ticker.s] = {
                     ...updated[ticker.s],

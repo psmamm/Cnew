@@ -59,7 +59,23 @@ export default function TradingViewWidget({
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
         script.async = true;
 
-        const config: any = {
+        interface TradingViewConfig {
+          autosize: boolean;
+          symbol: string;
+          interval: string;
+          timezone: string;
+          theme: string;
+          style: string;
+          locale: string;
+          enable_publishing: boolean;
+          allow_symbol_change: boolean;
+          calendar: boolean;
+          support_host: string;
+          width?: number | string;
+          height?: number | string;
+        }
+
+        const config: TradingViewConfig = {
           autosize: autosize,
           symbol: tradingViewSymbol,
           interval: interval,
@@ -124,11 +140,11 @@ export default function TradingViewWidget({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex items-center justify-center bg-[#0D0F18]/30 rounded-xl border border-white/10 p-8"
+        className="flex items-center justify-center bg-[#141416]/30 rounded-xl border border-[#2A2A2E] p-8"
         style={{ width: typeof width === 'number' ? `${width}px` : width, height: typeof height === 'number' ? `${height}px` : height }}
       >
         <div className="text-center">
-          <div className="text-[#E74C3C] text-lg font-semibold mb-2">Chart Loading Error</div>
+          <div className="text-[#F43F5E] text-lg font-semibold mb-2">Chart Loading Error</div>
           <div className="text-[#7F8C8D] text-sm mb-4">{error}</div>
           <div className="text-[#AAB0C0] text-xs">Using free TradingView widgets</div>
         </div>
@@ -141,7 +157,7 @@ export default function TradingViewWidget({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
-      className="relative bg-[#0D0F18]/30 rounded-xl overflow-hidden"
+      className="relative bg-[#141416]/30 rounded-xl overflow-hidden"
     >
       {/* Loading overlay */}
       {!isLoaded && (
@@ -149,10 +165,10 @@ export default function TradingViewWidget({
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
           transition={{ delay: 3, duration: 0.5 }}
-          className="absolute inset-0 flex items-center justify-center bg-[#0D0F18]/80 z-10 rounded-xl"
+          className="absolute inset-0 flex items-center justify-center bg-[#141416]/80 z-10 rounded-xl"
         >
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#6A3DF4] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-12 h-12 border-4 border-[#00D9C8] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <div className="text-white font-semibold mb-2">Loading TradingView Chart</div>
             <div className="text-[#7F8C8D] text-sm">Professional trading analysis for {symbol}</div>
           </div>
@@ -256,10 +272,10 @@ export function TradingViewMiniChart({
     <div className="relative">
       {!isLoaded && (
         <div
-          className="absolute inset-0 bg-[#0D0F18]/30 rounded flex items-center justify-center"
+          className="absolute inset-0 bg-[#141416]/30 rounded flex items-center justify-center"
           style={{ width: `${width}px`, height: `${height}px` }}
         >
-          <div className="w-4 h-4 border-2 border-[#6A3DF4] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-4 h-4 border-2 border-[#00D9C8] border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
       <div
@@ -270,3 +286,10 @@ export function TradingViewMiniChart({
     </div>
   );
 }
+
+
+
+
+
+
+

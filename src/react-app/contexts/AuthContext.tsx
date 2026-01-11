@@ -12,7 +12,7 @@ import {
 import { auth, googleProvider } from '../lib/firebase';
 import { useAuthSync } from '../hooks/useAuthSync';
 
-const emitDebugLog = (payload: Record<string, any>) => {
+const emitDebugLog = (payload: Record<string, unknown>) => {
   const url = 'http://127.0.0.1:7242/ingest/f3961031-a2d1-4bfa-88fe-0afd58d89888';
   const body = JSON.stringify(payload);
   try {
@@ -35,13 +35,13 @@ const emitDebugLog = (payload: Record<string, any>) => {
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
-  logout: () => Promise<{ error: any }>;
-  resetPassword: (email: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
-  updateUserProfile: (data: { displayName?: string; photoURL?: string }) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: unknown }>;
+  signUp: (email: string, password: string) => Promise<{ error: unknown }>;
+  signOut: () => Promise<{ error: unknown }>;
+  logout: () => Promise<{ error: unknown }>;
+  resetPassword: (email: string) => Promise<{ error: unknown }>;
+  signInWithGoogle: () => Promise<{ error: unknown }>;
+  updateUserProfile: (data: { displayName?: string; photoURL?: string }) => Promise<{ error: unknown }>;
   refreshUserData: () => Promise<User | null>;
 };
 
@@ -90,8 +90,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         message: 'Firebase email sign-in error',
         data: {
           emailProvided: Boolean(email),
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message
+          errorCode: error && typeof error === 'object' && 'code' in error ? String(error.code) : undefined,
+          errorMessage: error && typeof error === 'object' && 'message' in error ? String(error.message) : undefined
         },
         timestamp: Date.now()
       });
@@ -151,8 +151,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         location: 'AuthContext.tsx:signInWithGoogle',
         message: 'Firebase Google sign-in error',
         data: {
-          errorCode: (error as any)?.code,
-          errorMessage: (error as any)?.message
+          errorCode: error && typeof error === 'object' && 'code' in error ? String(error.code) : undefined,
+          errorMessage: error && typeof error === 'object' && 'message' in error ? String(error.message) : undefined
         },
         timestamp: Date.now()
       });

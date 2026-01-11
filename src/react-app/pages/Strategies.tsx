@@ -84,7 +84,7 @@ export default function StrategiesPage() {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
-  const [editingStrategy, setEditingStrategy] = useState<any>(null);
+  const [editingStrategy, setEditingStrategy] = useState<Strategy | null>(null);
   const [formData, setFormData] = useState<StrategyFormData>(initialFormData);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -189,7 +189,7 @@ export default function StrategiesPage() {
     }
   };
 
-  const handleEdit = (strategy: any) => {
+  const handleEdit = (strategy: Strategy) => {
     console.log('handleEdit called with strategy:', strategy);
     setEditingStrategy(strategy);
     setFormData({
@@ -285,7 +285,7 @@ export default function StrategiesPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
+          className="bg-[#141416] rounded-xl p-4 border border-[#2A2A2E]"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/5 via-blue-600/5 to-emerald-600/5" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-full blur-3xl" />
@@ -320,7 +320,7 @@ export default function StrategiesPage() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="text-center p-4 bg-[#0D0F18] rounded-xl border border-white/10"
+                  className="text-center p-4 bg-[#141416] rounded-xl border border-[#2A2A2E]"
                 >
                   <stat.icon className="w-5 h-5 text-purple-400 mx-auto mb-2" />
                   <div className="text-xl font-bold text-white">{stat.value}</div>
@@ -395,7 +395,7 @@ export default function StrategiesPage() {
             ))
           ) : filteredStrategies.length === 0 ? (
             <div className="col-span-full text-center py-20">
-              <div className="bg-[#0D0F18] rounded-xl p-4 border border-white/10">
+              <div className="bg-[#141416] rounded-xl p-4 border border-[#2A2A2E]">
                 <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Target className="w-10 h-10 text-white" />
                 </div>
@@ -424,7 +424,7 @@ export default function StrategiesPage() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
                 whileHover={{ y: -5, scale: 1.02 }}
-                className="group relative bg-[#0D0F18] rounded-xl p-4 border border-white/10 hover:bg-white/5 transition-all overflow-hidden"
+                className="group relative bg-[#141416] rounded-xl p-4 border border-[#2A2A2E] hover:bg-white/5 transition-all overflow-hidden"
               >
                 {/* Background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryColor(strategy.category || null)} opacity-5 group-hover:opacity-10 transition-opacity`} />
@@ -583,7 +583,7 @@ export default function StrategiesPage() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                className="bg-[#141416] rounded-xl p-4 border border-[#2A2A2E] w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-8">
@@ -607,8 +607,8 @@ export default function StrategiesPage() {
 
                 {/* Error Display */}
                 {errors.submit && (
-                  <div className="mb-6 p-4 bg-[#E74C3C]/10 border border-[#E74C3C]/30 rounded-xl">
-                    <p className="text-[#E74C3C] font-medium">{errors.submit}</p>
+                  <div className="mb-6 p-4 bg-[#F43F5E]/10 border border-[#F43F5E]/30 rounded-xl">
+                    <p className="text-[#F43F5E] font-medium">{errors.submit}</p>
                   </div>
                 )}
 
@@ -632,7 +632,7 @@ export default function StrategiesPage() {
                     border-radius: 10px;
                   }
                   .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: linear-gradient(180deg, #8B5CF6 0%, #6366F1 100%);
+                    background: linear-gradient(180deg, #00F5E1 0%, #6366F1 100%);
                     border-radius: 10px;
                   }
                   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -768,7 +768,7 @@ export default function StrategiesPage() {
                       className="w-full px-5 py-4 bg-gradient-to-br from-gray-700/90 to-gray-800/90 backdrop-blur-sm border-2 border-gray-600/30 hover:border-gray-500/50 rounded-2xl text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all resize-none shadow-lg custom-scrollbar"
                       style={{
                         scrollbarWidth: 'thin',
-                        scrollbarColor: '#8B5CF6 #1F2937'
+                        scrollbarColor: '#00F5E1 #1F2937'
                       }}
                     />
                   </div>
@@ -787,7 +787,7 @@ export default function StrategiesPage() {
                       className="w-full px-5 py-4 bg-gradient-to-br from-gray-700/90 to-gray-800/90 backdrop-blur-sm border-2 border-gray-600/30 hover:border-gray-500/50 rounded-2xl text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all resize-none shadow-lg custom-scrollbar"
                       style={{
                         scrollbarWidth: 'thin',
-                        scrollbarColor: '#8B5CF6 #1F2937'
+                        scrollbarColor: '#00F5E1 #1F2937'
                       }}
                     />
                   </div>
@@ -989,7 +989,7 @@ export default function StrategiesPage() {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-[#0D0F18] rounded-xl p-4 border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+                className="bg-[#141416] rounded-xl p-4 border border-[#2A2A2E] w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-8">
@@ -1042,7 +1042,7 @@ export default function StrategiesPage() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
-                          className="bg-[#0D0F18] rounded-xl p-4 border border-white/10"
+                          className="bg-[#141416] rounded-xl p-4 border border-[#2A2A2E]"
                         >
                           <metric.icon className="w-5 h-5 text-blue-400 mb-2" />
                           <div className="text-white font-bold text-lg">{metric.value}</div>
@@ -1055,7 +1055,7 @@ export default function StrategiesPage() {
                     {performance.trades.length > 0 && (
                       <div>
                         <h4 className="text-xl font-semibold text-white mb-4">Recent Trades</h4>
-                        <div className="bg-[#0D0F18] rounded-xl border border-white/10 overflow-hidden">
+                        <div className="bg-[#141416] rounded-xl border border-[#2A2A2E] overflow-hidden">
                           <div className="overflow-x-auto">
                             <table className="w-full">
                               <thead className="bg-gray-600/50">
@@ -1069,7 +1069,7 @@ export default function StrategiesPage() {
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-gray-600/30">
-                                {performance.trades.slice(0, 10).map((trade: any) => (
+                                {performance.trades.slice(0, 10).map((trade) => (
                                   <tr key={trade.id} className="hover:bg-gray-600/20">
                                     <td className="px-4 py-3 text-white font-medium">{trade.symbol}</td>
                                     <td className="px-4 py-3">
@@ -1104,3 +1104,15 @@ export default function StrategiesPage() {
     </DashboardLayout>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+

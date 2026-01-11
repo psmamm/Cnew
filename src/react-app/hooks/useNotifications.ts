@@ -8,7 +8,7 @@ export interface Notification {
   message: string;
   time: string;
   read: boolean;
-  data?: any;
+  data?: unknown;
   action?: {
     label: string;
     url: string;
@@ -43,7 +43,22 @@ export function useNotifications() {
       const data = await response.json();
       if (!data.transactions || !Array.isArray(data.transactions)) return;
 
-      const whaleTransactions: WhaleTransaction[] = data.transactions.map((tx: any) => ({
+      interface WhaleTransactionRaw {
+        id: string;
+        timestamp: string | number | Date;
+        coin: string;
+        amount: number;
+        usdValue: number;
+        transferType: 'wallet_to_exchange' | 'exchange_to_wallet' | 'whale_to_whale';
+        hash: string;
+        fromAddress?: string;
+        toAddress?: string;
+        blockchainExplorerUrl: string;
+        chain: string;
+        [key: string]: unknown;
+      }
+
+      const whaleTransactions: WhaleTransaction[] = (data.transactions as WhaleTransactionRaw[]).map((tx) => ({
         ...tx,
         timestamp: new Date(tx.timestamp)
       }));
